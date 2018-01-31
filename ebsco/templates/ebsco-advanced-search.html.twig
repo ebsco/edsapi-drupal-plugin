@@ -1,0 +1,31 @@
+{#
+
+/**
+ * @file
+ * Displays the advanced search form.
+ *
+ * @see template_preprocess_ebsco_advanced_search()
+ *
+ *
+ * Copyright [2017] [EBSCO Information Services]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#}
+
+<form  method="get" action="{{results_url}}" {{ attributes.addClass('search-form', 'search-block-form') }} >
+
+	<div class="offscreen" id="advanced-row-template">
+	{{search_form | raw}}
+	</div>
+</form>	

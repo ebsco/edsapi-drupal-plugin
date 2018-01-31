@@ -1,0 +1,26 @@
+ebsco.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    ebsco_guest:
+      type: integer
+    ebsco_default_limit:
+      type: integer
+    ebsco_default_sort:
+      type: string
+    ebsco_default_amount:
+      type: string
+    ebsco_default_mode:
+      type: string
+    ebsco_profile:
+      type: string
+    ebsco_user:
+      type: string
+    ebsco_password:
+      type: string
+    ebsco_interface:
+      type: string
+    ebsco_organization:
+      type: string
+    ebsco_local_ips:
+      type: string

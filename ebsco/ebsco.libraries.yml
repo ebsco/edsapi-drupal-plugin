@@ -1,0 +1,9 @@
+global-styling:
+  version: 1.x
+  css:
+    theme:
+      css/ebsco.css: {}
+global-scripts:
+    version: 1.x
+    js:
+      js/ebsco.js: {}

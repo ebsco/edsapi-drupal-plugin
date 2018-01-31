@@ -1,0 +1,101 @@
+{#
+
+/**
+ * @file
+ * Default theme implementation for displaying EBSCO results.
+ *
+ * @see template_preprocess_ebsco_results()
+ *
+ *
+ * Copyright [2017] [EBSCO Information Services]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#}
+
+
+{{search_form}}
+<br style="clear:both"/>
+{% if record_count is defined  %}
+
+	 {% if (record_count==0) %} 
+		<div class="error">{{msg_no_results}} </div>
+	 {% else %}
+		{# We have results , lets print them #}
+		{{'Showing'|t}}  <strong>{{record_start}} </strong> - <strong> {{ record_end }}</strong> {{'of'|t}}  <strong>{{record_count}}</strong> 
+
+		{{'for search'|t}} <strong>' {{lookfor}}'</strong>
+
+		{% if search_time is defined  %}
+			, {{'query time'|t}}: {{search_time}} s
+		{% endif %}
+
+		<div style="margin-left:auto;padding-bottom:20px;width:400px">
+		{{sort_form}}
+		</div>
+		<!-- upper pager -->
+		{{pager}}
+				
+		 <div class="resultslist-2columns">
+			{#
+				********************************************
+					facets
+				********************************************
+			#}
+			<div class="resultslist-facets">
+				{{processHtmlFacets | raw}}
+			</div>
+			
+			
+			
+			{#
+				********************************************
+					Result list  
+				********************************************
+			#}
+			<div class="resultslist-records">
+
+				{{guest_banner}}
+					
+					
+				{# check for autoSuggestTerms #}
+				{% if autoSuggestTerms is not empty  %}
+					 {% set suggestString="" %}
+						
+						
+						<p><strong>{{'Did you mean'|t}}  {{suggestString }}</strong></p>
+				{% endif %}
+				 
+
+				<br style="clear:both" />
+				
+				{{relatedContent | raw}}
+				<br/>
+				{{processHtmlRecords | raw}}
+				<br/>
+				<!-- bottom pager -->
+				{{pager}}			
+			</div>
+		</div> 
+		
+		
+			
+		 
+	 {% endif %}
+	 
+
+{% else %}
+	<p><strong class="color : red;">{{'Error : '|t}}  Please check EDS API definitions in the admin </strong></p>
+{% endif %}
+ 

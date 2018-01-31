@@ -1,0 +1,56 @@
+ebsco.admin:
+  path: /admin/config/search/ebsco
+  defaults:
+    _title: 'EBSCO settings'
+    _form: \Drupal\ebsco\Form\EbscoAdmin
+  requirements:
+    _permission: 'administer EDS '
+
+
+ebsco.content:
+  path: '/ebsco'
+  defaults:
+    _title: 'EDS search page'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::content'
+  requirements:
+    _permission: 'access content'
+
+ebsco.advanced:
+  path: '/ebsco/advanced'
+  defaults:
+    _title: 'EDS Advanced search page'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::advanced'
+  requirements:
+    _permission: 'access content'
+
+ebsco.results:
+  path: '/ebsco/results'
+  defaults:
+    _title: 'EDS results list'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::results'
+  requirements:
+    _permission: 'access content'
+
+ebsco.detailedrecord:
+  path: '/ebsco/detailedrecord'
+  defaults:
+    _title: 'Detailed record'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::detailed_record'
+  requirements:
+    _permission: 'access content'
+
+ebsco.pdf:
+  path: '/ebsco/pdf'
+  defaults:
+    _title: 'View PDF full text'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::pdf_page'
+  requirements:
+    _permission: 'access content'
+
+ebsco.fulltext:
+  path: '/ebsco/fulltext'
+  defaults:
+    _title: 'View HTML full text'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::fulltext_page'
+  requirements:
+    _permission: 'access content'

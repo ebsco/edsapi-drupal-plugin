@@ -1,0 +1,607 @@
+<?php
+
+/**
+ * @file
+ * The EBSCO Response object.
+ *
+ * PHP version 5
+ *
+ * Copyright [2017] [EBSCO Information Services]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+require_once 'sanitizer.class.php';
+
+/**
+ * EBSCOResponse class.
+ */
+class EBSCOResponse {
+
+  /**
+   * A SimpleXml object.
+   *
+   * @global object
+   */
+  private $response;
+
+  /**
+   * Constructor.
+   *
+   * Sets up the EBSCO Response.
+   *
+   * @param none
+   *
+   * @access public
+   */
+  public function __construct($response) {
+    $this->response = $response;
+  }
+
+  /**
+   * Returns the XML as an associative array of data.
+   *
+   * @param none
+   *
+   * @return array      An associative array of data
+   *
+   * @access public
+   */
+  public function result() {
+    if (!empty($this->response->AuthToken)) {
+      return $this->buildAuthenticationToken();
+    }
+    elseif (!empty($this->response->SessionToken)) {
+      return (string) $this->response->SessionToken;
+    }
+    elseif (!empty($this->response->SearchResult)) {
+      return $this->buildSearch();
+    }
+    elseif (!empty($this->response->Record)) {
+      return $this->buildRetrieve();
+    }
+    elseif (!empty($this->response->AvailableSearchCriteria)) {
+      return $this->buildInfo();
+    }
+    // Should not happen, it may be an exception.
+    else {
+      return $this->response;
+    }
+  }
+
+  /**
+   * Parse the SimpleXml object when an AuthenticationToken API call was executed.
+   *
+   * @param none
+   *
+   * @return array   An associative array of data
+   *
+   * @access private
+   */
+  private function buildAuthenticationToken() {
+    $token = (string) $this->response->AuthToken;
+    $timeout = (integer) $this->response->AuthTimeout;
+
+    $result = array(
+      'authenticationToken'   => $token,
+      'authenticationTimeout' => $timeout,
+    );
+
+    return $result;
+  }
+
+  /**
+   * Parse a SimpleXml object and
+   * return it as an associative array.
+   *
+   * @param none
+   *
+   * @return array   An associative array of data
+   *
+   * @access private
+   */
+  private function buildSearch() {
+    $hits = (integer) $this->response->SearchResult->Statistics->TotalHits;
+    $searchTime = (integer) $this->response->SearchResult->Statistics->TotalSearchTime / 1000;
+    $records = array();
+    $facets = array();
+    if ($hits > 0) {
+      $records = $this->buildRecords();
+      $facets = $this->buildFacets();
+    }
+
+    // Research Starters & emp.
+    $relatedC = NULL;
+    if ($this->response->SearchResult->RelatedContent) {
+      $result = json_decode(json_encode($this->response->SearchResult->RelatedContent), TRUE);;
+      $relatedC = $result;
+    }
+
+    // Did you mean / auto suggest.
+    $autoSuggestTerms = NULL;
+    if ($this->response->SearchResult->AutoSuggestedTerms) {
+      $result = json_decode(json_encode($this->response->SearchResult->AutoSuggestedTerms), TRUE);;
+      $autoSuggestTerms = $result;
+    }
+
+    $results = array(
+      'recordCount' => $hits,
+      'searchTime'  => $searchTime,
+      'numFound'    => $hits,
+      'start'       => 0,
+      'documents'   => $records,
+      'relatedContent'   => $relatedC,
+      'autoSuggestTerms'   => $autoSuggestTerms,
+      'facets'      => $facets,
+    );
+
+    return $results;
+  }
+
+  /**
+   * Parse a SimpleXml object and
+   * return it as an associative array.
+   *
+   * @param none
+   *
+   * @return array    An associative array of data
+   *
+   * @access private
+   */
+  private function buildRecords() {
+    $results = array();
+
+    $records = $this->response->SearchResult->Data->Records->Record;
+    foreach ($records as $record) {
+      $result = array();
+      // var_dump($record);
+      $result['ResultId'] = $record->ResultId ? (integer) $record->ResultId : '';
+      $result['DbId'] = $record->Header->DbId ? (string) $record->Header->DbId : '';
+      $result['DbLabel'] = $record->Header->DbLabel ? (string) $record->Header->DbLabel : '';
+      $result['An'] = $record->Header->An ? (string) $record->Header->An : '';
+      $result['PubType'] = $record->Header->PubType ? (string) $record->Header->PubType : '';
+      $result['AccessLevel'] = $record->Header->AccessLevel ? (string) $record->Header->AccessLevel : '';
+      $result['id'] = $result['An'] . '|' . $result['DbId'];
+      $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
+      if (!empty($record->ImageInfo->CoverArt)) {
+        foreach ($record->ImageInfo->CoverArt as $image) {
+          $size = (string) $image->Size;
+          $target = (string) $image->Target;
+          $result['ImageInfo'][$size] = $target;
+        }
+      }
+      else {
+        $result['ImageInfo'] = '';
+      }
+
+      if ($record->FullText) {
+        $availability = (integer) $record->FullText->Text->Availability == 1;
+        $links = array();
+        // RF 2012-12-18.
+        if (isset($record->FullText->Links)) {
+          foreach ($record->FullText->Links->Link as $link) {
+            $type = (string) $link->Type;
+            $url = (string) $link->Url;
+            // If we have an empty url when type is pdflink then just return something so
+            // that the UI check for empty string will pass.
+            $url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
+            $links[$type] = $url;
+          }
+        }
+        $result['FullText'] = array(
+          'Availability' => $availability,
+          'Links'        => $links,
+        );
+      }
+
+      if ($record->CustomLinks) {
+        $result['CustomLinks'] = array();
+        foreach ($record->CustomLinks->CustomLink as $customLink) {
+          $category = $customLink->Category ? (string) $customLink->Category : '';
+          $icon = $customLink->Icon ? (string) $customLink->Icon : '';
+          $mouseOverText = $customLink->MouseOverText ? (string) $customLink->MouseOverText : '';
+          $name = $customLink->Name ? (string) $customLink->Name : '';
+          $text = $customLink->Text ? (string) $customLink->Text : '';
+          $url = $customLink->Url ? (string) $customLink->Url : '';
+          $result['CustomLinks'][] = array(
+            'Category'      => $category,
+            'Icon'          => $icon,
+            'MouseOverText' => $mouseOverText,
+            'Name'          => $name,
+            'Text'          => $text,
+            'Url'           => $url,
+          );
+        }
+      }
+
+      if ($record->Items) {
+        $result['Items'] = array();
+        foreach ($record->Items->Item as $item) {
+          $name = $item->Name ? (string) $item->Name : '';
+          $label = $item->Label ? (string) $item->Label : '';
+          $group = $item->Group ? (string) $item->Group : '';
+          $data = $item->Data ? (string) $item->Data : '';
+          $result['Items'][$name] = array(
+            'Name'  => $name,
+            'Label' => $label,
+            'Group' => $group,
+            'Data'  => $this->toHTML($data, $group),
+          );
+        }
+      }
+
+      $results[] = $result;
+    }
+
+    return $results;
+  }
+
+  /**
+   * Parse a SimpleXml object and
+   * return it as an associative array.
+   *
+   * @param none
+   *
+   * @return array    An associative array of data
+   *
+   * @access private
+   */
+  private function buildFacets() {
+    $results = array();
+
+    $facets = $this->response->SearchResult->AvailableFacets->AvailableFacet;
+    if ($facets) {
+      foreach ($facets as $facet) {
+        $values = array();
+        foreach ($facet->AvailableFacetValues->AvailableFacetValue as $value) {
+          $this_value = (string) $value->Value;
+          $this_value = str_replace(array('\(', '\)'), array('(', ')'), $this_value);
+          $this_action = (string) $value->AddAction;
+          $this_action = str_replace(array('\(', '\)'), array('(', ')'), $this_action);
+          $values[] = array(
+            'Value'  => $this_value,
+            'Action' => $this_action,
+            'Count'  => (string) $value->Count,
+          );
+        }
+        $id = (string) $facet->Id;
+        $label = (string) $facet->Label;
+        if (!empty($label)) {
+          $results[] = array(
+            'Id'        => $id,
+            'Label'     => $label,
+            'Values'    => $values,
+            'isApplied' => FALSE,
+          );
+        }
+      }
+    }
+
+    return $results;
+  }
+
+  /**
+   * Parse a SimpleXml object and
+   * return it as an associative array.
+   *
+   * @param none
+   *
+   * @return array      An associative array of data
+   *
+   * @access private
+   */
+  private function buildInfo() {
+    // Sort options.
+    $elements = $this->response->AvailableSearchCriteria->AvailableSorts->AvailableSort;
+    $sort = array();
+    foreach ($elements as $element) {
+      $sort[] = array(
+        'Id'     => (string) $element->Id,
+        'Label'  => (string) $element->Label,
+        'Action' => (string) $element->AddAction,
+      );
+    }
+
+    // Search fields.
+    $elements = $this->response->AvailableSearchCriteria->AvailableSearchFields->AvailableSearchField;
+    $tags = array();
+    foreach ($elements as $element) {
+      $tags[] = array(
+        'Label' => (string) $element->Label,
+        'Code'  => (string) $element->FieldCode,
+      );
+    }
+
+    // Expanders.
+    $elements = $this->response->AvailableSearchCriteria->AvailableExpanders->AvailableExpander;
+    $expanders = array();
+    foreach ($elements as $element) {
+      $expanders[] = array(
+        'Id'       => (string) $element->Id,
+        'Label'    => (string) $element->Label,
+        'Action'   => (string) $element->AddAction,
+      // Added because of the checkboxes.
+        'selected' => FALSE,
+      );
+    }
+
+    // RelatedContent.
+    $elements = $this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent;
+    $relatedContent = array();
+    foreach ($elements as $element) {
+      $relatedContent[] = array(
+        'Type'       => (string) $element->Type,
+        'Label'    => (string) $element->Label,
+        'Action'   => (string) $element->AddAction,
+        'DefaultOn' => (string) $element->DefaultOn,
+      );
+    }
+
+    // Did you mean.
+    $elements = $this->response->AvailableSearchCriteria->AvailableDidYouMeanOptions->AvailableDidYouMeanOption;
+    $didYouMean = array();
+    foreach ($elements as $element) {
+      $didYouMean[] = array(
+        'Id'       => (string) $element->Id,
+        'Label'    => (string) $element->Label,
+        'DefaultOn' => (string) $element->DefaultOn,
+      );
+    }
+
+    // Limiters.
+    $elements = $this->response->AvailableSearchCriteria->AvailableLimiters->AvailableLimiter;
+    $limiters = array();
+    $values = array();
+    foreach ($elements as $element) {
+      if ($element->LimiterValues) {
+        $items = $element->LimiterValues->LimiterValue;
+        foreach ($items as $item) {
+          $values[] = array(
+            'Value'    => (string) $item->Value,
+            'Action'   => (string) $item->AddAction,
+          // Added because of the checkboxes.
+            'selected' => FALSE,
+          );
+        }
+      }
+      $limiters[] = array(
+        'Id'       => (string) $element->Id,
+        'Label'    => (string) $element->Label,
+        'Action'   => (string) $element->AddAction,
+        'Type'     => (string) $element->Type,
+        'Values'   => $values,
+        'selected' => FALSE,
+      );
+    }
+
+    $result = array(
+      'sort'      => $sort,
+      'tags'      => $tags,
+      'expanders' => $expanders,
+      'limiters'  => $limiters,
+      'relatedContent'  => $relatedContent,
+      'didYouMean'  => $didYouMean,
+    );
+
+    return $result;
+  }
+
+  /**
+   * Parse a SimpleXml object and
+   * return it as an associative array.
+   *
+   * @param none
+   *
+   * @return array      An associative array of data
+   *
+   * @access private
+   */
+  private function buildRetrieve() {
+    $record = $this->response->Record;
+    if ($record) {
+      // There is only one record.
+      $record = $record[0];
+    }
+
+    $result = array();
+    $result['DbId'] = $record->Header->DbId ? (string) $record->Header->DbId : '';
+    $result['DbLabel'] = $record->Header->DbLabel ? (string) $record->Header->DbLabel : '';
+    $result['An'] = $record->Header->An ? (string) $record->Header->An : '';
+    $result['id'] = $result['An'] . '|' . $result['DbId'];
+    $result['PubType'] = $record->Header->PubType ? (string) $record->Header->PubType : '';
+    $result['AccessLevel'] = $record->Header->AccessLevel ? (string) $record->Header->AccessLevel : '';
+    $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
+    if (!empty($record->ImageInfo->CoverArt)) {
+      foreach ($record->ImageInfo->CoverArt as $image) {
+        $size = (string) $image->Size;
+        $target = (string) $image->Target;
+        $result['ImageInfo'][$size] = $target;
+      }
+    }
+    else {
+      $result['ImageInfo'] = '';
+    }
+
+    if ($record->FullText) {
+      $availability = (integer) ($record->FullText->Text->Availability) == 1;
+      $links = array();
+	  if (isset($record->FullText->Links->Link)) {
+		  
+		  foreach ($record->FullText->Links->Link as $link) {
+			$type = (string) $link->Type;
+			$url = (string) $link->Url;
+			// If we have an empty url when type is pdflink then just return something so
+			// that the UI check for empty string will pass.
+			$url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
+			$links[$type] = $url;
+		  }
+	  }
+      $value = $this->toHTML($record->FullText->Text->Value);
+      $result['FullText'] = array(
+        'Availability' => $availability,
+        'Links'        => $links,
+        'Value'        => $value,
+      );
+    }
+
+    if ($record->CustomLinks) {
+      $result['CustomLinks'] = array();
+      foreach ($record->CustomLinks->CustomLink as $customLink) {
+        $category = $customLink->Category ? (string) $customLink->Category : '';
+        $icon = $customLink->Icon ? (string) $customLink->Icon : '';
+        $mouseOverText = $customLink->MouseOverText ? (string) $customLink->MouseOverText : '';
+        $name = $customLink->Name ? (string) $customLink->Name : '';
+        $text = $customLink->Text ? (string) $customLink->Text : '';
+        $url = $customLink->Url ? (string) $customLink->Url : '';
+        $result['CustomLinks'][] = array(
+          'Category'      => $category,
+          'Icon'          => $icon,
+          'MouseOverText' => $mouseOverText,
+          'Name'          => $name,
+          'Text'          => $text,
+          'Url'           => $url,
+        );
+      }
+    }
+
+    if ($record->Items) {
+      $result['Items'] = array();
+      foreach ($record->Items->Item as $item) {
+        $name = $item->Name ? (string) $item->Name : '';
+        $label = $item->Label ? (string) $item->Label : '';
+        $group = $item->Group ? (string) $item->Group : '';
+        $data = $item->Data ? (string) $item->Data : '';
+        $result['Items'][$name] = array(
+          'Name'  => $name,
+          'Label' => $label,
+          'Group' => $group,
+          'Data'  => $this->toHTML($data, $group),
+        );
+      }
+    }
+
+    return $result;
+  }
+
+  /**
+   * Parse a SimpleXml element and
+   * return it's inner XML as an HTML string.
+   *
+   * @param SimpleXml $element
+   *   A SimpleXml DOM.
+   *
+   * @return string            The HTML string
+   *
+   * @access protected
+   */
+  private function toHTML($data, $group = NULL) {
+    // Any group can be added here, but we only use Au (Author)
+    // Other groups, not present here, won't be transformed to HTML links.
+    $allowed_searchlink_groups = array('au');
+
+    // Map xml tags to the HTML tags
+    // This is just a small list, the total number of xml tags is far more greater.
+    $xml_to_html_tags = array(
+      '<jsection'    => '<section',
+      '</jsection'   => '</section',
+      '<highlight'   => '<span class="highlight"',
+    // Temporary bug fix.
+      '<highligh'    => '<span class="highlight"',
+    // Temporary bug fix.
+      '</highlight>' => '</span>',
+      '</highligh'   => '</span>',
+      '<text'        => '<div',
+      '</text'       => '</div',
+      '<title'       => '<h2',
+      '</title'      => '</h2',
+      '<anid'        => '<p',
+      '</anid'       => '</p',
+      '<aug'         => '<p class="aug"',
+      '</aug'        => '</p',
+      '<hd'          => '<h3',
+      '</hd'         => '</h3',
+      '<linebr'      => '<br',
+      '</linebr'     => '',
+      '<olist'       => '<ol',
+      '</olist'      => '</ol',
+      '<reflink'     => '<a',
+      '</reflink'    => '</a',
+      '<blist'       => '<p class="blist"',
+      '</blist'      => '</p',
+      '<bibl'        => '<a',
+      '</bibl'       => '</a',
+      '<bibtext'     => '<span',
+      '</bibtext'    => '</span',
+      '<ref'         => '<div class="ref"',
+      '</ref'        => '</div',
+      '<ulink'       => '<a',
+      '</ulink'      => '</a',
+      '<superscript' => '<sup',
+      '</superscript' => '</sup',
+      '<relatesTo'   => '<sup',
+      '</relatesTo'  => '</sup',
+    );
+
+    // Map xml types to Search types used by the UI.
+    $xml_to_search_types = array(
+      'au' => 'Author',
+      'su' => 'Subject',
+    );
+
+    // The XML data is XML escaped, let's unescape html entities (e.g. &lt; => <)
+    $data = html_entity_decode($data);
+
+    // Start parsing the xml data.
+    if (!empty($data)) {
+      // Replace the XML tags with HTML tags.
+      $search = array_keys($xml_to_html_tags);
+      $replace = array_values($xml_to_html_tags);
+      $data = str_replace($search, $replace, $data);
+
+      // Temporary : fix unclosed tags.
+      $data = preg_replace('/<\/highlight/', '</span>', $data);
+      $data = preg_replace('/<\/span>>/', '</span>', $data);
+      $data = preg_replace('/<\/searchLink/', '</searchLink>', $data);
+      $data = preg_replace('/<\/searchLink>>/', '</searchLink>', $data);
+
+      // Parse searchLinks.
+      if (!empty($group)) {
+        $group = strtolower($group);
+        if (in_array($group, $allowed_searchlink_groups)) {
+			$type = $xml_to_search_types[$group];
+			$path = \Drupal\Core\Url::fromRoute('ebsco.results',  array('type' => $type))->toString();
+			 $link_xml = '/<searchLink fieldCode="([^\"]*)" term="%22([^\"]*)%22">/';
+			 $link_html = "<a href=\"{$path}&lookfor=$2\">";
+			 $data = preg_replace($link_xml, $link_html, $data);
+			 $data = str_replace('</searchLink>', '</a>', $data);
+        }
+      }
+
+      // Replace the rest of searchLinks with simple spans.
+      $link_xml = '/<searchLink fieldCode="([^\"]*)" term="%22([^\"]*)%22">/';
+      $link_html = '<span>';
+      $data = preg_replace($link_xml, $link_html, $data);
+      $data = str_replace('</searchLink>', '</span>', $data);
+
+      // Parse bibliography (anchors and links)
+      $data = preg_replace('/<a idref="([^\"]*)"/', '<a href="#$1"', $data);
+      $data = preg_replace('/<a id="([^\"]*)" idref="([^\"]*)" type="([^\"]*)"/', '<a id="$1" href="#$2"', $data);
+    }
+
+    $sanitizer = new HTML_Sanitizer();
+    $data = $sanitizer->sanitize($data);
+
+    return $data;
+  }
+
+}

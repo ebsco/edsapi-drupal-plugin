@@ -1,0 +1,11 @@
+ebsco_guest: 0
+ebsco_default_limit: 10
+ebsco_default_sort: relevance
+ebsco_default_amount: brief
+ebsco_default_mode: all
+ebsco_profile: "[Your EDS API profile name]"
+ebsco_user: "[Your api username]"
+ebsco_password: "[Your api password]"
+ebsco_interface: "Drupal EDS API module "
+ebsco_organization: "[Institution name] "
+ebsco_local_ips: ""

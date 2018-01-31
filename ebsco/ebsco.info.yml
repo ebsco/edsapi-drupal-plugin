@@ -1,0 +1,12 @@
+name: 'EBSCO Discovery Service'
+type: module
+description: 'Full-text articles and eBooks from EBSCO Discovery Service'
+core: 8.x
+dependencies:
+  - drupal:block
+  - drupal:views
+  - drupal:node
+libraries:
+  - ebsco/global-styling 
+
+

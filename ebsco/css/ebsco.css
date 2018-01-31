@@ -1,0 +1,608 @@
+/**
+ * @file
+ * The EBSCO module styles.
+ *
+ * Copyright [2017] [EBSCO Information Services]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@CHARSET "UTF-8";
+
+/** General ***/
+
+.floatleft {
+  float: left;
+}
+
+.floatright {
+  float: right;
+}
+
+.clear {
+  clear: both;
+}
+
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  background: url("../images/ajax_loading.gif") no-repeat left top;
+  display: none;
+}
+
+.highlight {
+  font-weight: bold;
+}
+
+
+/** Search list ***/
+
+.ebsco .result {
+  max-width: 650px;
+}
+
+.ebsco .record-number {
+  margin-right: 10px;
+  min-width: 10px;
+}
+
+.ebsco .span-2 {
+  width: auto;
+  max-width: 70px;
+  margin-right: 10px;
+  float: left;
+}
+
+.ebsco .span-9 {
+  float: none;
+  overflow: auto;
+  width: auto;
+  margin-right: 0;
+}
+
+.ebsco .pagination {
+  margin-bottom: 0;
+  padding: 0.2em
+}
+
+.ebsco p.submit {
+  padding: 10px 0;
+}
+
+.ebsco .jumpMenu {
+  max-width: 130px;
+}
+
+.ebsco ul.custom-links {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ebsco ul.custom-links li {
+  display: inline-block;
+  padding-left: 0;
+  padding-right: 10px;
+  margin-left: 10px;
+  border-right: 1px solid #cccccc;
+}
+
+.ebsco ul.custom-links li:first-child {
+  margin-left: 0;
+}
+
+.ebsco ul.custom-links li:last-child {
+  padding-right: 0;
+  border-right: 0 none;
+}
+
+
+
+/** Side facets **/
+
+#block-ebsco-ebsco-facets h2 {
+  font-weight: bold;
+}
+
+#block-ebsco-ebsco-facets {
+  padding: 5px !important;
+}
+
+#block-ebsco-ebsco-facets dl {
+  margin: 5px 0;
+  padding: 0;
+}
+
+#block-ebsco-ebsco-facets dl dt {
+  font-size: 115%;
+  padding: 5px;
+  background-color: #eeeeee;
+}
+
+#block-ebsco-ebsco-facets dd {
+  font-weight: normal !important;
+  margin: 0;
+  padding: 5px !important;
+  border-bottom: 1px solid #dddddd;
+}
+
+#block-ebsco-ebsco-facets dd.submit input {
+  margin: 0;
+}
+
+#block-ebsco-ebsco-facets dl dd:last-child {
+  border-bottom: none;
+}
+
+#block-ebsco-ebsco-facets dd label {
+  font-weight: normal;
+  font-family: Arial;
+  padding: 0 3px;
+}
+
+#block-ebsco-ebsco-facets dd label {
+  display: inline;
+}
+
+#block-ebsco-ebsco-facets dl.expandable:hover {
+  cursor: pointer;
+}
+
+#block-ebsco-ebsco-facets dl.expandable:hover dt span {
+  color: #444444;
+}
+
+#block-ebsco-ebsco-facets .narrow-list.filters {
+  background-color: orange;
+}
+
+#block-ebsco-ebsco-facets .narrow-list.filters a {
+  color: white;
+}
+
+
+
+/** Detailed view ***/
+
+.ebsco-record .toolbar {
+  border-bottom: 1px solid #eeeeee;
+  margin-bottom: 1em;
+  min-height: 2em;
+  padding-left: 1em;
+}
+
+.ebsco-record.push-5 {
+  margin: 0;
+}
+
+.ebsco-record .span-13 {
+  min-width: 540px;
+  max-width: 690px;
+  width: auto;
+  float: left;
+}
+
+.ebsco-record .span-13 table {
+  margin-top: 0;
+}
+
+.ebsco-record .span-13 table tr td {
+  word-break: break-all;
+}
+
+.ebsco-record .span-4 {
+  max-width: 150px;
+  min-width: 80px;
+  width: auto;
+  margin: 0 0 0 10px;
+  text-align: center;
+  float: left;
+}
+
+.ebsco-record .external-links {
+  border: 1px solid #eeeeee;
+  list-style-type: none;
+  margin: 10px 0;
+  padding: 0;
+}
+
+.ebsco-record .external-links li {
+  display: inline-block;
+  padding-left: 0;
+  padding-right: 10px;
+  margin-left: 10px;
+  border-right: 1px solid #cccccc;
+  line-height: 32px;
+  margin: 5px;
+}
+
+.ebsco-record .external-links li:last-child {
+  border-right: 0 none;
+}
+
+.external-link img {
+  vertical-align: middle;
+  padding-right: 5px;
+}
+
+.top-login-message {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.ebsco-record .record {
+  width: 100%;
+  padding: 0;
+}
+
+.ebsco-record .book-jacket {
+  max-width: 150px;
+}
+
+.ebsco-record .html {
+  background-color: white;
+  padding: 10px 0;
+  border: 0;
+}
+
+
+/** Basic search form ***/
+
+#ebsco-basic-search-form .form-item-lookfor,
+#ebsco-basic-search-form .form-item-type {
+  display: inline !important;
+}
+
+#ebsco-basic-search-form #edit-links {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none 0;
+  position: static;
+}
+
+#ebsco-basic-search-form #edit-offscreen {
+  display: none;
+}
+
+#ebsco-basic-search-form .form-item-remember label {
+  font-weight: bold;
+  
+}
+
+#ebsco-sort-form {
+  margin: 10px 0;
+}
+
+#ebsco-sort-form > div {
+  border-bottom: 1px solid #cccccc;
+}
+
+#ebsco-sort-form label,
+#ebsco-sort-form .form-item {
+  display: inline-block !important;
+}
+
+#ebsco-sort-form .form-item:first-child {
+  float: right;
+}
+
+#ebsco-sort-form .form-item:last-child {
+  float: left;
+}
+
+/** Advanced search form ***/
+
+.ebsco-advanced ._advanced-row {
+  border: 0 none;
+  padding: 0;
+}
+
+.ebsco-advanced #edit-rows {
+  margin-bottom: 20px;
+}
+
+.ebsco-advanced ._advanced-row .fieldset-wrapper {
+  margin: 0 !important;
+  padding: 0;
+  width : 100%;
+}
+
+.ebsco-advanced .form-item-group0-lookfor label {
+  display: inline-block;
+  text-align: right;
+  width: 100px;
+}
+.ebsco-advanced .form-type-radio label {
+  display: inline-block;
+  text-align: left;
+  width: 90%;
+}
+
+.ebsco-advanced #edit-add-row {
+  border: 0 none;
+  padding: 0;
+  margin: 10px;
+  top: 5px;
+}
+
+.ebsco-advanced #edit-add-row .fieldset-wrapper {
+  margin-top: 5px;
+}
+
+.ebsco-advanced #edit-links {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.ebsco-advanced #edit-links .fieldset-wrapper {
+  margin-top: 10px;
+}
+
+.ebsco-advanced #edit-limiters {
+  width: 99%;
+}
+
+.ebsco-advanced #edit-modes {
+  width: 49%;
+  float: left;
+}
+
+.ebsco-advanced #edit-modes {
+  width: 49%;
+  float: left;
+}
+
+
+.ebsco-advanced #edit-expanders {
+  width: 49%;
+  float: right;
+}
+
+.ebsco-advanced #edit-limiters label {
+  font-weight: normal;
+}
+
+.ebsco-advanced #edit-limiters .form-type-select label {
+  display: block;
+}
+
+.ebsco-advanced #edit-limiters hr {
+  margin: 15px 0;
+  height: 1px;
+  background-color: #cccccc;
+  color: #cccccc;
+  border: 0 none;
+}
+
+.dateSlider {
+  width: 150px;
+  display: inline-block !important;
+  margin: 0 10px;
+}
+
+
+/** Icons ***/
+
+.icon {
+  background: url("../images/sprites_32.png") no-repeat top left;
+  height: 32px;
+  line-height: 32px;
+  display: inline-block;
+  padding: 0  0 0 36px !important;
+}
+
+.icon.ebook {
+  background-position: 0 0;
+}
+
+.icon.html {
+  background-position: 0 -42px;
+}
+
+.icon.pdf {
+  background-position: 0 -84px;
+}
+
+.icon13 {
+  background: url("../images/sprites_32.png") no-repeat top left;
+  padding-left: 18px !important;
+  width: 13px;
+  height: 13px;
+}
+
+.icon13.collapsed {
+  background-position: 0 -126px;
+}
+
+.icon13.expanded {
+  background-position: 0 -149px;
+}
+
+.icon16 {
+  background: url("../images/sprites_32.png") no-repeat top left;
+  padding-left: 21px !important;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+.icon16.tick {
+  background-position: 0 -171px;
+}
+
+
+/*  RS, EMP carousel */
+#quote-carousel {
+  padding: 0 10px 30px 10px;
+  margin-top: 30px;
+}
+
+/* Control buttons  */
+#quote-carousel .carousel-control {
+  background: none;
+  color: #222;
+  font-size: 2.3em;
+  text-shadow: none;
+  margin-top: 30px;
+}
+/* Previous button  */
+#quote-carousel .carousel-control.left {
+  left: -12px;
+}
+/* Next button  */
+#quote-carousel .carousel-control.right {
+  right: -12px !important;
+}
+/* Changes the position of the indicators */
+#quote-carousel .carousel-indicators {
+  right: 50%;
+  top: auto;
+  bottom: 0px;
+  margin-right: -19px;
+}
+/* Changes the color of the indicators */
+#quote-carousel .carousel-indicators li {
+  background: #c0c0c0;
+}
+#quote-carousel .carousel-indicators .active {
+  background: #333333;
+}
+#quote-carousel img {
+  width: 250px;
+  height: 100px
+}
+/* End carousel */
+
+.item blockquote {
+  border-left: none;
+  margin: 0;
+}
+
+.item blockquote img {
+  margin-bottom: 10px;
+}
+
+.item blockquote p:before {
+  content: "\f10d";
+  font-family: 'Fontawesome';
+  float: left;
+  margin-right: 10px;
+}
+
+#relatedInformation img {
+  padding-right: 10px;
+}
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.carousel-control .glyphicon-chevron-right {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  display: inline-block;
+}
+.carousel-control.left span,
+.carousel-control.right span {
+  background-color: #000;
+}
+
+
+h3.relatedTitle a {
+  font-size: 24px;
+}
+
+ol.search-results li {
+	
+	list-style-type: none;
+}
+fieldset._advanced-row {
+	display:inline;
+	float:left;
+	width:100%;
+	margin:0px;
+	padding : 2px;
+	border:none;
+}
+
+input[id^="ebsco-advanced-search"] {
+    display:inline !important;
+}
+input.form-text, input.form-tel, input.form-email, input.form-url, input.form-search, input.form-file, input.form-number, input.form-color, textarea.form-textarea, select.form-select {
+    display: inline !important;
+}
+.form-item, .form-actions {
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+	display:inline;
+}
+
+label {
+    display: inline ! important;
+}
+
+.resultslist-2columns{
+	
+}
+
+.resultslist-2columns:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.resultslist-facets{
+    float: left;
+    width: 20%;	
+	font-size : 12px;
+	padding-left:2px;
+}
+
+.resultslist-facets dt{
+	font-weight:bold;
+}
+
+.resultslist-facets dd{
+	margin-left:2px;
+}
+
+.resultslist-facets dd label{
+	padding-left:5px;
+	font-weight: normal;
+}
+
+.resultslist-records{
+    float: left;
+    width: 78%;	
+	
+}
+
+@media (max-width: 400px) {
+
+	.resultslist-facets{
+		width: 100%;	
+	}
+	.resultslist-records{
+		width: 100%;	
+		
+	}
+}
