@@ -42,19 +42,19 @@
      */
     var onLoad = function () {
         // EBSCO/Search : Expand limiters
-        $('._more_limiters').live('click', function (event) {
+        $('._more_limiters').on('click', function (event) {
             $("#moreLimiters").hide();
             $("#limitersHidden").removeClass("offscreen");
         });
 
         // Search : Collapse limiters
-        $('._less_limiters').live('click', function (event) {
+        $('._less_limiters').on('click', function (event) {
             $("#moreLimiters").show();
             $("#limitersHidden").addClass("offscreen");
         });
 
         // EBSCO/Search : Collapse / expand facets
-        $('.expandable').live('click', function (event) {
+        $('.expandable').on('click', function (event) {
             var span = $(this).find('dt span'),
                 id = $(this).attr('id').replace('facet-','');
             if (span.length > 0) {
@@ -78,14 +78,14 @@
         });
 
         // EBSCO/Search : Less facets
-        $('._less_facets').live('click', function (event) {
+        $('._less_facets').on('click', function (event) {
             var id = $(this).attr('id').replace('less-facets-','');
             var dl = $('#facet-' + id);
             dl.trigger('click');
         });
 
         // Search : Ajax request the Record action
-        $('._record_link').live('click', function (event) {
+        $('._record_link').on('click', function (event) {
             var element = $(this);
             var position = element.position();
             event.preventDefault();
@@ -99,7 +99,7 @@
         });
 
         // Advanced Search : Add a new search term
-        $('._add_row').live('click', function (event) {
+        $('._add_row').on('click', function (event) {
             event.preventDefault();
             var newSearch = $('#advanced-row-template').html();
             var rows = $('._advanced-row');
@@ -114,13 +114,13 @@
         });
 
         // Advanced Search : Delete an advanced search row
-        $('._delete_row').live('click', function (event) {
+        $('._delete_row').on('click', function (event) {
             event.preventDefault();
             $(this).parents('._advanced-row').remove();
         });
 
         // Advanced Search : Reset the form fields to default values
-        $('.ebsco-advanced input[name="reset"]').live('click', function (event) {
+        $('.ebsco-advanced input[name="reset"]').on('click', function (event) {
             event.preventDefault();
             $('#ebsco-advanced-search-form').find('input, select').each(function (index) {
                 var type = this.type;
@@ -152,7 +152,7 @@
         });
 
         // Auto submit the seelct boxes with '_jump_menu' class
-        $('._jump_menu').live('change', function (event) {
+        $('._jump_menu').on('change', function (event) {
             var name = $(this).attr('id').replace('ebsco-', ''),
                 value = $(this).attr('value'),
                 url = $('#ebsco-sort-form').attr('action');
@@ -161,7 +161,7 @@
         });
 
         // Retain search filters checkbox functionality
-        $('#edit-remember').live('click', function (event) {
+        $('#edit-remember').on('click', function (event) {
             $("#ebsco-basic-search-form :input[type='checkbox'][name^='filter[']").attr('checked', $(this).attr('checked'));
         });
 

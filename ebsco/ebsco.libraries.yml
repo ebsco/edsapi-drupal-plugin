@@ -7,3 +7,6 @@ global-scripts:
     version: 1.x
     js:
       js/ebsco.js: {}
+    dependencies:
+      - core/jquery
+      - core/jquery.once
