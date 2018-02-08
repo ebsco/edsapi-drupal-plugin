@@ -89,19 +89,6 @@ try
 				dl.trigger('click');
 			});
 
-			// Search : Ajax request the Record action
-			jQuery('._record_link').on('click', function (event) {
-				var element = jQuery(this);
-				var position = element.position();
-				event.preventDefault();
-				jQuery('#spinner').show();
-				jQuery("#spinner").offset({left:event.pageX - 18,top:event.pageY - 18});
-
-				jQuery.get(element.attr('href'), function (data) {
-					jQuery('#main').html(data);
-					jQuery('#spinner').hide();
-				});
-			});
 
 			// Advanced Search : Add a new search term
 			jQuery('._add_row').on('click', function (event) {
@@ -158,9 +145,9 @@ try
 
 			// Auto submit the seelct boxes with '_jump_menu' class
 			jQuery('._jump_menu').on('change', function (event) {
-				var name = jQuery(this).attr('id').replace('ebsco-', ''),
-					value = jQuery(this).attr('value'),
-					url = jQuery('#ebsco-sort-form').attr('action');
+				var name = jQuery(this).attr('id').replace('ebsco-', '');
+				var value = jQuery(this).val();
+				var url = window.location.href;
 				url += "&" + name + "=" + value;
 				window.location.href = url;
 			});

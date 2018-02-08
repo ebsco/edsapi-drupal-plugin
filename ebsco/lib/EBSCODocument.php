@@ -389,7 +389,7 @@ class EBSCODocument {
 
 		$pagerVars = array(
 			'#type' => 'pager',
-			//'tags' => NULL, 
+			'tags' => NULL, 
 			//'#element' => "pageid", 
 			'#route_name' => "ebsco.results", 
 			//'pageid' => $pageId,  
@@ -399,7 +399,7 @@ class EBSCODocument {
 		$pager= drupal_render($pagerVars);
 
 
-//        $pager = preg_replace('/<li class="pager-last last">(.*)<\/li>/', '', $pager);
+//        $pager = preg_replace('/<li class="pager(.*)pager__item--last">(.*)<\/li>/', '', $pager);
       }
 
     }

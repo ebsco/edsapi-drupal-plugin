@@ -163,7 +163,7 @@ function ebsco_basic_search_form() {
         foreach($params['filter'] as $key => $value) {
             $form['basic']['group'.$key]['filter[]'] = array(
                 '#id'            => 'ebsco-basic-search-filter' . $key,
-                '#type'          => 'checkbox',
+                '#type'          => 'hidden',
                 '#default_value' => $value, // doesn't work
                 '#attributes'    => array('checked' => 'checked', 'value' => $value)
 								
@@ -452,7 +452,7 @@ function ebsco_sort_form() {
         '#id'            => 'ebsco-amount',
         '#type'          => 'select',
         '#title'         => t('Page options'),
-        '#default_value' => $default_value,
+        '#value' => 	$default_value,
         '#options'       => $options,
         '#attributes'    => array('class' => array('form-select', '_jump_menu'))
     );
@@ -464,7 +464,7 @@ function ebsco_sort_form() {
         '#id'            => 'ebsco-sort',
         '#type'          => 'select',
         '#title'         => t('Sort'),
-        '#default_value' => $default_value,
+        '#value' => 	$default_value,
         '#options'       => $options,
         '#attributes'    => array('class' => array('form-select', '_jump_menu'))
     );
