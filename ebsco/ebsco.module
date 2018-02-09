@@ -42,13 +42,12 @@ $Document = null;
  */
 function ebsco_user_login($account) {
     if (isset($_SESSION['EBSCO']['redirect'])) {
-        //$_GET['destination'] = urldecode($_SESSION['EBSCO']['redirect']['destination']);
 		$destination = urldecode($_SESSION['EBSCO']['redirect']['destination']);
         //unset($_SESSION['EBSCO']['redirect']);
-		  $response = new RedirectResponse($destination, 302);
-		  $response->send();
-		  return;
-		  exit();
+		 $response = new RedirectResponse($destination, 302);
+		 $response->send();
+		 return;
+		 exit();
     }
 }
 
@@ -286,15 +285,6 @@ function hooks_ebsco_block_view($delta = '') {
                 'content' => $reject ? '' : ebsco_basic_search_block()
             );
             break;
-
-        case 'ebsco_facets':
-            $reject = isset($params['q']) && strpos('ebsco/advanced', $params['q']) !== false;
-            $reject = $reject || (isset($params['edit']) && strpos('ebsco/results', $params['q']) !== false);
-            $reject = $reject || (isset($params['q']) && strpos('ebsco/result', $params['q']) !== false);
-            return array(
-                'content' => $reject ? '' : ebsco_side_facets_block()
-            );
-        break;
     }
 }
 
@@ -302,21 +292,6 @@ function hooks_ebsco_block_view($delta = '') {
  // * Page callbacks
  // ******************************************************/
 
-
-// function hooks_ebsco_results_page() {
-    // return theme('ebsco_results');
-// }
-
-
-function hooks_ebsco_result_page() {
-    $is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    if ($is_xhr) {
-        print theme('ebsco_result');
-        return true;
-    } else {
-        return theme('ebsco_result');
-    }
-}
 
 
 function hooks_ebsco_fulltext_page() {
@@ -340,23 +315,25 @@ function hooks_ebsco_fulltext_page() {
 }
 
 
-function hooks_ebsco_pdf_page() {
-    global $Document;
-    $params = $_REQUEST;
+// function hooks_ebsco_pdf_page() {
+    // global $Document;
+    // $params = $_REQUEST;
 
-    if (user_is_logged_in()) {
-        if (empty($Document)) {
-            $Document = new EBSCODocument();
-        }
-        $Document->retrieve();
-        $record = $Document->record();
-        drupal_goto($record->pdf_link);
-    } 
-	else {
-        $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-        drupal_goto('user');
-    }
-}
+    // if (user_is_logged_in()) {
+        // if (empty($Document)) {
+            // $Document = new EBSCODocument();
+        // }
+        // $Document->retrieve();
+        // $record = $Document->record();
+		// var_dump($record->pdf_link);
+		// die();
+        // drupal_goto($record->pdf_link);
+    // } 
+	// else {
+        // $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+        // drupal_goto('user');
+    // }
+// }
 
 
 

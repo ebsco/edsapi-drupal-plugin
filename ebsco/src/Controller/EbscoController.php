@@ -70,8 +70,8 @@ class EbscoController extends ControllerBase  {
 	{
 		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
 		return new RedirectResponse(\Drupal::url('user.page'));
-		
     }
+
   }
 
   public function fulltext_page() {
