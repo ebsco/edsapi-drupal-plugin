@@ -392,8 +392,7 @@ class EBSCODocument {
 			'tags' => NULL, 
 			//'#element' => "pageid", 
 			'#route_name' => "ebsco.results", 
-			//'pageid' => $pageId,  
-			//'#parameters' =>null,
+			'#parameters' =>array(),
 			'#quantity' => self::$page_links
 		);
 		$pager= drupal_render($pagerVars);

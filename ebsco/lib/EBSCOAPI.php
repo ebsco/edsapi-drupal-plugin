@@ -439,7 +439,7 @@ class EBSCOAPI {
         $type = $group['type'];
         if (isset($group['lookfor'])) {
           $term = $group['lookfor'];
-          $op = $group['bool'];
+          $op = isset($group['bool'])?$group['bool']:"AND";
           $tag = $type && isset(self::$search_tags[$type]) ? self::$search_tags[$type] : '';
 
           // Escape some characters from lookfor term.
