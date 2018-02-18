@@ -315,26 +315,6 @@ function hooks_ebsco_fulltext_page() {
 }
 
 
-// function hooks_ebsco_pdf_page() {
-    // global $Document;
-    // $params = $_REQUEST;
-
-    // if (user_is_logged_in()) {
-        // if (empty($Document)) {
-            // $Document = new EBSCODocument();
-        // }
-        // $Document->retrieve();
-        // $record = $Document->record();
-		// var_dump($record->pdf_link);
-		// die();
-        // drupal_goto($record->pdf_link);
-    // } 
-	// else {
-        // $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-        // drupal_goto('user');
-    // }
-// }
-
 
 
 function hooks_ebsco_basic_search_block() {
@@ -1060,7 +1040,7 @@ function template_preprocess_ebsco_results(&$variables) {
 																		}
 
 																		 if ($record->pdf_availability){
-																			  $recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext">'.t('PDF full text')."</a>";
+																			  $recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext" target="_blank">'.t('PDF full text')."</a>";
 																		 }
 
 											$recordHtml.='</div>'

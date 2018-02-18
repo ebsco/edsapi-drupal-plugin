@@ -5,7 +5,9 @@
 
 namespace Drupal\ebsco\Controller;
 
+use Drupal\Core\Url;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -62,9 +64,10 @@ class EbscoController extends ControllerBase  {
 		}
 		$_ebsco_document->retrieve();
 		$record = $_ebsco_document->record();
-		$url=\Drupal\Core\Url::fromUri($record->pdf_link)->toString(TRUE)->getGeneratedUrl();
-		return new TrustedRedirectResponse ($url);
-		
+		$url=str_replace('&amp;','&',$record->pdf_link);
+		// redirect on the new window
+		header('Location: '.$url);
+		die();
     }
     else 
 	{
