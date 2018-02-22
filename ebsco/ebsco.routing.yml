@@ -45,7 +45,10 @@ ebsco.pdf:
     _title: 'View PDF full text'
     _controller: '\Drupal\ebsco\Controller\EbscoController::pdf_page'
   requirements:
+    _access: 'TRUE'
     _permission: 'access content'
+  options:
+   no_cache: 'TRUE'
 
 ebsco.fulltext:
   path: '/ebsco/fulltext'

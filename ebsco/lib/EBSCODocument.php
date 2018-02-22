@@ -389,17 +389,23 @@ class EBSCODocument {
 
 		$pagerVars = array(
 			'#type' => 'pager',
-			//'tags' => NULL, 
+			'tags' => NULL, 
 			//'#element' => "pageid", 
 			'#route_name' => "ebsco.results", 
-			//'pageid' => $pageId,  
-			//'#parameters' =>null,
+			'#parameters' =>array(),
 			'#quantity' => self::$page_links
 		);
 		$pager= drupal_render($pagerVars);
 
-
-//        $pager = preg_replace('/<li class="pager-last last">(.*)<\/li>/', '', $pager);
+		// remove last page navigation. Does not make sense in discovery navigation
+		$pi=@stripos((string)$pager,'<li class="pager__item pager__item--last">');
+		if ($pi!==false)
+		{
+			$pf=stripos((string)$pager,'</li>',$pi)-1;
+			$s=substr($pager,1,$pi-1).substr($pager,$pf+6,strlen($pager)-($pf+6));
+			$pager=$s;
+		}
+        // $pager = preg_replace('/<li class="pager__item pager__item--last">(.*)<\/li>/', '', $pager);
       }
 
     }

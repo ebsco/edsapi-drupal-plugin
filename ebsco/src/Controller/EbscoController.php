@@ -5,7 +5,9 @@
 
 namespace Drupal\ebsco\Controller;
 
+use Drupal\Core\Url;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -62,22 +64,17 @@ class EbscoController extends ControllerBase  {
 		}
 		$_ebsco_document->retrieve();
 		$record = $_ebsco_document->record();
-		//drupal_goto($record->pdf_link);
-		$url=\Drupal\Core\Url::fromUri($record->pdf_link)->toString(TRUE)->getGeneratedUrl();
-		//echo $url;
-		return new TrustedRedirectResponse ($url);
-		
+		$url=str_replace('&amp;','&',$record->pdf_link);
+		// redirect on the new window
+		header('Location: '.$url);
+		die();
     }
     else 
 	{
 		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-		// var_dump("controler - ");
-		// var_dump($_SESSION['EBSCO']['redirect']);
-		// die();
-		//drupal_goto('user');
 		return new RedirectResponse(\Drupal::url('user.page'));
-		
     }
+
   }
 
   public function fulltext_page() {
@@ -103,9 +100,7 @@ class EbscoController extends ControllerBase  {
         return;
       }
       else {
-        //drupal_goto('user');
 		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-		//drupal_goto('user');
 		return new RedirectResponse(\Drupal::url('user.page'));		
       }
     }

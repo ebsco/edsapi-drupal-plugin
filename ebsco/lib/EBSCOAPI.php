@@ -439,7 +439,7 @@ class EBSCOAPI {
         $type = $group['type'];
         if (isset($group['lookfor'])) {
           $term = $group['lookfor'];
-          $op = $group['bool'];
+          $op = isset($group['bool'])?$group['bool']:"AND";
           $tag = $type && isset(self::$search_tags[$type]) ? self::$search_tags[$type] : '';
 
           // Escape some characters from lookfor term.
@@ -493,9 +493,10 @@ class EBSCOAPI {
       }
     }
     if (!empty($limiters)) {
+	  $query['limiter']='';
       foreach ($limiters as $field => $limiter) {
         // e.g. LA99:English,French,German.
-        $query['limiter'][] = $field . ':' . implode(',', $limiter);
+        $query['limiter'].= $field . ':' . implode(',', $limiter);
       }
     }
     if (!empty($expanders)) {
@@ -506,7 +507,7 @@ class EBSCOAPI {
       $groupId = 1;
       foreach ($facets as $field => $facet) {
         // e.g. 1,DE:Math,DE:History.
-        $query['facetfilter'][] = $groupId . ',' . implode(',', $facet);
+        $query['facetfilter'] = $groupId . ',' . implode(',', $facet);
         $groupId += 1;
       }
     }
