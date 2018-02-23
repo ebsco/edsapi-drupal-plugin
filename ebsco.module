@@ -1201,7 +1201,6 @@ function template_preprocess_ebsco_result(&$variables) {
 							
 							
 											.'<div class="detailrecord-recordmetadata">'
-												.'<h1>'.$record->title.'</h1>'
 																			.'<div class="record-toolbar">'
 																			;
 																			  if ($lastSearch){
@@ -1257,7 +1256,7 @@ function template_preprocess_ebsco_result(&$variables) {
 																								$link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
 																								$detailRecordHTML.='<tr id="html" valign="top">'
 																																	.'<td colspan="2" class="html">'
-																																		.'<p>' . t('The full text cannot be displayed to guests.') . '<br />.'
+																																		.'<p>' . t('The full text cannot be displayed to guests.') . '<br />'
 																																			.'<strong>' . sprintf(t('%s for full access.'), $link) . '</strong>'
 																																		.'</p>'
 																																	.'</td>'
