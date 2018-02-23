@@ -9,8 +9,6 @@ A Drupal 8 module for the EBSCO Discovery Services API.
 
 #### Configuration
 
-Create new event subscriber that responds to \Drupal\commerce_paytrail\Events\PaytrailEvents::FORM_ALTER.
-
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/ebsco/edsapi-drupal8-plugin.
