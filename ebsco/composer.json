@@ -1,0 +1,26 @@
+{
+  "name": "ebsco/edsapi-drupal8-plugin",
+  "description": "A Drupal 8 module for the EBSCO Discovery Services API.",
+  "keywords": ["ebsco", "eds", "drupal8", "drupal"],
+  "type": "drupal-module",
+  "homepage": "https://github.com/ebsco/edsapi-drupal8-plugin",
+  "authors": [
+    {
+      "name": "Rui Francisco",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/ebsco/edsapi-drupal8-plugin/issues",
+    "source": "https://github.com/ebsco/edsapi-drupal8-plugin"
+  },
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "repositories": [
+    {
+      "type": "composer",
+      "url":  "https://packages.drupal.org/8"
+    }
+  ],
+  "require": { }
+}
