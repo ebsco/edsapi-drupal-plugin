@@ -1,5 +1,5 @@
 {
-  "name": "drupal/edsapi-drupal8-plugin",
+  "name": "ebsco/edsapi-drupal8-plugin",
   "description": "A Drupal 8 module for the EBSCO Discovery Services API.",
   "keywords": ["ebsco", "eds", "drupal8", "drupal"],
   "type": "drupal-module",
@@ -14,7 +14,7 @@
     "issues": "https://github.com/ebsco/edsapi-drupal8-plugin/issues",
     "source": "https://github.com/ebsco/edsapi-drupal8-plugin"
   },
-  "license": "MIT",
+  "license": "GPL-2.0+",
   "minimum-stability": "dev",
   "repositories": [
     {
@@ -22,8 +22,5 @@
       "url":  "https://packages.drupal.org/8"
     }
   ],
-  "require": {
-    "php": ">=7.0",
-    "composer/installers": "~1.0"
-  }
+  "require": { }
 }
