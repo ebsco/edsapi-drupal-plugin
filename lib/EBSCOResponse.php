@@ -21,7 +21,7 @@
  * limitations under the License.
  */
 
-require_once 'sanitizer.class.php';
+require_once __DIR__ . '/sanitizer.class.php';
 
 /**
  * EBSCOResponse class.

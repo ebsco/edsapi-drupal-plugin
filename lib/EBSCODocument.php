@@ -28,6 +28,8 @@
 
 require_once __DIR__ . '/EBSCOAPI.php';
 require_once __DIR__ . '/EBSCORecord.php';
+require_once __DIR__ . '/EBSCOException.php';
+
 
 /**
  *
@@ -38,14 +40,14 @@ class EBSCODocument {
      *
      * @global object EBSCOAPI
      */
-    private $eds = NULL;
+    private $eds;
 
     /**
      * The associative array of current request parameters.
      *
      * @global array
      */
-    private $params = array();
+    private $params;
 
     /**
      * The associative array of EBSCO results returned by a Search API call
@@ -71,7 +73,7 @@ class EBSCODocument {
      * The EBSCORecord model returned by a Retrieve API call
      * #global object EBSCORecord.
      */
-    private $record = NULL;
+    private $record;
 
     /**
      * The array of EBSCORecord models returned by a Search API call
@@ -196,12 +198,12 @@ class EBSCODocument {
         'ISSN'   => 'ISSN',
     );
 
-    private $local_ips = "";
+    // private $local_ips = '';
 
     /**
      * Constructor.
      *
-     * @param array $data
+     * @param array $params
      *   Raw data from the EBSCO search representing the record.
      */
     public function __construct($params = NULL) {
@@ -214,14 +216,12 @@ class EBSCODocument {
             'organization' => \Drupal::config('ebsco.settings')->get('ebsco_organization'),
             'local_ip_address' => \Drupal::config('ebsco.settings')->get('ebsco_local_ips'),
             'guest'        => \Drupal::config('ebsco.settings')->get('ebsco_guest'),
-            'log'          => \Drupal::config('ebsco.settings')->get('ebsco_log')?\Drupal::config('ebsco.settings')->get('ebsco_log'):false,
+            'log'          => \Drupal::config('ebsco.settings')->get('ebsco_log')?: false,
         ));
 
-        $this->params = $params ? $params : $_REQUEST;
-
-        $this->limit = \Drupal::config('ebsco.settings')->get('ebsco_default_limit') ? \Drupal::config('ebsco.settings')->get('ebsco_default_limit') : $this->limit;
-
-        $this->amount = \Drupal::config('ebsco.settings')->get('ebsco_default_amount') ? \Drupal::config('ebsco.settings')->get('ebsco_default_amount') : $this->amount;
+        $this->params = $params ?: $_REQUEST;
+        $this->limit = \Drupal::config('ebsco.settings')->get('ebsco_default_limit') ?: $this->limit;
+        $this->amount = \Drupal::config('ebsco.settings')->get('ebsco_default_amount') ?: $this->amount;
     }
 
     /**
@@ -239,7 +239,7 @@ class EBSCODocument {
      *
      * @return array
      */
-    public function retrieve() {
+    public function retrieve(): array {
         list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
         $this->result = $this->eds->apiRetrieve($an, $db);
 
@@ -252,9 +252,7 @@ class EBSCODocument {
      * @return array
      */
     public function search() {
-        $search = array();
-
-        if (isset($this->params['lookfor']) && isset($this->params['type'])) {
+        if (isset($this->params['lookfor'], $this->params['type'])) {
             $search = array(
                 'lookfor' => $this->params['lookfor'],
                 'index'   => $this->params['type'],
@@ -267,54 +265,50 @@ class EBSCODocument {
             return array();
         }
 
-
-
-        $filter = isset($this->params['filter']) ? $this->params['filter'] : array();
+        $filter = isset($this->params['filter']) ?: array();
         $page = isset($this->params['page']) ? $this->params['page'] + 1 : 1;
         $limit = $this->limit;
-        $sort = isset($this->params['sort']) ? $this->params['sort'] : 'relevance';
-        $amount = isset($this->params['amount']) ? $this->params['amount'] : 'brief';     $mode = isset($this->params['mode']) ? $this->params['mode'] : 'all';
+        $sort = isset($this->params['sort']) ?: 'relevance';
+        $amount = isset($this->params['amount']) ?: 'brief';
+        $mode = isset($this->params['mode']) ?: 'all';
 
         // Check if research starters , EMP are active.
         $info = $this->info();
-        if ($info instanceof  EBSCOException) {
+        if ($info instanceof EBSCOException) {
             return array();
         }
         $rs = FALSE;
         $emp = FALSE;
 
-        if (isset($info["relatedContent"])) {
-            foreach ($info["relatedContent"] as $related) {
-                if (($related["Type"] == "rs") and ($related["DefaultOn"] == "y")) {
+        if (isset($info['relatedContent'])) {
+            foreach ($info['relatedContent'] as $related) {
+                if (($related['Type'] === 'rs') && ($related['DefaultOn'] === 'y')) {
                     $rs = TRUE;
                 }
-                if (($related["Type"] == "emp") and ($related["DefaultOn"] == "y")) {
+                if (($related['Type'] === 'emp') && ($related['DefaultOn'] === 'y')) {
                     $emp = TRUE;
                 }
             }
         }
         $autosug = FALSE;
-        if (isset($info["didYouMean"])) {
-            if ($info["didYouMean"][0]["DefaultOn"] == "y") {
+        if (isset($info['didYouMean'])) {
+            if ($info['didYouMean'][0]['DefaultOn'] === 'y') {
                 $autosug = TRUE;
             }
         }
-
         $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug);
-
         return $this->results;
     }
 
     /**
      * Get the EBSCORecord model for the result.
      *
-     * * @return array.
+     * * @return EBSCORecord.
      */
     public function record() {
-        if (empty($this->record) && !(empty($this->result))) {
+        if (empty($this->record) && !empty($this->result)) {
             $this->record = new EBSCORecord($this->result);
         }
-
         return $this->record;
     }
 
@@ -344,12 +338,10 @@ class EBSCODocument {
      *
      */
     public function relatedContent() {
-
         if ($this->results instanceof EBSCOException) {
             return NULL;
         }
-        $this->relatedContent = isset($this->results['relatedContent']) ? $this->results['relatedContent'] : array();
-
+        $this->relatedContent = isset($this->results['relatedContent']) ?: array();
         return $this->relatedContent;
     }
 
@@ -357,9 +349,7 @@ class EBSCODocument {
      *
      */
     public function autoSuggestTerms() {
-
-        $this->autoSuggestTerms = isset($this->results['autoSuggestTerms']) ? $this->results['autoSuggestTerms'] : NULL;
-
+        $this->autoSuggestTerms = isset($this->results['autoSuggestTerms']) ?: NULL;
         return $this->autoSuggestTerms;
     }
 
@@ -376,7 +366,7 @@ class EBSCODocument {
 
                 //calculate pages
                 $pageId=1;
-                if (isset($_REQUEST["page"]))
+                if (isset($_REQUEST['page']))
                 {
                     if ($pageId>($this->record_count() * $this->limit))
                     {
@@ -384,31 +374,29 @@ class EBSCODocument {
                     }
                     else
                     {
-                        $pageId=(int)urldecode($_REQUEST["page"]);
+                        $pageId=(int)urldecode($_REQUEST['page']);
                     }
                 }
-
                 $pagerVars = array(
                     '#type' => 'pager',
                     'tags' => NULL,
                     //'#element' => "pageid",
-                    '#route_name' => "ebsco.results",
+                    '#route_name' => 'ebsco.results',
                     '#parameters' =>array(),
                     '#quantity' => self::$page_links
                 );
-                $pager= drupal_render($pagerVars);
+                // DEPRECATED: $pager= drupal_render($pagerVars);
+                $pager = \Drupal::service('renderer')->render($pagerVars);
 
                 // remove last page navigation. Does not make sense in discovery navigation
-                $pi=@stripos((string)$pager,'<li class="pager__item pager__item--last">');
-                if ($pi!==false)
+                $pi = @stripos((string)$pager,'<li class="pager__item pager__item--last">');
+                if ($pi !== false)
                 {
                     $pf=stripos((string)$pager,'</li>',$pi)-1;
                     $s=substr($pager,1,$pi-1).substr($pager,$pf+6,strlen($pager)-($pf+6));
                     $pager=$s;
                 }
-                // $pager = preg_replace('/<li class="pager__item pager__item--last">(.*)<\/li>/', '', $pager);
             }
-
         }
         catch (Exception $e) {
         }
@@ -507,17 +495,14 @@ class EBSCODocument {
                 $actions[] = $filter['action'];
             }
 
-            $expanders = isset($this->info['expanders']) ? $this->info['expanders'] : array();
+            $expanders = isset($this->info['expanders']) ?: array();
             foreach ($expanders as $key => $expander) {
                 if (in_array($expander['Action'], $actions)) {
                     $expanders[$key]['selected'] = TRUE;
                 }
             }
-
         }
-        catch (Exception $e) {
-        }
-
+        catch (Exception $e) { }
         return $expanders;
     }
 
@@ -530,13 +515,11 @@ class EBSCODocument {
         if ($this->results instanceof EBSCOException) {
             return array();
         }
-
         $actions = array();
         foreach ($this->filters as $filter) {
             $actions[] = $filter['action'];
         }
-
-        $facets = isset($this->results['facets']) ? $this->results['facets'] : array();
+        $facets = isset($this->results['facets']) ?: array();
         foreach ($facets as $key => $cluster) {
             foreach ($cluster['Values'] as $k => $facet) {
                 $is_applied = FALSE;
@@ -546,7 +529,6 @@ class EBSCODocument {
                 $facets[$key]['Values'][$k]['applied'] = $is_applied;
             }
         }
-
         return $facets;
     }
 
@@ -564,26 +546,26 @@ class EBSCODocument {
             $this->filters = array();
             foreach ($_REQUEST['filter'] as $filter) {
                 if (!empty($filter)) {
-                    $temp = str_replace(array('addfacetfilter(', 'addlimiter(', 'addexpander('), array('', '', ''), $filter);
-                    if (substr($temp, -1, 1) == ')') {
+                    $temp = str_replace(array('addfacetfilter(', 'addlimiter(', 'addexpander('),
+                        array('', '', ''), $filter);
+                    if ($temp[strlen($temp)-1] === ')') {
                         $temp = substr($temp, 0, -1);
                     }
                     // Do not display addfacetfilter, addlimiter or addexpander strings.
                     if (preg_match('/\:/', $filter)) {
                         list($field, $value) = explode(':', $temp, 2);
-                        $displayField = isset($labels[$field]) ? $labels[$field] : $field;
-                        $displayValue = $value == 'y' ? 'yes' : $value;
+                        $displayField = isset($labels[$field]) ?: $field;
+                        $displayValue = $value === 'y' ? 'yes' : $value;
                     }
                     elseif (preg_match('/addexpander/', $filter)) {
                         $field = $temp;
                         $value = 'y';
-                        $displayField = isset($labels[$field]) ? $labels[$field] : $field;
+                        $displayField = isset($labels[$field]) ?: $field;
                         $displayValue = 'yes';
                     }
                     else {
                         $field = $value = $displayField = $displayValue = $filter;
                     }
-
                     $this->filters[] = array(
                         'field'        => $field,
                         'value'        => $value,
@@ -613,7 +595,7 @@ class EBSCODocument {
             $ids[] = $filter['field'];
         }
 
-        $limiters = isset($this->info['limiters']) ? $this->info['limiters'] : array();
+        $limiters = isset($this->info['limiters']) ?: array();
         foreach ($limiters as $key => $cluster) {
             // Multi select limiter.
             if (!empty($cluster['Values'])) {
@@ -625,7 +607,7 @@ class EBSCODocument {
                 }
                 // Date limiter.
             }
-            elseif ($cluster['Type'] == 'ymrange') {
+            elseif ($cluster['Type'] === 'ymrange') {
                 $id = $cluster['Id'];
                 if (($k = array_search($id, $ids)) !== FALSE) {
                     $limiters[$key]['selected'] = $filters[$k]['action'];
@@ -639,7 +621,6 @@ class EBSCODocument {
                 }
             }
         }
-
         return $limiters;
     }
 
@@ -684,14 +665,13 @@ class EBSCODocument {
     /**
      * Get the search time.
      *
-     * @return decimal number
+     * @return float number
      */
     public function search_time() {
         if ($this->results instanceof EBSCOException) {
             return 0;
         }
-        return !empty($this->results) &&
-        isset($this->results['searchTime']) ? $this->results['searchTime'] : 0;
+        return !empty($this->results) && isset($this->results['searchTime']) ?: 0;
     }
 
     /**
@@ -703,9 +683,7 @@ class EBSCODocument {
         if (isset($_REQUEST['group'])) {
             return 'advanced';
         }
-        else {
-            return 'basic';
-        }
+        return 'basic';
     }
 
     /**
@@ -739,15 +717,12 @@ class EBSCODocument {
     public function link_search_params() {
         // Filter the page parameter.
         $not_allowed_keys = array('page', 'ui', 'has_js', 'op', 'submit', 'form_id', 'form_build_id');
-
-        $query = "";
+        $query = '';
         if (isset($_SERVER['QUERY_STRING'])) {
             $query = urldecode($_SERVER['QUERY_STRING']);
         }
         parse_str($query, $params);
-
         $params = $this->array_unset_recursive($params, $not_allowed_keys);
-
         return $params;
     }
 
@@ -766,7 +741,8 @@ class EBSCODocument {
     /**
      * Create the last search data.
      *
-     * @return void
+     * @param null $query
+     * @return array
      */
     public function search_create($query = NULL) {
         if ($this->results instanceof EBSCOException) {
@@ -783,13 +759,13 @@ class EBSCODocument {
             $last_search['count'] = $this->record_count();
             $_SESSION['count'] = $this->record_count();
         }
-
         return $last_search;
     }
 
     /**
      * Save last search data in session.
      *
+     * @param null $query
      * @return void
      */
     public function search_write($query = NULL) {
@@ -799,7 +775,9 @@ class EBSCODocument {
     /**
      * Load last search data from session.
      *
-     * @return array
+     * @param null $id
+     * @param null $op
+     * @return mixed
      */
     public function search_read($id = NULL, $op = NULL) {
         $params = array();
@@ -809,16 +787,16 @@ class EBSCODocument {
             if ($id) {
 
                 parse_str($lastSearchParams, $params);
-                $params['page'] = (int) (isset($params['page']) ? $params['page'] : 0);
+                $params['page'] = (int) (isset($params['page']) ?: 0);
                 // $index = array_search($id, $lastSearch['records']);
                 $index = $this->getIndexOfRecordInArrayWithId($lastSearch['records'], $id);
 
                 // If this is not the first scroll and if this is not a page refresh.
-                if (isset($lastSearch['current']) && $lastSearch['current'] != $id) {
+                if (isset($lastSearch['current']) && $lastSearch['current'] !== $id) {
                     // If we change page.
-                    if (($op == 'Next' && $index % $this->limit === 0) ||
-                        ($op == 'Previous' && $index % $this->limit === 9)) {
-                        $params['page'] = ($op == 'Next') ? $params['page'] + 1 : $params['page'] - 1;
+                    if (($op === 'Next' && $index % $this->limit === 0) ||
+                        ($op === 'Previous' && $index % $this->limit === 9)) {
+                        $params['page'] = ($op === 'Next') ? $params['page'] + 1 : $params['page'] - 1;
                         $query= \Drupal\Component\Utility\UrlHelper::buildQuery($params);
                         $lastSearch['query'] = $_SESSION['EBSCO']['last-search']['query'] = $query;
                     }
@@ -833,18 +811,18 @@ class EBSCODocument {
                 }
 
                 if (!isset($lastSearch['records'][$index + 1])) {
-                    $params['page'] += 1;
+                    ++$params['page'];
                     $driver = new EBSCODocument($params);
                     $driver->search();
                     $query= \Drupal\Component\Utility\UrlHelper::buildQuery($params);
                     $newSearch = $driver->search_create($query);
-                    $newSearch['records'] = @unserialize($newSearch['records']);
+                    $newSearch['records'] = @unserialize($newSearch['records'], TRUE);
                     $lastSearch['records'] = @array_merge($lastSearch['records'], $newSearch['records']);
                     $_SESSION['EBSCO']['last-search']['records'] = serialize($lastSearch['records']);
-                    if ($op == 'Next') {
-                        $lastSearch['previous'] = isset($records[8]) ? $records[8] : '';
+                    if ($op === 'Next') {
+                        $lastSearch['previous'] = isset($records[8]) ?: '';
                     }
-                    $lastSearch['next'] = isset($newSearch['records'][0]) ? $newSearch['records'][0] : '';
+                    $lastSearch['next'] = isset($newSearch['records'][0]) ?: '';
                 }
                 else {
                     $lastSearch['next'] = $lastSearch['records'][$index + 1];
@@ -852,17 +830,17 @@ class EBSCODocument {
 
                 if (!isset($lastSearch['records'][$index - 1])) {
                     if ($params['page'] > 0) {
-                        $params['page'] -= 1;
+                        --$params['page'];
                         $driver = new EBSCODocument($params);
                         $driver->search();
                         $query= \Drupal\Component\Utility\UrlHelper::buildQuery($params);
                         $newSearch = $driver->search_create($query);
-                        $newSearch['records'] = @unserialize($newSearch['records']);
+                        $newSearch['records'] = @unserialize($newSearch['records'], TRUE);
                         $lastSearch['records'] = @array_merge($lastSearch['records'], $newSearch['records']);
                         $_SESSION['EBSCO']['last-search']['records'] = serialize($lastSearch['records']);
-                        $lastSearch['previous'] = isset($newSearch['records'][9]) ? $newSearch['records'][9] : '';
-                        if ($op == 'Previous') {
-                            $lastSearch['next'] = isset($records[1]) ? $records[1] : '';
+                        $lastSearch['previous'] = isset($newSearch['records'][9]) ?: '';
+                        if ($op === 'Previous') {
+                            $lastSearch['next'] = isset($records[1]) ?: '';
                         }
                     }
                     else {
@@ -872,12 +850,10 @@ class EBSCODocument {
                 else {
                     $lastSearch['previous'] = $lastSearch['records'][$index - 1];
                 }
-
                 $lastSearch['current_index'] = $start * $this->limit + $index % $this->limit + 1;
                 $lastSearch['current'] = $id;
             }
         }
-
         $_SESSION['EBSCO']['last-search']['current'] = $id;
         return $lastSearch;
     }
@@ -924,7 +900,7 @@ class EBSCODocument {
      */
     private function getIndexOfRecordInArrayWithId($array, $value) {
         foreach($array as $index=>$arrayInf) {
-            if($arrayInf->record_id == $value) {
+            if($arrayInf->record_id === $value) {
                 return $index;
             }
         }

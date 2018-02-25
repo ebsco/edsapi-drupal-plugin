@@ -23,20 +23,6 @@
 
 
 /**
- * EBSCOException class.
- */
-class EBSCOException extends Exception {
-  const CRITICAL_ERROR = 1;
-
-  /**
-   * Make message argument mandatory.
-   */
-  public function __construct($message, $code = self::CRITICAL_ERROR, Exception $previous = NULL) {
-    parent::__construct($message, $code, $previous);
-  }
-
-}
-/**
  * EBSCOConnector class.
  */
 class EBSCOConnector {
@@ -500,8 +486,8 @@ class EBSCOConnector {
     if ($this->logAPIRequests) {
     // $client = both the HTTP request and response
     // $response = only the HTTP response
-    $message = $this->toString($client); // or $this->toString($response)
-    \Drupal::logger('ebsco')->error($client);
+    $message = $this->toString($this->client); // or $this->toString($response)
+    \Drupal::logger('ebsco')->error($this->client);
     }
 
     return $return;

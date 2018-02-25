@@ -22,8 +22,9 @@
  * limitations under the License.
  */
 
-require_once 'EBSCOConnector.php';
-require_once 'EBSCOResponse.php';
+require_once __DIR__ . '/EBSCOConnector.php';
+require_once __DIR__ . '/EBSCOResponse.php';
+require_once __DIR__ . '/EBSCOException.php';
 
 /**
  * EBSCO API class.
