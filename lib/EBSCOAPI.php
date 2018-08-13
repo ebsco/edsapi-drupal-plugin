@@ -496,7 +496,15 @@ class EBSCOAPI {
 	  $query['limiter']='';
       foreach ($limiters as $field => $limiter) {
         // e.g. LA99:English,French,German.
-        $query['limiter'].= $field . ':' . implode(',', $limiter);
+		if ($query['limiter']=="")
+		{
+			$query['limiter'].= $field . ':' . implode(',', $limiter);
+		}
+		else
+		{
+			// add next limiters s addlimiter()
+			$limiters[$field][] = $limiter;
+		}
       }
     }
     if (!empty($expanders)) {

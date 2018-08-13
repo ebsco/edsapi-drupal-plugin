@@ -739,6 +739,12 @@ function template_preprocess_ebsco_results(&$variables) {
     $variables["relatedContent"]="";
     $variables["processHtmlRecords"]="";
     $variables['lookfor'] = '';
+	
+	// get settings to display or not PDF and HTML Links
+	$showPDFlink=\Drupal::config('ebsco.settings')->get('ebsco_show_pdf_links', 1);
+	$showHTMLlink=\Drupal::config('ebsco.settings')->get('ebsco_show_html_links', 1);
+
+		
     if (isset($params['lookfor'])) {
         $variables['lookfor'] = $params['lookfor'];
     } else if (isset($params['group'])) {
@@ -945,6 +951,7 @@ function template_preprocess_ebsco_results(&$variables) {
             $fulltextUrl= \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
             $pdfUrl= \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
 
+			
             $recordHtml="<li>"
                 .'<div class="record-number floatleft">'.$record->result_id.'</div>'
 
@@ -1035,13 +1042,20 @@ function template_preprocess_ebsco_results(&$variables) {
 
             // PDF and HTML processing
             $recordHtml.='<div class="result-line5">';
-            if ($record->full_text_availability){
-                $recordHtml.= '<a href="' . $fulltextUrl . '#html" class="icon html fulltext _record_link">'.t('HTML full text')."</a>&nbsp; &nbsp;";
-            }
+			
+			if ($showHTMLlink==1) {
+				if ($record->full_text_availability){
+					$recordHtml.= '<a href="' . $fulltextUrl . '#html" class="icon html fulltext _record_link">'.t('HTML full text')."</a>&nbsp; &nbsp;";
+				}
+				
+			}
+			
+			if ($showPDFlink==1) {
+				if ($record->pdf_availability){
+					$recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext" target="_blank">'.t('PDF full text')."</a>";
+				}
+			}
 
-            if ($record->pdf_availability){
-                $recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext" target="_blank">'.t('PDF full text')."</a>";
-            }
 
             $recordHtml.='</div>'
 

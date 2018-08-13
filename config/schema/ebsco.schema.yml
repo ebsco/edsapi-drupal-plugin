@@ -24,3 +24,7 @@ ebsco.settings:
       type: string
     ebsco_local_ips:
       type: string
+    ebsco_show_pdf_links:
+      type: integer
+    ebsco_show_html_links:
+      type: integer
