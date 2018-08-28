@@ -26,20 +26,20 @@
   <div class="detailrecord-links">
     <ul class="external-links">
       {% if p_link_url is not empty %}
-        <li><a href="{{ p_link_url }}">{% trans %}View in EDS{% endtrans %}</a></li>
+        <li class="p-link"><a href="{{ p_link_url }}">{% trans %}View in EDS{% endtrans %}</a></li>
       {% endif %}
 
       {% if pdf_link_url is not empty %}
-        <li><a href="{{ pdf_link_url }}" class="icon pdf fulltext">{% trans %}PDF full text{% endtrans %}</a></li>
+        <li class="fulltext-pdf-link"><a href="{{ pdf_link_url }}" class="icon pdf fulltext">{% trans %}PDF full text{% endtrans %}</a></li>
       {% endif %}
 
       {% if fulltext_link_url is not empty %}
-        <li><a href="{{ fulltext_link_url }}" class="icon html fulltext">{% trans %}HTML full text{% endtrans %}</a></li>
+        <li class="fulltext-html-link"><a href="{{ fulltext_link_url }}" class="icon html fulltext">{% trans %}HTML full text{% endtrans %}</a></li>
       {% endif %}
 
       {% if record.custom_links is not empty %}
         {% for link in record.custom_links %}
-        <li><a href="{{ link.Url }}" target="_blank" title="{{ link.MouseOverText }}" class="external-link">
+        <li class="custom-link custom-link--{{ link.Name|clean_class }}"><a href="{{ link.Url }}" target="_blank" title="{{ link.MouseOverText }}" class="external-link">
           {% if link.Icon %}
           <img src="{{ link.Icon }}" alt="{{ link.Name }}"/>
           {% else %}
@@ -79,25 +79,25 @@
     <div class="span-13">
       <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="{% trans %}Bibliographic Details{% endtrans %}">
         {% for item in record.items %}
-        <tr valign="top">
+        <tr valign="top" class="{{ item.Label|clean_class }}">
           <th width="150">{{ item.Label }}:</th>
           <td>{{ item.Auto_Link|raw }}</td>
         </tr>
         {% endfor %}
 
         {% if record.db_label is not empty %}
-          <tr valign="top">
+          <tr valign="top" class="{{ 'Database'|clean_class }}">
             <th width="150">{% trans %}Database{% endtrans %}:</th>
             <td>{{ record.db_label }}</td>
           </tr>
         {% endif %}
 
         {% if record.full_text is not empty %}
-          <tr valign="top" id="html">
+          <tr valign="top" id="html" class="fulltext-html">
             <td colspan="2" class="html">{{ record.full_text }}</td>
           </tr>
         {% elseif record.access_level and not logged_in %}
-          <tr valign="top" id="html">
+          <tr valign="top" id="html" class="fulltext-html">
             <td colspan="2" class="html">
               <p>
                 {% trans %}The full text cannot be displayed to guests.{% endtrans %}
