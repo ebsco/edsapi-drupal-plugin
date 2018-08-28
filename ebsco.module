@@ -17,10 +17,14 @@
 * limitations under the License.
  */
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
+
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
 
 require_once __DIR__ . '/lib/EBSCODocument.php';
@@ -1151,163 +1155,74 @@ function template_preprocess_ebsco_advanced_search(&$variables) {
  * @see ebsco-result.tpl.php
  */
 function template_preprocess_ebsco_result(&$variables) {
-
     $params = $_REQUEST;
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
-    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+    $destination = \Drupal::destination()->getAsArray();
+
+    $_SESSION['EBSCO']['redirect'] = $destination;
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
     $Document->retrieve();
-    $record = $Document->record();
+    $variables['record'] = $record = $Document->record();
 
-    $variables['record'] = $record;
-    $lastSearch['count'] = $Document->record_count();
-    $variables['count'] = $Document->record_count();
+    if (isset($record)) {
+        $link_parameters = [
+            'id' => Html::escape($record->record_id())
+        ];
 
-    $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
-    $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
-    $detailRecordHTML="";
-
-    if (isset($record) ){
-
-        $id          = \Drupal\Component\Utility\Html::escape($record->record_id());
-        $fulltextUrl= \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();;
-        $pdfUrl= \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-
-
-        $detailRecordHTML='<div class="ebsco-record detailrecord-2columns">'
-            .'<div>'
-            .'<div class="detailrecord-links">	'
-
-            .'<ul class="external-links">'
-        ;
-        if($record->p_link){
-            $detailRecordHTML.= "<li> <a href='" . $record->p_link . "'>" . t('View in EDS') . "</a></li>";
+        if ($record->p_link) {
+            $variables['p_link_url'] = $record->p_link;
         }
 
-        if ($record->pdf_link){
-            $detailRecordHTML.= '
-															  <li>
-															  <a href="' . $pdfUrl . '" class="icon pdf fulltext">' . t('PDF full text') . '</a>
-															  </li>';
+        if ($record->pdf_link) {
+            $variables['pdf_link_url'] = Url::fromRoute('ebsco.pdf', $link_parameters)->toString();
         }
 
-        if ($record->full_text_availability){
-            $detailRecordHTML.= '
-															  <li>
-															  <a href="' . ((!\Drupal::currentUser()->isAuthenticated()) ? $fulltextUrl : "") . '#html" class="icon html fulltext">' . t('HTML full text') . '</a>
-															  </li>';
-        }
+        if ($record->full_text_availability) {
+            $variables['fulltext_link_url'] = Url::fromRoute('ebsco.fulltext', $link_parameters, ['fragment' => 'html'])->toString();
 
-        if (!empty($record->custom_links)){
-            foreach ($record->custom_links as $link){
-                $detailRecordHTML.= '
-																<li>
-																  <a href="' . $link['Url'] . '" target="_blank" title="' . $link['MouseOverText'] . '" class="external-link">' . ($link['Icon']) ? '<img src="' . $link['Icon'] . '" />' : '' . $link['Name'] . '</a>
-																</li>';
-            }
-        }
-        $detailRecordHTML.='</ul>'
-        ;
-
-
-        $detailRecordHTML.='</div>'
-
-
-            .'<div class="detailrecord-recordmetadata">'
-            .'<div class="record-toolbar">'
-        ;
-        if ($lastSearch){
-            $detailRecordHTML.='<div class="floatright">';
-            if ($lastSearch['previous']){
-                $previousUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $lastSearch['previous']->record_id, 'op' => 'Previous'))->toString();
-                $detailRecordHTML.= '<a href="' . $previousUrl. '" class="_record_link">&laquo; ' . t('Previous') . '</a> ';
-            }
-            $detailRecordHTML.= $lastSearch['current_index'].' of ' . $_SESSION['search_total'];
-
-            if ($lastSearch['next']!==''){
-                $nextUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $lastSearch['next']->record_id, 'op' => 'Next'))->toString();
-                $detailRecordHTML.= ' <a href="' . $nextUrl . '" class="_record_link">' . t('Next') . ' &raquo;</a>';
-            }
-            $detailRecordHTML.='</div>'
-            ;
-            if (isset($_SESSION['EBSCO']['lastsearch']["destination"])) {
-                $detailRecordHTML.'<div class="floatleft">'
-                .'<a href="'.$_SESSION['EBSCO']['lastsearch']["destination"].'"> &laquo; '.t('Back to Results list').'</a>'
-                .'</div>'
-                .'<div class="clear"></div>'
-                ;
-            }
-        }
-        $detailRecordHTML.='</div>';
-
-
-        $detailRecordHTML.='<div class="span-13">'
-            .' <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="'.t('Bibliographic Details').'">'
-        ;
-        foreach ($record->items as $item){
-            if (!empty($item['Data'])){
-                $detailRecordHTML.='<tr valign="top">'
-                    .'<th width="150">' . t($item['Label']) . ':</th>'
-                    .'<td>'. auto_link($item['Data']) . '</td>'
-                    .'</tr>';
+            // Simplify the link if the user is logged in already.
+            if (\Drupal::currentUser()->isAuthenticated()) {
+                $variables['fulltext_link_url'] = '#html';
             }
         }
 
-        if ($record->db_label){
-            $detailRecordHTML.='<tr valign="top">'
-                .'<th width="150">' . t('Database') . ':</th><td>' . \Drupal\Component\Utility\Html::escape($record->db_label) . '</td>'
-                .'</tr>';
+        $variables['login_link'] = Link::createFromRoute(t('Login'), 'user.login', [], ['query' => $destination, 'fragment' => 'html'])->toString();
+
+        $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : [];
+        if (!empty($lastSearch)) {
+            $variables['last_search'] = $lastSearch;
+            $variables['current_index'] = $lastSearch['current_index'];
+
+            if (!empty($_SESSION['search_total'])) {
+                $variables['last_search_total'] = $_SESSION['search_total'];
+            }
+
+            if ($lastSearch['previous']) {
+                $variables['previous_url'] = Url::fromRoute('ebsco.detailedrecord', array('id' => $lastSearch['previous']->record_id, 'op' => 'Previous'))->toString();
+            }
+
+            if ($lastSearch['next'] !== '') {
+                $variables['next_url'] = Url::fromRoute('ebsco.detailedrecord', array('id' => $lastSearch['next']->record_id, 'op' => 'Next'))->toString();
+            }
+
+            if (isset($_SESSION['EBSCO']['lastsearch']['destination'])) {
+                $variables['backlink_url'] = $_SESSION['EBSCO']['lastsearch']['destination'];
+            }
         }
 
-        if ($record->full_text){
-            $detailRecordHTML.='<tr id="html" valign="top">'
-                .'<td colspan="2" class="html">' . $record->full_text . '</td>'
-                .'</tr>';
-        }
-        elseif ($record->access_level && !\Drupal::currentUser()->isAuthenticated()){
-
-            $link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
-            $detailRecordHTML.='<tr id="html" valign="top">'
-                .'<td colspan="2" class="html">'
-                .'<p>' . t('The full text cannot be displayed to guests.') . '<br />'
-                .'<strong>' . sprintf(t('%s for full access.'), $link) . '</strong>'
-                .'</p>'
-                .'</td>'
-                .'</tr>';
-        }
-        $detailRecordHTML.='</table>'
-            .'</div>'
-        ;
-
-        $detailRecordHTML.='<div class="span-4">';
-        if ($record->medium_thumb_link){
-            $detailRecordHTML.='<img src="' . check_url($record->medium_thumb_link) . '" class="book-jacket" alt="' . t('Book jacket') . '"/>';
+        foreach ($record->items as &$item) {
+            if (!empty($item['Data'])) {
+                $item['Auto_Link'] = auto_link($item['Data']);
+            }
         }
 
-        if ($record->publication_type){
-            $detailRecordHTML.= '<p>' . \Drupal\Component\Utility\Html::escape($record->publication_type) . '</p>';
+        $request = \Drupal::request();
+        if ($route = $request->attributes->get(RouteObjectInterface::ROUTE_OBJECT)) {
+            $route->setDefault('_title', $record->title);
         }
-        $detailRecordHTML.='</div>'
-
-            .'</div>'
-            .'</div>'
-        ;
-
-        $detailRecordHTML.='<div class="clear"></div>';
-
-        $detailRecordHTML.='</div>';
-    }
-    $variables['detailrecord'] = $detailRecordHTML;
-
-
-
-
-    $request = \Drupal::request();
-    if ($route = $request->attributes->get(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT)) {
-        $route->setDefault('_title', $record->title);
     }
 }
 

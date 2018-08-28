@@ -5,6 +5,7 @@
  *
  * @see template_preprocess_ebsco_result()
  *
+ * @ingroup themeable
  *
  * Copyright [2017] [EBSCO Information Services]
  *
@@ -21,7 +22,105 @@
  * limitations under the License.
  */
 #}
+<div class="ebsco-record detailrecord-2columns">
+  <div class="detailrecord-links">
+    <ul class="external-links">
+      {% if p_link_url is not empty %}
+        <li><a href="{{ p_link_url }}">{% trans %}View in EDS{% endtrans %}</a></li>
+      {% endif %}
 
+      {% if pdf_link_url is not empty %}
+        <li><a href="{{ pdf_link_url }}" class="icon pdf fulltext">{% trans %}PDF full text{% endtrans %}</a></li>
+      {% endif %}
 
-{{ detailrecord |raw }}
+      {% if fulltext_link_url is not empty %}
+        <li><a href="{{ fulltext_link_url }}" class="icon html fulltext">{% trans %}HTML full text{% endtrans %}</a></li>
+      {% endif %}
 
+      {% if record.custom_links is not empty %}
+        {% for link in record.custom_links %}
+        <li><a href="{{ link.Url }}" target="_blank" title="{{ link.MouseOverText }}" class="external-link">
+          {% if link.Icon %}
+          <img src="{{ link.Icon }}" alt="{{ link.Name }}"/>
+          {% else %}
+          {{ link.Name }}
+          {% endif %}
+        </a></li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </div>
+  <div class="detailrecord-recordmetadata">
+    <div class="record-toolbar">
+      {% if last_search %}
+      <div class="floatright">
+        {% if previous_url %}
+          <a href="{{ previous_url }}" class="_record_link">{% trans %}&laquo; Previous{% endtrans %}</a>
+        {% endif %}
+
+        {% if last_search_total %}
+        {% trans %}{{ current_index }} of {{ last_search_total }}{% endtrans %}
+        {% endif %}
+
+        {% if next_url %}
+          <a href="{{ next_url }}" class="_record_link">{% trans %}Next &raquo;{% endtrans %}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if backlink_url %}
+      <div class="floatleft">
+        <a href="{{ backlink_url }}">{% trans %}&laquo; Back to Results list{% endtrans %}</a>
+      </div>
+      {% endif %}
+      <div class="clear"></div>
+    </div>
+
+    <div class="span-13">
+      <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="{% trans %}Bibliographic Details{% endtrans %}">
+        {% for item in record.items %}
+        <tr valign="top">
+          <th width="150">{{ item.Label }}:</th>
+          <td>{{ item.Auto_Link|raw }}</td>
+        </tr>
+        {% endfor %}
+
+        {% if record.db_label is not empty %}
+          <tr valign="top">
+            <th width="150">{% trans %}Database{% endtrans %}:</th>
+            <td>{{ record.db_label }}</td>
+          </tr>
+        {% endif %}
+
+        {% if record.full_text is not empty %}
+          <tr valign="top" id="html">
+            <td colspan="2" class="html">{{ record.full_text }}</td>
+          </tr>
+        {% elseif record.access_level and not logged_in %}
+          <tr valign="top" id="html">
+            <td colspan="2" class="html">
+              <p>
+                {% trans %}The full text cannot be displayed to guests.{% endtrans %}
+                <br />
+                <strong>{% trans %}{{ login_link }} for full access.{% endtrans %}</strong>
+              </p>
+            </td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
+
+    <div class="span-4">
+      {% if record.medium_thumb_link %}
+        <img src="{{ record.medium_thumb_link }}" class="book-jacket" alt="{% trans %}Book jacket{% endtrans %}"/>
+      {% endif %}
+
+      {% if record.publication_type %}
+        <p>{{ record.publication_type }}</p>
+      {% endif %}
+    </div>
+
+    <div class="clear"></div>
+
+  </div>
+</div>
