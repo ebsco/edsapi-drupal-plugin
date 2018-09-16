@@ -4,7 +4,7 @@ ebsco.admin:
     _title: 'EBSCO settings'
     _form: \Drupal\ebsco\Form\EbscoAdmin
   requirements:
-    _permission: 'administer EDS '
+    _permission: 'administer ebsco'
 
 
 ebsco.content:
