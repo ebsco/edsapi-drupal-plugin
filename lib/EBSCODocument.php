@@ -825,11 +825,13 @@ class EBSCODocument {
                 }
                 $start = $params['page'];
 
-                if (count($lastSearch['records']) > 10) {
-                    $records = array_slice($lastSearch['records'], $index - $index % $this->limit, $this->limit);
-                }
-                else {
-                    $records = $lastSearch['records'];
+                if (is_array($lastSearch['records'])) {
+                    if (count($lastSearch['records']) > 10) {
+                        $records = array_slice($lastSearch['records'], $index - $index % $this->limit, $this->limit);
+                    }
+                    else {
+                        $records = $lastSearch['records'];
+                    }
                 }
 
                 if (!isset($lastSearch['records'][$index + 1])) {
@@ -923,9 +925,11 @@ class EBSCODocument {
      * @return int|null|string
      */
     private function getIndexOfRecordInArrayWithId($array, $value) {
-        foreach($array as $index=>$arrayInf) {
-            if($arrayInf->record_id == $value) {
-                return $index;
+        if (is_array($array)) {
+            foreach($array as $index=>$arrayInf) {
+                if($arrayInf->record_id == $value) {
+                    return $index;
+                }
             }
         }
         return null;
