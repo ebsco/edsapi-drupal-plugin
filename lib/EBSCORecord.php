@@ -372,8 +372,17 @@ class EBSCORecord {
    * @return string
    */
   public function title() {
-    return isset($this->data['Items']['Title']) ?
-            $this->data['Items']['Title']['Data'] : '';
+	$s="";
+    if (isset($this->data['Items']['Title'])) {
+		$s=$this->data['Items']['Title']['Data'] ;
+	}
+	else
+	{
+		if (isset($this->data['Items']['TitleAlt'])){
+			$s=$this->data['Items']['TitleAlt']["Data"];
+		}			
+	}
+	return $s;
   }
 
   /**
