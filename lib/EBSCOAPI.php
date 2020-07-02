@@ -397,14 +397,16 @@ class EBSCOAPI {
    */
   public function apiSearch($search,
   $filters,
-        $start = 1,
+  $start = 1,
   $limit = 10,
   $sortBy = 'relevance',
   $amount = 'detailed',
   $mode = 'all',
   $rs = FALSE,
   $emp = FALSE,
-  $autosuggest = FALSE) {
+  $autosuggest = FALSE,
+  $includeimagequickview = FALSE
+  ) {
     $query = array();
 
     // Basic search.
@@ -496,15 +498,7 @@ class EBSCOAPI {
 	  $query['limiter']='';
       foreach ($limiters as $field => $limiter) {
         // e.g. LA99:English,French,German.
-		if ($query['limiter']=="")
-		{
-			$query['limiter'].= $field . ':' . implode(',', $limiter);
-		}
-		else
-		{
-			// add next limiters s addlimiter()
-			$limiters[$field][] = $limiter;
-		}
+        $query['limiter'].= $field . ':' . implode(',', $limiter);
       }
     }
     if (!empty($expanders)) {
@@ -553,6 +547,10 @@ class EBSCOAPI {
     // 'pagenumber'     => 1,
         // Specifies whether or not to include highlighting in the search results.
       'highlight'      => 'y',
+
+      //'includeimagequickview'=> 'y',
+      'includeimagequickview' => $includeimagequickview,
+   
     );
 
     if ($autosuggest == TRUE) {
@@ -572,9 +570,17 @@ class EBSCOAPI {
       }
     }
 
+    if ($includeimagequickview == TRUE) {
+      $params["includeimagequickview"] = "y";
+    }
+
+
     $params = array_merge($params, $query);
 
+
     $result = $this->request('Search', $params);
+
+
     return $result;
   }
 

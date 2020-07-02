@@ -38,8 +38,6 @@ class EbscoAdmin extends ConfigFormBase {
 	$config->set("ebsco_organization", $values["ebsco_organization"]);
 	$config->set("ebsco_profile", $values["ebsco_profile"]);
 	$config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
-	$config->set("ebsco_show_pdf_links", $values["ebsco_show_pdf_links"]);
-	$config->set("ebsco_show_html_links", $values["ebsco_show_html_links"]);
 	$config->save(); 
 	
   }
@@ -127,20 +125,6 @@ class EbscoAdmin extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $form['ebsco_credentials']['ebsco_guest'] = [
-      '#type' => 'radios',
-      '#title' => t('Guest ?'),
-      '#default_value' => $config->get('ebsco_guest'),
-      '#description' => t("The Guest session."),
-      '#options' => [
-        t('No'),
-        t('Yes'),
-      ],
-      '#required' => TRUE,
-    ];
-
-
-
     $form['ebsco_general'] = [
       '#type' => 'fieldset',
       '#title' => t('General Settings'),
@@ -181,31 +165,7 @@ class EbscoAdmin extends ConfigFormBase {
       '#options' => \EBSCODocument::mode_options(),
       '#required' => TRUE,
     ];
-	
-    $form['ebsco_general']['ebsco_show_pdf_links'] = [
-      '#type' => 'radios',
-      '#title' => t('Show PDF Links ?'),
-      '#default_value' => $config->get('ebsco_show_pdf_links'),
-      '#description' => t("If the PDF link from EBSCO databases should be displayed  in the result list or record level"),
-      '#options' => [
-        t('No'),
-        t('Yes'),
-      ],
-      '#required' => TRUE,
-    ];
-	
-    $form['ebsco_general']['ebsco_show_html_links'] = [
-      '#type' => 'radios',
-      '#title' => t('Show HTML Links ?'),
-      '#default_value' => $config->get('ebsco_show_html_links'),
-      '#description' => t("If the HTML link from EBSCO databases should be displayed in the result list or record level"),
-      '#options' => [
-        t('No'),
-        t('Yes'),
-      ],
-      '#required' => TRUE,
-    ];
-	
+
     return parent::buildForm($form, $form_state);
   }
 
