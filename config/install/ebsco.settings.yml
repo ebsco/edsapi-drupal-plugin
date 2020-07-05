@@ -9,5 +9,3 @@ ebsco_password: "[Your api password]"
 ebsco_interface: "Drupal EDS API module "
 ebsco_organization: "[Institution name] "
 ebsco_local_ips: ""
-ebsco_show_pdf_links: 1
-ebsco_show_html_links: 1

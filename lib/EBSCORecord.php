@@ -159,6 +159,16 @@ class EBSCORecord {
    */
   public $access_level = NULL;
 
+  /**image quick view
+   * ImageQuickViewItems 
+   */
+  /**
+   * * @global string
+   */
+  public $image_quick_view_type = NULL;
+
+
+
   /**
    * Constructor.
    *
@@ -166,6 +176,7 @@ class EBSCORecord {
    *   Raw data from the EBSCO search representing the record.
    */
   public function __construct($data = array()) {
+  
     $this->data = $data;
     $this->record_id = $this->record_id();
     $this->result_id = $this->result_id();
@@ -186,8 +197,12 @@ class EBSCORecord {
     $this->medium_thumb_link = $this->thumb_link('medium');
     $this->source = $this->source();
     $this->access_level = $this->access_level();
+    $this->image_quick_view_type = $this->image_quick_view_type();
+    
   }
 
+  
+  
   /********************************************************
    *
    * Getters
@@ -200,6 +215,8 @@ class EBSCORecord {
    * @return string
    */
   public function access_level() {
+    // var_dump($this->data);
+    // die();
     return isset($this->data['AccessLevel']) ?
             $this->data['AccessLevel'] : '';
   }
@@ -372,17 +389,8 @@ class EBSCORecord {
    * @return string
    */
   public function title() {
-	$s="";
-    if (isset($this->data['Items']['Title'])) {
-		$s=$this->data['Items']['Title']['Data'] ;
-	}
-	else
-	{
-		if (isset($this->data['Items']['TitleAlt'])){
-			$s=$this->data['Items']['TitleAlt']["Data"];
-		}			
-	}
-	return $s;
+    return isset($this->data['Items']['Title']) ?
+            $this->data['Items']['Title']['Data'] : '';
   }
 
   /**
@@ -403,6 +411,16 @@ class EBSCORecord {
   public function record_id() {
     return isset($this->data['id']) ?
             $this->data['id'] : '';
+  }
+
+   /**
+   * Get the iamge quick view of the record.
+   *
+   * @return string
+   */
+
+  public function image_quick_view_type() {
+    return isset($this->data['iqv']) ? $this->data['iqv'] : array();
   }
 
 }
