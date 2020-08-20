@@ -982,5 +982,4 @@ class EBSCODocument {
         return null;
     }
  
- 
 }

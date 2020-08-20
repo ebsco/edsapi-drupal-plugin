@@ -57,3 +57,12 @@ ebsco.fulltext:
     _controller: '\Drupal\ebsco\Controller\EbscoController::fulltext_page'
   requirements:
     _permission: 'access content'
+
+ebsco.image_quick_view:
+  path: '/ebsco/image_quick_view'
+  defaults:
+    _title: 'Image Quick View'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::image_quick_view'
+  requirements:
+    _permission: 'access content'
+  

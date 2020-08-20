@@ -405,7 +405,8 @@ class EBSCOAPI {
   $rs = FALSE,
   $emp = FALSE,
   $autosuggest = FALSE,
-  $includeimagequickview = FALSE
+  $includeimagequickview = FALSE,
+  $IllustrationInfo = FALSE
   ) {
     $query = array();
 
@@ -549,7 +550,10 @@ class EBSCOAPI {
       'highlight'      => 'y',
 
       //'includeimagequickview'=> 'y',
-      'includeimagequickview' => $includeimagequickview,
+     'includeimagequickview' => $includeimagequickview,
+
+     //IllustrationInfo
+     //'llustrationinfo' => 'y',
    
     );
 
@@ -580,6 +584,8 @@ class EBSCOAPI {
 
     $result = $this->request('Search', $params);
 
+    // var_dump($params);
+    // die();
 
     return $result;
   }
@@ -600,16 +606,26 @@ class EBSCOAPI {
    */
   public function apiRetrieve($an, $db) {
     // Add the HTTP query params.
+    //$includeimagequickviewDetail = FALSE;
     $params = array(
       'an'        => $an,
       'dbid'      => $db,
       'highlight' => 'y',
+      //'includeimagequickview' => $includeimagequickviewDetail,
+      //'IllustrationInfo' => 'y',
+      'IllustrationInfo' => $IllustrationInfo,
     );
-
+    
     $result = $this->request('Retrieve', $params);
+   
+
+    
     return $result;
+
+    
   }
 
+  
   /**
    * Wrapper for info API call.
    *

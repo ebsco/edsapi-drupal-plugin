@@ -179,8 +179,7 @@ class EBSCOResponse {
    */
   private function buildRecords() {
     $results = array();
-    // var_dump($results);
-    // die();
+    
 
     $records = $this->response->SearchResult->Data->Records->Record;
     foreach ($records as $record) {
@@ -193,7 +192,7 @@ class EBSCOResponse {
       $result['AccessLevel'] = $record->Header->AccessLevel ? (string) $record->Header->AccessLevel : '';
       $result['id'] = $result['An'] . '|' . $result['DbId'];
       $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
-      $result['ImageQuickViewItem'] = $record->ImageQuickViewItems->ImageQuickViewItem ? (string) $record->ImageQuickViewItems->ImageQuickViewItem : '';
+      //$result['ImageQuickViewItem'] = $record->ImageQuickViewItems->ImageQuickViewItem ? (string) $record->ImageQuickViewItems->ImageQuickViewItem : '';
       
       if (!empty($record->ImageInfo->CoverArt)) {
         foreach ($record->ImageInfo->CoverArt as $image) {
@@ -226,6 +225,7 @@ class EBSCOResponse {
           'Links'        => $links,
         );
       }
+
 
       if ($record->CustomLinks) {
         
@@ -391,26 +391,106 @@ class EBSCOResponse {
             );
             }
             }
+
+            
         }
      }
      }
 
-  
-      if($record->ImageQuickViewItems->ImageQuickViewItem){
-        $result['iqv'] = array();
-        foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
-          $dbcode = $iqv->DbId ? (string) $iqv->DbId : '';
-          $an = $iqv->An ? (string) $iqv->An : '';
-          $type = $iqv->Type ? (string) $iqv->Type : '';
-          $url = $iqv->Url ? (string) $iqv->Url : '';
-          $result['iqv'][] = array(
-              'DbId' => $dbcode,
-              'An' => $an,
-              'Type' => $type,
-              'url'  => $url
-          );
-        }
+     if($record->ImageQuickViewItems->ImageQuickViewItem){
+      $result['iqv'] = array();
+      foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
+        $dbid = $iqv->DbId ? (string) $iqv->DbId : '';
+        $an = $iqv->An ? (string) $iqv->An : '';
+        $type = $iqv->Type ? (string) $iqv->Type : '';
+        $url = $iqv->Url ? (string) $iqv->Url : '';
+        $result['iqv'][] = array(
+            'DbId' => $dbid,
+            'An' => $an,
+            'Type' => $type,
+            'Url'  => $url,
+        );
       }
+    }
+
+
+    // var_dump($record);
+    // die();
+
+
+    // if ($record->Items) {
+    //   $result['Items'] = array();
+    //   foreach ($record->Items->Item as $item) {
+    //     $name = $item->Name ? (string) $item->Name : '';
+    //     $label = $item->Label ? (string) $item->Label : '';
+    //     $group = $item->Group ? (string) $item->Group : '';
+    //     $data = $item->Data ? (string) $item->Data : '';
+    //     $result['Items'][$name] = array(
+    //       'Name'  => $name,
+    //       'Label' => $label,
+    //       'Group' => $group,
+    //       'Data'  => $this->toHTML($data, $group),
+    //     );
+    //   }
+    // }
+
+    // if($record->ImageQuickViewItems->ImageQuickViewItem){
+    //   $result['ImageQuickViewItems'] = array();
+    //   foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv2){
+    //     $dbid = $iqv2->DbId ? (string) $iqv2->DbId : '';
+    //     $an = $iqv2->An ? (string) $iqv2->An : '';
+    //     $type = $iqv2->Type ? (string) $iqv2->Type : '';
+    //     $url = $iqv2->Url ? (string) $iqv2->Url : '';
+    //     $result['ImageQuickViewItems'][$dbid] = array(
+    //         'DbId' => $dbid,
+    //         'An' => $an,
+    //         'Type' => $type,
+    //         'Url' => $url,
+    //         //'Url'  => $this->toHTML($url, $an),
+    //     );
+    //   }
+    // }
+
+    // if($record->ImageQuickViewItems->ImageQuickViewItem){
+    //   $result['ImageQuickViewItems'] = array();
+    //   $result['ImageQuickViewItems']['ImageQuickViewItem'] = array();
+    //   $result['ImageQuickViewItem']['ImageQuickViewItem']=array(
+    //       'DbId'=>array(),
+    //       'An'=>array(),
+    //       'Type'=>array(),
+    //       'Url'=>array()
+    //   );
+
+
+    // }
+
+
+    // var_dump($record->ImageQuickViewItems);
+    // die();
+  
+     
+    //  if($record->ImageQuickViewItems){
+    //   $result['ImageQuickViewItems'] = array();
+    //   foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
+    //     $dbcode = $iqv->DbId ? (string) $iqv->DbId : '';
+    //     $an = $iqv->An ? (string) $iqv->An : '';
+    //     $type = $iqv->Type ? (string) $iqv->Type : '';
+    //     $url = $iqv->Url ? (string) $iqv->Url : '';
+    //     $result['ImageQuickViewItems'][$dbcode] = array(
+    //         'DbId' => $dbcode,
+    //         'An' => $an,
+    //         'Type' => $type,
+    //         'url'  => $url,
+    //         //'url'  => $this->toHTML($url, $an),
+    //     );
+    //   }
+    // }
+
+      // var_dump($record->ImageQuickViewItems);
+      // die();
+
+      // var_dump($record);
+      // die();
       
       $results[] = $result;
       
@@ -418,7 +498,8 @@ class EBSCOResponse {
     }
 
 
-
+    // var_dump($record);
+    // die();
     return $results;
 
     
@@ -588,6 +669,7 @@ class EBSCOResponse {
 
     return $result;
 
+    
    
   }
 
@@ -604,256 +686,254 @@ class EBSCOResponse {
    * @access private
    */
   private function buildRetrieve() {
-    $record = $this->response->Record;
-    if ($record) {
-      // There is only one record.
-      $record = $record[0];
-    }
-
-
-    $result = array();
-    $result['DbId'] = $record->Header->DbId ? (string) $record->Header->DbId : '';
-    $result['DbLabel'] = $record->Header->DbLabel ? (string) $record->Header->DbLabel : '';
-    $result['An'] = $record->Header->An ? (string) $record->Header->An : '';
-    $result['id'] = $result['An'] . '|' . $result['DbId'];
-    $result['PubType'] = $record->Header->PubType ? (string) $record->Header->PubType : '';
-    $result['AccessLevel'] = $record->Header->AccessLevel ? (string) $record->Header->AccessLevel : '';
-    $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
-    
-    $result['Type'] = $record->ImageQuickViewItems->Type ? (string) $record->ImageQuickViewItems->Type : '';
-
-    $result['ImageQuickViewItem'] = $record->ImageQuickViewItems->ImageQuickViewItem ? (string) $record->ImageQuickViewItems->ImageQuickViewItem : '';
-    
-    if (!empty($record->ImageInfo->CoverArt)) {
-      foreach ($record->ImageInfo->CoverArt as $image) {
-        $size = (string) $image->Size;
-        $target = (string) $image->Target;
-        $result['ImageInfo'][$size] = $target;
+      $record = $this->response->Record;
+      if ($record) {
+        // There is only one record.
+        $record = $record[0];
       }
-    }
-    else {
-      $result['ImageInfo'] = '';
-    }
+      
+      
+      $result = array();
+      $result['DbId'] = $record->Header->DbId ? (string) $record->Header->DbId : '';
+      $result['DbLabel'] = $record->Header->DbLabel ? (string) $record->Header->DbLabel : '';
+      $result['An'] = $record->Header->An ? (string) $record->Header->An : '';
+      $result['id'] = $result['An'] . '|' . $result['DbId'];
+      $result['PubType'] = $record->Header->PubType ? (string) $record->Header->PubType : '';
+      $result['AccessLevel'] = $record->Header->AccessLevel ? (string) $record->Header->AccessLevel : '';
+      $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
+      $result['IllustrationInfo'] = $record->IllustrationInfo ? (string) $record->IllustrationInfo : '';
+      $result['Type'] = $record->ImageQuickViewItems->Type ? (string) $record->ImageQuickViewItems->Type : '';
 
-    if ($record->FullText) {
-      $availability = (integer) ($record->FullText->Text->Availability) == 1;
-      $links = array();
-	  if (isset($record->FullText->Links->Link)) {
-		  
-		  foreach ($record->FullText->Links->Link as $link) {
-			$type = (string) $link->Type;
-			$url = (string) $link->Url;
-			// If we have an empty url when type is pdflink then just return something so
-			// that the UI check for empty string will pass.
-			$url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
-			$links[$type] = $url;
-		  }
-	  }
-      $value = $this->toHTML($record->FullText->Text->Value);
-      $result['FullText'] = array(
-        'Availability' => $availability,
-        'Links'        => $links,
-        'Value'        => $value,
-      );
-    }
-    
+      
+      if (!empty($record->ImageInfo->CoverArt)) {
+        foreach ($record->ImageInfo->CoverArt as $image) {
+          $size = (string) $image->Size;
+          $target = (string) $image->Target;
+          $result['ImageInfo'][$size] = $target;
+        }
+      }
+      else {
+        $result['ImageInfo'] = '';
+      }
 
-    if ($record->CustomLinks) {
-      $result['CustomLinks'] = array();
-      foreach ($record->CustomLinks->CustomLink as $customLink) {
-        $category = $customLink->Category ? (string) $customLink->Category : '';
-        $icon = $customLink->Icon ? (string) $customLink->Icon : '';
-        $mouseOverText = $customLink->MouseOverText ? (string) $customLink->MouseOverText : '';
-        $name = $customLink->Name ? (string) $customLink->Name : '';
-        $text = $customLink->Text ? (string) $customLink->Text : '';
-        $url = $customLink->Url ? (string) $customLink->Url : '';
-        $result['CustomLinks'][] = array(
-          'Category'      => $category,
-          'Icon'          => $icon,
-          'MouseOverText' => $mouseOverText,
-          'Name'          => $name,
-          'Text'          => $text,
-          'Url'           => $url,
+      if ($record->FullText) {
+        $availability = (integer) ($record->FullText->Text->Availability) == 1;
+        $links = array();
+      if (isset($record->FullText->Links->Link)) {
+        
+        foreach ($record->FullText->Links->Link as $link) {
+        $type = (string) $link->Type;
+        $url = (string) $link->Url;
+        // If we have an empty url when type is pdflink then just return something so
+        // that the UI check for empty string will pass.
+        $url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
+        $links[$type] = $url;
+        }
+      }
+        $value = $this->toHTML($record->FullText->Text->Value);
+        $result['FullText'] = array(
+          'Availability' => $availability,
+          'Links'        => $links,
+          'Value'        => $value,
         );
       }
-    }
+    
 
-    if ($record->Items) {
-      $result['Items'] = array();
-      foreach ($record->Items->Item as $item) {
-        $name = $item->Name ? (string) $item->Name : '';
-        $label = $item->Label ? (string) $item->Label : '';
-        $group = $item->Group ? (string) $item->Group : '';
-        $data = $item->Data ? (string) $item->Data : '';
-        $result['Items'][$name] = array(
-          'Name'  => $name,
-          'Label' => $label,
-          'Group' => $group,
-          'Data'  => $this->toHTML($data, $group),
+      if ($record->CustomLinks) {
+        $result['CustomLinks'] = array();
+        foreach ($record->CustomLinks->CustomLink as $customLink) {
+          $category = $customLink->Category ? (string) $customLink->Category : '';
+          $icon = $customLink->Icon ? (string) $customLink->Icon : '';
+          $mouseOverText = $customLink->MouseOverText ? (string) $customLink->MouseOverText : '';
+          $name = $customLink->Name ? (string) $customLink->Name : '';
+          $text = $customLink->Text ? (string) $customLink->Text : '';
+          $url = $customLink->Url ? (string) $customLink->Url : '';
+          $result['CustomLinks'][] = array(
+            'Category'      => $category,
+            'Icon'          => $icon,
+            'MouseOverText' => $mouseOverText,
+            'Name'          => $name,
+            'Text'          => $text,
+            'Url'           => $url,
+          );
+        }
+      }
+
+      if ($record->Items) {
+        $result['Items'] = array();
+        foreach ($record->Items->Item as $item) {
+          $name = $item->Name ? (string) $item->Name : '';
+          $label = $item->Label ? (string) $item->Label : '';
+          $group = $item->Group ? (string) $item->Group : '';
+          $data = $item->Data ? (string) $item->Data : '';
+          $result['Items'][$name] = array(
+            'Name'  => $name,
+            'Label' => $label,
+            'Group' => $group,
+            'Data'  => $this->toHTML($data, $group),
+          );
+        }
+      }
+
+      if($record->RecordInfo){
+        $result['RecordInfo'] = array();
+        $result['RecordInfo']['BibEntity']=array(
+            'Identifiers'=>array(),
+            'Languages'=>array(),
+            'PhysicalDescription'=>array(),
+            'Subjects'=>array(),
+            'Titles'=>array()
         );
-      }
-    }
-
-    if($record->RecordInfo){
-      $result['RecordInfo'] = array();
-      $result['RecordInfo']['BibEntity']=array(
-          'Identifiers'=>array(),
-          'Languages'=>array(),
-          'PhysicalDescription'=>array(),
-          'Subjects'=>array(),
-          'Titles'=>array()
-      );
-                  
-      if($record->RecordInfo->BibRecord->BibEntity->Identifiers){
-      foreach($record->RecordInfo->BibRecord->BibEntity->Identifiers->Identfier as $identifier){
-          $type = $identifier->Type? (string) $identifier->Type:'';
-          $value = $identifier->Value? (string) $identifier->Value:'';
-          $result['RecordInfo']['BibEntity']['Identifiers'][]= array(
-          'Type'=>$type,
-          'Value'=>$value
-          );
-      }            
-      }
-      
-      if($record->RecordInfo->BibRecord->BibEntity->Languages){
-      foreach($record->RecordInfo->BibRecord->BibEntity->Languages->Language as $language){
-          $code = $language->Code? (string)$language->Code:'';
-          $text = $language->Text? (string)$language->Text:'';
-          $result['RecordInfo']['BibEntity']['Languages'][]= array(
-          'Code'=>$code,
-          'Text'=>$text
-          );
-      }             
-      }             
-      
-      if($record->RecordInfo->BibRecord->BibEntity->PhysicalDescription){
-      $pageCount = $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->PageCount? (string) $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->PageCount:'';
-      $startPage = $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->StartPage? (string) $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->StartPage:'';
-      $result['RecordInfo']['BibEntity']['PhysicalDescription']['Pagination'] = $pageCount;
-      $result['RecordInfo']['BibEntity']['PhysicalDescription']['StartPage'] = $startPage;
-      }
-                     
-      if($record->RecordInfo->BibRecord->BibEntity->Subjects){
-      foreach($record->RecordInfo->BibRecord->BibEntity->Subjects->Subject as $subject){
-          $subjectFull = $subject->SubjectFull? (string)$subject->SubjectFull:'';
-          $type = $subject->Type? (string)$subject->Type:'';
-          $result['RecordInfo']['BibEntity']['Subjects'][]=array(
-              'SubjectFull'=>$subjectFull,
-              'Type'=>$type
-          );
-      }
-      }
-      
-      if($record->RecordInfo->BibRecord->BibEntity->Titles){
-      foreach($record->RecordInfo->BibRecord->BibEntity->Titles->Title as $title){
-          $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
-          $type = $title->Type? (string)$title->Type:'';
-          $result['RecordInfo']['BibEntity']['Titles'][]=array(
-              'TitleFull'=>$titleFull,
-              'Type'=>$type
-          );
-      }
-      }
-      
-      $result['RecordInfo']['BibRelationships']=array(
-          'HasContributorRelationships'=>array(),
-          'IsPartOfRelationships'=>array()                
-      );
-      
-      if($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships){
-      foreach($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships->HasContributor as $contributor){
-          $nameFull = $contributor->PersonEntity->Name->NameFull? (string)$contributor->PersonEntity->Name->NameFull:'';
-          $result['RecordInfo']['BibRelationships']['HasContributorRelationships'][]=array(
-              'NameFull'=>$nameFull
-          );
-      }
-      }
-      
-      if($record->RecordInfo->BibRecord->BibRelationships){
-      foreach($record->RecordInfo->BibRecord->BibRelationships->IsPartOfRelationships->IsPartOf as $relationship){
-          if($relationship->BibEntity->Dates){
-              foreach($relationship->BibEntity->Dates->Date as $date){
-          $d = $date->D? (string)$date->D:'';
-          $m = $date->M? (string)$date->M:'';
-          $type = $date->Type? (string)$date->Type:'';
-          $y = $date->Y? (string)$date->Y:'';
-          $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['date'][] = array(
-            'D'=> $d,
-            'M'=>$m,
+                    
+        if($record->RecordInfo->BibRecord->BibEntity->Identifiers){
+        foreach($record->RecordInfo->BibRecord->BibEntity->Identifiers->Identfier as $identifier){
+            $type = $identifier->Type? (string) $identifier->Type:'';
+            $value = $identifier->Value? (string) $identifier->Value:'';
+            $result['RecordInfo']['BibEntity']['Identifiers'][]= array(
             'Type'=>$type,
-            'Y'=>$y
-          );
-          }
-          }
-          
-          if($relationship->BibEntity->Identifiers){
-          foreach($relationship->BibEntity->Identifiers->Identfier as $identifier){
-              $type = $identifier->Type? (string) $identifier->Type :'';
-              $value = $identifier->Value? (string) $identifier->Value:'';
-              $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['Identifiers'][]=array(
-                  'Type'=>$type,
-                  'Value'=>$value
-              );
-          }
-          }
-          
-          if($relationship->BibEntity->Numbering){
-              foreach($relationship->BibEntity->Numbering->Number as $number){
-               $type = (string)$number->Type;
-               $value= (string)$number->Value;
-          $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['numbering'][] = array(
-            'Type'=> $type,
             'Value'=>$value
-          );
-          }
-          }
-          
-          if($relationship->BibEntity->Titles){
-              foreach($relationship->BibEntity->Titles->Title as $title){
-                 $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
-                 $type = $title->Type? (string)$title->Type:'';
-                  $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['Titles'][]=array(
-                    'TitleFull' => $titleFull,
-                    'Type'=>$type
-                  );
-              }
-          }
-      }
-   }
-   }
+            );
+        }            
+        }
+        
+        if($record->RecordInfo->BibRecord->BibEntity->Languages){
+        foreach($record->RecordInfo->BibRecord->BibEntity->Languages->Language as $language){
+            $code = $language->Code? (string)$language->Code:'';
+            $text = $language->Text? (string)$language->Text:'';
+            $result['RecordInfo']['BibEntity']['Languages'][]= array(
+            'Code'=>$code,
+            'Text'=>$text
+            );
+        }             
+        }             
+        
+        if($record->RecordInfo->BibRecord->BibEntity->PhysicalDescription){
+        $pageCount = $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->PageCount? (string) $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->PageCount:'';
+        $startPage = $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->StartPage? (string) $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->StartPage:'';
+        $result['RecordInfo']['BibEntity']['PhysicalDescription']['Pagination'] = $pageCount;
+        $result['RecordInfo']['BibEntity']['PhysicalDescription']['StartPage'] = $startPage;
+        }
+                      
+        if($record->RecordInfo->BibRecord->BibEntity->Subjects){
+        foreach($record->RecordInfo->BibRecord->BibEntity->Subjects->Subject as $subject){
+            $subjectFull = $subject->SubjectFull? (string)$subject->SubjectFull:'';
+            $type = $subject->Type? (string)$subject->Type:'';
+            $result['RecordInfo']['BibEntity']['Subjects'][]=array(
+                'SubjectFull'=>$subjectFull,
+                'Type'=>$type
+            );
+        }
+        }
+        
+        if($record->RecordInfo->BibRecord->BibEntity->Titles){
+        foreach($record->RecordInfo->BibRecord->BibEntity->Titles->Title as $title){
+            $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
+            $type = $title->Type? (string)$title->Type:'';
+            $result['RecordInfo']['BibEntity']['Titles'][]=array(
+                'TitleFull'=>$titleFull,
+                'Type'=>$type
+            );
+        }
+        }
+        
+        $result['RecordInfo']['BibRelationships']=array(
+            'HasContributorRelationships'=>array(),
+            'IsPartOfRelationships'=>array()                
+        );
+        
+        if($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships){
+        foreach($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships->HasContributor as $contributor){
+            $nameFull = $contributor->PersonEntity->Name->NameFull? (string)$contributor->PersonEntity->Name->NameFull:'';
+            $result['RecordInfo']['BibRelationships']['HasContributorRelationships'][]=array(
+                'NameFull'=>$nameFull
+            );
+        }
+        }
+        
+        if($record->RecordInfo->BibRecord->BibRelationships){
+            foreach($record->RecordInfo->BibRecord->BibRelationships->IsPartOfRelationships->IsPartOf as $relationship){
+                if($relationship->BibEntity->Dates){
+                    foreach($relationship->BibEntity->Dates->Date as $date){
+                $d = $date->D? (string)$date->D:'';
+                $m = $date->M? (string)$date->M:'';
+                $type = $date->Type? (string)$date->Type:'';
+                $y = $date->Y? (string)$date->Y:'';
+                $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['date'][] = array(
+                  'D'=> $d,
+                  'M'=>$m,
+                  'Type'=>$type,
+                  'Y'=>$y
+                );
+                }
+                }
+                
+                if($relationship->BibEntity->Identifiers){
+                foreach($relationship->BibEntity->Identifiers->Identfier as $identifier){
+                    $type = $identifier->Type? (string) $identifier->Type :'';
+                    $value = $identifier->Value? (string) $identifier->Value:'';
+                    $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['Identifiers'][]=array(
+                        'Type'=>$type,
+                        'Value'=>$value
+                    );
+                }
+                }
+                
+                if($relationship->BibEntity->Numbering){
+                    foreach($relationship->BibEntity->Numbering->Number as $number){
+                    $type = (string)$number->Type;
+                    $value= (string)$number->Value;
+                $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['numbering'][] = array(
+                  'Type'=> $type,
+                  'Value'=>$value
+                );
+                }
+                }
+                
+                if($relationship->BibEntity->Titles){
+                    foreach($relationship->BibEntity->Titles->Title as $title){
+                      $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
+                      $type = $title->Type? (string)$title->Type:'';
+                        $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['Titles'][]=array(
+                          'TitleFull' => $titleFull,
+                          'Type'=>$type
+                        );
+                    }
+                }
+            }
+        }
 
-   if($record->ImageQuickViewItems->ImageQuickViewItem){
-    $result['iqv'] = array();
-    foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
-      $dbcode = $iqv->DbId ? (string) $iqv->DbId : '';
-      $an = $iqv->An ? (string) $iqv->An : '';
-      $type = $iqv->Type ? (string) $iqv->Type : '';
-      $url = $iqv->Url ? (string) $iqv->Url : '';
-      $result['iqv'][] = array(
-          'DbId' => $dbcode,
-          'An' => $an,
-          'Type' => $type,
-          'url'  => $url
-      );
     }
-  }
 
- 
-   if($record->IllustrationInfo) {
-       $result['IllustrationInfo'] = array();
-       foreach ($record->IllustrationInfo->Images->Image as $imageInfo) {             
-           $size = $imageInfo->Size ? (string) $imageInfo->Size : '';
-           $target = $imageInfo->Target ? (string) $imageInfo->Target : '';
-           $result['IllustrationInfo'][] = array(                
-               'Size' => $size,
-               'Target' => $target
-           );
-       }
-   }
-    
-  
+    if($record->ImageQuickViewItems->ImageQuickViewItem){
+      $result['iqv'] = array();
+      foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
+        $dbcode = $iqv->DbId ? (string) $iqv->DbId : '';
+        $an = $iqv->An ? (string) $iqv->An : '';
+        $type = $iqv->Type ? (string) $iqv->Type : '';
+        $url = $iqv->Url ? (string) $iqv->Url : '';
+        $result['iqv'][] = array(
+            'DbId' => $dbcode,
+            'An' => $an,
+            'Type' => $type,
+            'url'  => $url
+        );
+      }
+    }
+
+    if($record->IllustrationInfo) {
+      $result['IllustrationInfo'] = array();
+      foreach ($record->IllustrationInfo->Images->Image as $img) {             
+          $size = $img->Size ? (string) $img->Size : '';
+          $target = $img->Target ? (string) $img->Target : '';
+          $result['IllustrationInfo'][] = array(                
+              'Size' => $size,
+              'Target' => $target
+          );
+      }
+    }
+
+   
     return $result;
-
 
   }
   
