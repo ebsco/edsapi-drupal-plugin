@@ -165,9 +165,50 @@ class EBSCORecord {
   /**
    * * @global string
    */
-  public $image_quick_view_type = NULL;
+  //public $image_quick_view_type = NULL;
+  public $image_quick_view = array();
 
+  public $image_quick_view_type_2 = array();
+  /**image quick view
+   * ImageQuickViewItems 
+   */
+  /**
+   * * @global string
+   */
+  public $image_quick_url = NULL;
 
+  /* IllustrationInfo 
+   */
+  /**
+   * * @global string
+   */
+    public $illustrationinfo = array();
+  
+  /**
+   * Type to IQV
+   * * @global string
+   */
+    public $type = NULL;
+
+   /**
+   * Cite  to IQV
+   * * @global string
+   */
+  public $cite = NULL;
+
+   /**
+   * Permission to IQV
+   * * @global string
+   */
+  public $permission = NULL;
+
+  
+
+  /**
+   * imgTitle to IQV
+   * * @global string
+   */
+  public $imgtitle = NULL;
 
   /**
    * Constructor.
@@ -197,7 +238,17 @@ class EBSCORecord {
     $this->medium_thumb_link = $this->thumb_link('medium');
     $this->source = $this->source();
     $this->access_level = $this->access_level();
-    $this->image_quick_view_type = $this->image_quick_view_type();
+    $this->image_quick_view = $this->image_quick_view();
+    $this->image_quick_view_type_2 = $this->image_quick_view_type_2();
+    $this->image_quick_url = $this->image_quick_url();
+    $this->illustrationinfo = $this->illustrationinfo();
+    $this->type = $this->type();
+    $this->cite = $this->cite();
+    $this->permission = $this->permission();
+    $this->imgtitle = $this->imgtitle();
+    
+    // var_dump($this->data);
+    // die();
     
   }
 
@@ -314,6 +365,8 @@ class EBSCORecord {
    * @return bool
    */
   public function pdf_availability() {
+    // var_dump($this->data['FullText']['Links']['pdflink']);
+    // die();
     return isset($this->data['FullText']) &&
             isset($this->data['FullText']['Links']) &&
             isset($this->data['FullText']['Links']['pdflink']) &&
@@ -326,6 +379,8 @@ class EBSCORecord {
    * @return string
    */
   public function pdf_link() {
+    // var_dump($this->data['FullText']);
+    // die();
     return isset($this->data['FullText']) &&
             isset($this->data['FullText']['Links']) &&
             isset($this->data['FullText']['Links']['pdflink']) ?
@@ -414,13 +469,56 @@ class EBSCORecord {
   }
 
    /**
-   * Get the iamge quick view of the record.
+   * Get the image quick view of the record.
    *
    * @return string
    */
 
-  public function image_quick_view_type() {
+  public function image_quick_view() {
     return isset($this->data['iqv']) ? $this->data['iqv'] : array();
+  }
+
+  public function image_quick_url() {
+    return isset($this->data['iqv']) ? $this->data['iqv'] : array();
+  
+  }
+
+
+  public function image_quick_view_type_2() {
+    return isset($this->data['ImageQuickViewItems']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['DbId']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['An']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['Type']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['Url']) ?
+    $this->data['ImageQuickViewItems']['iqv']['DbId']['An']['Type']['Url'] : '';
+  }
+
+  public function illustrationinfo() {
+    return isset($this->data['IllustrationInfo'][0]) ? $this->data['IllustrationInfo'][0] : array();
+  }
+
+  
+  public function type() {
+    
+    return isset($this->data['Items']['type']) ?
+    $this->data['Items']['type'] : '';
+  }
+
+  public function cite() {
+    return isset($this->data['Items']['Cite']) ?
+    $this->data['Items']['Cite'] : '';
+  }
+
+  public function permission() {    
+    return isset($this->data['Items']['Permission']) ?
+    $this->data['Items']['Permission'] : '';
+  }
+
+
+  public function imgtitle() {    
+    return isset($this->data['Items']['imgTitle']) ?
+    $this->data['Items']['imgTitle'] : '';
   }
 
 }

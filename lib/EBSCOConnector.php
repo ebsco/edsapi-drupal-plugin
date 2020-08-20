@@ -390,11 +390,11 @@ class EBSCOConnector {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_MAXREDIRS, 10 );		
-		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+		    curl_setopt($curl, CURLOPT_MAXREDIRS, 10 );		
+		    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+		    curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 					
         switch ($method)
         {

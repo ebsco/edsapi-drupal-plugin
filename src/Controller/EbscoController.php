@@ -37,7 +37,8 @@ class EbscoController extends ControllerBase  {
 
   
   public function detailed_record() {
-    $is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+	$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+
     if ($is_xhr) {
 		return [
 		  '#theme' => 'ebsco_result'
@@ -50,7 +51,9 @@ class EbscoController extends ControllerBase  {
 		  '#theme' => 'ebsco_result'
 		];
 
-    }
+	}
+	
+
   }
 
 
@@ -65,6 +68,7 @@ class EbscoController extends ControllerBase  {
 		$_ebsco_document->retrieve();
 		$record = $_ebsco_document->record();
 		$url=str_replace('&amp;','&',$record->pdf_link);
+		
 		// redirect on the new window
 		header('Location: '.$url);
 		die();
@@ -73,39 +77,97 @@ class EbscoController extends ControllerBase  {
 	{
 		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
 		return new RedirectResponse(\Drupal::url('user.page'));
-    }
+	}
+	
+
 
   }
 
-  public function fulltext_page() {
-    $is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    if (\Drupal::currentUser()->isAuthenticated()) {
-      if ($is_xhr) {
-		return [
-		  '#theme' => 'ebsco_result'
-		];
-		return true;
-      }
-      else {
-		return [
-		  '#theme' => 'ebsco_result'
-		];
+  
 
-      }
-    }
-    else {
-      $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-      if ($is_xhr) {
-        echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
-        return;
-      }
-      else {
+	public function fulltext_page() {
+		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+		if (\Drupal::currentUser()->isAuthenticated()) {
+		if ($is_xhr) {
+			return [
+			'#theme' => 'ebsco_result'
+			];
+			return true;
+		}
+		else {
+			return [
+			'#theme' => 'ebsco_result'
+			];
+
+		}
+		}
+		else {
 		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-		return new RedirectResponse(\Drupal::url('user.page'));		
-      }
-    }
-  }
+		if ($is_xhr) {
+			echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
+			return;
+		}
+		else {
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));		
+		}
+		}
+	}
 
 
+
+	public function image_quick_view() {
+		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+		if (\Drupal::currentUser()->isAuthenticated()) {
+		if ($is_xhr) {
+			return [
+			'#theme' => 'ebsco_image_quick_view'
+			];
+			return true;
+		}
+		else {
+			return [
+			'#theme' => 'ebsco_image_quick_view'
+			];
+
+		}
+		}
+		else {
+		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+		if ($is_xhr) {
+			echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
+			return;
+		}
+		else {
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));		
+		}
+		}
+
+	}
+
+	public function image_quick_url() {
+    global $_ebsco_document;
+    $params = $_REQUEST;
+
+		if (\Drupal::currentUser()->isAuthenticated()) {
+			if (empty($_ebsco_document)) {
+				$_ebsco_document = new \EBSCODocument();
+			}
+			$_ebsco_document->retrieve();
+			$record = $_ebsco_document->record();
+			$url=str_replace('&amp;','&',$record->image_quick_url);
+		
+			// redirect on the new window
+			header('Location: '.$url);
+			die();
+		}
+		else 
+		{
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));
+		}
+
+	}
 	
 }
