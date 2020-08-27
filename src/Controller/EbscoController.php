@@ -17,73 +17,71 @@ require_once __DIR__ . "/../../lib/EBSCODocument.php";
  * Default controller for the ebsco module.
  */
 class EbscoController extends ControllerBase  {
+
 	public function content() {
 		return [
-		   '#theme' => 'ebsco_basic_search',
+		'#theme' => 'ebsco_basic_search',
 		];
 	}
 	
 	public function advanced() {
 		return [
-		  '#theme' => 'ebsco_advanced_search'
+		'#theme' => 'ebsco_advanced_search'
 		];
 	}
 	
 	public function results() {
 		return [
-		  '#theme' => 'ebsco_results'
+		'#theme' => 'ebsco_results'
 		];
 	}
 
-  
-  public function detailed_record() {
-	$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+	public function detailed_record() {
+		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 
-    if ($is_xhr) {
-		return [
-		  '#theme' => 'ebsco_result'
-		];
-		 return true;
-    }
-    else {
-      // @FIXME
-		return [
-		  '#theme' => 'ebsco_result'
-		];
-
-	}
-	
-
-  }
-
-
-  public function pdf_page() {
-    global $_ebsco_document;
-    $params = $_REQUEST;
-
-    if (\Drupal::currentUser()->isAuthenticated()) {
-		if (empty($_ebsco_document)) {
-			$_ebsco_document = new \EBSCODocument();
+		if ($is_xhr) {
+			return [
+			'#theme' => 'ebsco_result'
+			];
+			return true;
 		}
-		$_ebsco_document->retrieve();
-		$record = $_ebsco_document->record();
-		$url=str_replace('&amp;','&',$record->pdf_link);
+		else {
+		// @FIXME
+			return [
+			'#theme' => 'ebsco_result'
+			];
+
+		}
 		
-		// redirect on the new window
-		header('Location: '.$url);
-		die();
-    }
-    else 
-	{
-		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-		return new RedirectResponse(\Drupal::url('user.page'));
+
 	}
-	
 
 
-  }
+	public function pdf_page() {
+		global $_ebsco_document;
+		$params = $_REQUEST;
 
-  
+		if (\Drupal::currentUser()->isAuthenticated()) {
+			if (empty($_ebsco_document)) {
+				$_ebsco_document = new \EBSCODocument();
+			}
+			$_ebsco_document->retrieve();
+			$record = $_ebsco_document->record();
+			
+			$url=str_replace('&amp;','&',$record->pdf_link);
+
+			header('Location: '.$url);
+			die();
+		}
+		else 
+		{
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));
+		}
+		
+	}
+
+
 
 	public function fulltext_page() {
 		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
@@ -101,6 +99,7 @@ class EbscoController extends ControllerBase  {
 
 		}
 		}
+		
 		else {
 		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
 		if ($is_xhr) {
@@ -144,6 +143,52 @@ class EbscoController extends ControllerBase  {
 		}
 		}
 
+	}
+
+
+	public function exportformat_detail() {
+		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+		
+		if ($is_xhr) {
+			return [
+			'#theme' => 'ebsco_exportformat_detail'
+			];
+			return true;
+		}
+		else {
+			return [
+			'#theme' => 'ebsco_exportformat_detail'
+			];
+
+		}
+
+	}		
+
+
+
+	public function exportformat() {
+		global $_ebsco_document;
+		$params = $_REQUEST;
+
+		if (\Drupal::currentUser()->isAuthenticated()) {
+			if (empty($_ebsco_document)) {
+				$_ebsco_document = new \EBSCODocument();
+			}
+			$_ebsco_document->export();
+			$record = $_ebsco_document->record();
+
+			$url = $_ebsco_document->export();
+			
+		
+			header('Location: '.$url);
+			die();
+		}
+		else 
+		{
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));
+		}
+		
 	}
 
 	public function image_quick_url() {

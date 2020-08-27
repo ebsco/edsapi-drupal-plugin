@@ -254,6 +254,19 @@ class EBSCODocument {
         
     }
 
+     /**
+     * Perform the API Export call.
+     *
+     * @return array
+     */
+    public function export() {
+        list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
+        $this->result = $this->eds->apiExport($an, $db);
+
+        return $this->result;
+        
+    }
+
     /**
      * Perform the API Search call.
      *
@@ -311,13 +324,6 @@ class EBSCODocument {
             }
         }
 
-        // $iqv = FALSE;
-        // if (isset($info["ImageQuickViewItems"])) {
-            
-        //     if ($info["ImageQuickViewItems"][0]["DefaultOn"] == "y") {
-        //         $iqv = TRUE;
-        //     }
-        // }
         $iqv = FALSE;
         if (isset($info["includeImageQuickView"])) {
             
@@ -326,11 +332,6 @@ class EBSCODocument {
             }
         }
 
-        //var_dump($info["includeImageQuickView"]);
-        // var_dump($info);
-        // die();
-
-        //$this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug);
         $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug, $iqv);
 
         return $this->results;
@@ -406,6 +407,7 @@ class EBSCODocument {
         
     }
 
+    
     
     public function imageQuickViewTerms() {
 

@@ -549,12 +549,12 @@ class EBSCOAPI {
         // Specifies whether or not to include highlighting in the search results.
       'highlight'      => 'y',
 
-      //'includeimagequickview'=> 'y',
-     'includeimagequickview' => $includeimagequickview,
+      
+      'includeimagequickview' => $includeimagequickview,
 
-     //IllustrationInfo
-     //'llustrationinfo' => 'y',
-   
+      'format' => 'ris',
+
+
     );
 
     if ($autosuggest == TRUE) {
@@ -614,14 +614,27 @@ class EBSCOAPI {
       //'includeimagequickview' => $includeimagequickviewDetail,
       //'IllustrationInfo' => 'y',
       'IllustrationInfo' => $IllustrationInfo,
+      'format' => 'ris',
     );
     
     $result = $this->request('Retrieve', $params);
-   
-
     
     return $result;
+    
+  }
 
+  
+
+  public function apiExport($an, $db) {
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'format' => 'ris'
+    );
+    
+    $result = $this->request('Export', $params);
+    
+    return $result;
     
   }
 

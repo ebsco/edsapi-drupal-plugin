@@ -405,7 +405,8 @@ class EBSCOAPI {
   $rs = FALSE,
   $emp = FALSE,
   $autosuggest = FALSE,
-  $includeimagequickview = FALSE
+  $includeimagequickview = FALSE,
+  $IllustrationInfo = FALSE
   ) {
     $query = array();
 
@@ -549,8 +550,13 @@ class EBSCOAPI {
       'highlight'      => 'y',
 
       //'includeimagequickview'=> 'y',
-      'includeimagequickview' => $includeimagequickview,
+     'includeimagequickview' => $includeimagequickview,
 
+     'format' => 'ris',
+
+     //IllustrationInfo
+     //'llustrationinfo' => 'y',
+   
     );
 
     if ($autosuggest == TRUE) {
@@ -573,10 +579,15 @@ class EBSCOAPI {
     if ($includeimagequickview == TRUE) {
       $params["includeimagequickview"] = "y";
     }
-    
+
+
     $params = array_merge($params, $query);
 
+
     $result = $this->request('Search', $params);
+
+    // var_dump($params);
+    // die();
 
     return $result;
   }
@@ -597,16 +608,37 @@ class EBSCOAPI {
    */
   public function apiRetrieve($an, $db) {
     // Add the HTTP query params.
+    //$includeimagequickviewDetail = FALSE;
     $params = array(
       'an'        => $an,
       'dbid'      => $db,
       'highlight' => 'y',
+      //'includeimagequickview' => $includeimagequickviewDetail,
+      //'IllustrationInfo' => 'y',
+      'IllustrationInfo' => $IllustrationInfo,
+      'format' => 'ris',
     );
-
+    
     $result = $this->request('Retrieve', $params);
+    
     return $result;
+    
   }
 
+  public function apiExport($an, $db) {
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'format' => 'ris'
+    );
+    
+    $result = $this->request('Export', $params);
+    
+    return $result;
+    
+  }
+
+  
   /**
    * Wrapper for info API call.
    *
@@ -628,7 +660,6 @@ class EBSCOAPI {
 
     return $result;
   }
-
 
   /**
    * Handle a PEAR_Error. Return :

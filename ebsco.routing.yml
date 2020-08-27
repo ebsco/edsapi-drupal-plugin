@@ -48,7 +48,7 @@ ebsco.pdf:
     _access: 'TRUE'
     _permission: 'access content'
   options:
-   no_cache: 'TRUE'
+    no_cache: 'TRUE'
 
 ebsco.fulltext:
   path: '/ebsco/fulltext'
@@ -65,4 +65,22 @@ ebsco.image_quick_view:
     _controller: '\Drupal\ebsco\Controller\EbscoController::image_quick_view'
   requirements:
     _permission: 'access content'
-  
+
+ebsco.exportformat:
+  path: '/ebsco/exportformat'
+  defaults:
+    _title: 'Ris Export Format'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::exportformat'
+  requirements:
+    _access: 'TRUE'
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'
+
+ebsco.exportformat_detail:
+  path: '/ebsco/exportformat_detail'
+  defaults:
+    _title: 'Detailed RIS 2'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::exportformat_detail'
+  requirements:
+    _permission: 'access content'
