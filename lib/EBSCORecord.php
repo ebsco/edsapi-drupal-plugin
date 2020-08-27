@@ -516,7 +516,9 @@ class EBSCORecord {
   }
 
 
-  public function imgtitle() {    
+  public function imgtitle() {
+    // var_dump($this->data);
+    // die();
     return isset($this->data['Items']['imgTitle']) ?
     $this->data['Items']['imgTitle'] : '';
   }

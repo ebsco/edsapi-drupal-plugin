@@ -115,6 +115,10 @@ function  ebsco_theme($existing, $type, $theme, $path) {
         'ebsco_image_quick_view' => array(
             'render element' => 'elements',
             'template' => 'ebsco-image-quick-view'
+        ),
+        'ebsco_exportformat_detail' => array(
+            'render element' => 'elements',
+            'template' => 'ebsco-export-format'
         )
     );
     return $themes;
@@ -880,7 +884,7 @@ function template_preprocess_ebsco_results(&$variables) {
 
                 // Replated publications.
                 if  (isset($item["RelatedPublication"])) {
-                    // var_dump($item);
+                    
                     $tabs .= '<li data-target="#ematchplacard" data-slide-to="' . $counter . '" ' . ($counter == 0 ? ' class="active" ' : ' ') . '></li>';
                     $counter++;
 
@@ -971,18 +975,11 @@ function template_preprocess_ebsco_results(&$variables) {
 
         foreach ($Document->records() as $record) {
 
-        //    var_dump($record);
-        //    die();
-
             $id = \Drupal\Component\Utility\Html::escape($record->record_id());
             $recordUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $id))->toString();
             $fulltextUrl= \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
             $pdfUrl= \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-            
-            // $iqvUrl = \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An']))->toString();
-            //$iqvUrl = \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv))->toString();
-            
-            
+                        
 
             $recordHtml="<li>"
                 .'<div class="record-number floatleft">'.$record->result_id.'</div>'
@@ -1100,22 +1097,15 @@ function template_preprocess_ebsco_results(&$variables) {
             // PDF and HTML processing
             $recordHtml.='<div class="result-line5">';
             if ($record->full_text_availability){
-                $recordHtml.= '<a href="' . $fulltextUrl . '#html" class="icon html fulltext _record_link">'.t('HTML full text results')."</a>&nbsp; &nbsp;";
+                $recordHtml.= '<a href="' . $fulltextUrl . '#html" class="icon html fulltext _record_link">'.t('HTML full text')."</a>&nbsp; &nbsp;";
                 
             }
 
             if ($record->pdf_availability){
-                $recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext" target="_blank">'.t('PDF full texto results line 1196')."</a>";
+                $recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext" target="_blank">'.t('PDF full text')."</a>";
 
-                // var_dump($pdfUrl);
-                // die();
             }
 
-            // if ($record->image_quick_url){
-            //     $recordHtml.= ' <a href="' . $iqvUrl . '" class="" target="_blank">'.t('Images???')."</a>";
-            // }
-            // var_dump($record);
-            // die();
 
             $recordHtml.='</div>'
 
@@ -1171,9 +1161,6 @@ function template_preprocess_ebsco_results(&$variables) {
         $variables["processHtmlRecords"].="</ol>";
 
 
-
-
-
     }
 
 }
@@ -1220,6 +1207,7 @@ function template_preprocess_ebsco_result(&$variables) {
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
+
     $Document->retrieve();
     $record = $Document->record();
 
@@ -1231,21 +1219,29 @@ function template_preprocess_ebsco_result(&$variables) {
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
     $detailRecordHTML="";
     
+    
+    
 
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
         $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();;
         $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
-    
-        
+        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
 
-        $detailRecordHTML='<div class="ebsco-record detailrecord-2columns">'
+        $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
+      
+        $detailRecordHTML.='<div class="ebsco-record detailrecord-2columns">'
             .'<div>'
             .'<div class="detailrecord-links">	'
 
             .'<ul class="external-links">';
+        
+    
+        if($record->record_id){
+
+            $detailRecordHTML.= "<li> <a href='" . $exportFormatDetail . "&format=ris'>" . t('RIS Export') . "</a></li>";
+        }
 
         if($record->p_link){
             $detailRecordHTML.= "<li> <a href='" . $record->p_link . "'>" . t('View in EDS') . "</a></li>";
@@ -1254,14 +1250,7 @@ function template_preprocess_ebsco_result(&$variables) {
         if ($record->pdf_link){
             $detailRecordHTML.= '
                 <li>
-                <a href="' . $pdfUrl . '" class="icon pdf fulltext">' . t('PDF full texto Detalhado') . '</a>
-                </li>';
-        }
-
-        if ($record->image_quick_view){
-            $detailRecordHTML.= '
-                <li>
-                <a href="' . $iqvUrl . '" class="Imagestest">' . t('Images details?') . '</a>
+                <a href="' . $pdfUrl . '" class="icon pdf fulltext">' . t('PDF full text') . '</a>
                 </li>';
         }
 
@@ -1270,7 +1259,7 @@ function template_preprocess_ebsco_result(&$variables) {
 
             $detailRecordHTML.= '
                 <li>
-                <a href="' . ((!\Drupal::currentUser()->isAuthenticated()) ? $fulltextUrl : "") . '#html" class="icon html fulltext">' . t('HTML full text???') . '</a>
+                <a href="' . ((!\Drupal::currentUser()->isAuthenticated()) ? $fulltextUrl : "") . '#html" class="icon html fulltext">' . t('HTML full text') . '</a>
                 </li>';
         }
 
@@ -1407,12 +1396,12 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
     $detailImageQuickViewHTML="";
 
+
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
         
         $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
-            
 
 
         $detailImageQuickViewHTML.='<div class="result-line5">';       
@@ -1475,6 +1464,70 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
 /*
 to IQV records
 */
+
+// /*
+// to Ris Export Format
+
+function template_preprocess_ebsco_exportformat_detail(&$variables) {
+
+    $params = $_REQUEST;
+
+    $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
+
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+    if (empty($Document)) {
+        $Document = new EBSCODocument();
+    }
+
+    
+    
+    $Document->retrieve();
+    
+    $record = $Document->record();
+    $Document->export();
+
+    $variables['record'] = $record;
+    $lastSearch['count'] = $Document->record_count();
+    $variables['count'] = $Document->record_count();
+
+    $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
+    $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
+    $risDetailViewHTML="";
+    
+    
+    
+
+    if (isset($record) ){
+
+        $id = \Drupal\Component\Utility\Html::escape($record->record_id());
+        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();;
+        $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
+        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+
+        $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
+
+        $exportFormat = $Document->export();
+        $filename = $_REQUEST['an'].'delivery'.$_REQUEST['db'].'.ris';
+        header('Content-Type: application/x-research-info-systems');
+        header('Content-Disposition: inline; filename="'.$filename.'"');
+        echo (string)$exportFormat;
+
+            
+    }
+
+
+    $variables['exportformatrecord'] = $risDetailViewHTML;
+
+    $request = \Drupal::request();
+    if ($route = $request->attributes->get(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT)) {
+        $route->setDefault('_title', $record->title);
+    }
+}
+
+
+// /*
+// to Ris Export Format
+// */
 function ebsco_side_facets($facetVars) {
 
     $params = $_REQUEST;

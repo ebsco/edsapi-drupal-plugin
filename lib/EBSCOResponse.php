@@ -74,6 +74,9 @@ class EBSCOResponse {
     elseif (!empty($this->response->AvailableSearchCriteria)) {
       return $this->buildInfo();
     }
+    elseif (!empty($this->response->Format) && $this->response->Format == 'RIS') {
+      return $this->response->Data;
+    }
     // Should not happen, it may be an exception.
     else {
       return $this->response;
@@ -159,9 +162,6 @@ class EBSCOResponse {
       'facets'      => $facets,
       'imageQuickViewTerms' => $imageQuickViewTerms,
     );
-
-    // var_dump($results);
-    // die();
     
 
     return $results;
@@ -192,7 +192,6 @@ class EBSCOResponse {
       $result['AccessLevel'] = $record->Header->AccessLevel ? (string) $record->Header->AccessLevel : '';
       $result['id'] = $result['An'] . '|' . $result['DbId'];
       $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
-      //$result['ImageQuickViewItem'] = $record->ImageQuickViewItems->ImageQuickViewItem ? (string) $record->ImageQuickViewItems->ImageQuickViewItem : '';
       
       if (!empty($record->ImageInfo->CoverArt)) {
         foreach ($record->ImageInfo->CoverArt as $image) {
@@ -249,7 +248,6 @@ class EBSCOResponse {
       }
 
       
-     
       if ($record->Items) {
         $result['Items'] = array();
         foreach ($record->Items->Item as $item) {
@@ -372,8 +370,8 @@ class EBSCOResponse {
             
             if($relationship->BibEntity->Titles){
                 foreach($relationship->BibEntity->Titles->Title as $title){
-                   $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
-                   $type = $title->Type? (string)$title->Type:'';
+                  $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
+                  $type = $title->Type? (string)$title->Type:'';
                     $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['Titles'][]=array(
                       'TitleFull' => $titleFull,
                       'Type'=>$type
@@ -383,8 +381,8 @@ class EBSCOResponse {
             
             if($relationship->BibEntity->Numbering){
                 foreach($relationship->BibEntity->Numbering->Number as $number){
-                 $type = (string)$number->Type;
-                 $value= (string)$number->Value;
+                $type = (string)$number->Type;
+                $value= (string)$number->Value;
             $result['RecordInfo']['BibRelationships']['IsPartOfRelationships']['numbering'][] = array(
               'Type'=> $type,
               'Value'=>$value
@@ -413,84 +411,6 @@ class EBSCOResponse {
       }
     }
 
-
-    // var_dump($record);
-    // die();
-
-
-    // if ($record->Items) {
-    //   $result['Items'] = array();
-    //   foreach ($record->Items->Item as $item) {
-    //     $name = $item->Name ? (string) $item->Name : '';
-    //     $label = $item->Label ? (string) $item->Label : '';
-    //     $group = $item->Group ? (string) $item->Group : '';
-    //     $data = $item->Data ? (string) $item->Data : '';
-    //     $result['Items'][$name] = array(
-    //       'Name'  => $name,
-    //       'Label' => $label,
-    //       'Group' => $group,
-    //       'Data'  => $this->toHTML($data, $group),
-    //     );
-    //   }
-    // }
-
-    // if($record->ImageQuickViewItems->ImageQuickViewItem){
-    //   $result['ImageQuickViewItems'] = array();
-    //   foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv2){
-    //     $dbid = $iqv2->DbId ? (string) $iqv2->DbId : '';
-    //     $an = $iqv2->An ? (string) $iqv2->An : '';
-    //     $type = $iqv2->Type ? (string) $iqv2->Type : '';
-    //     $url = $iqv2->Url ? (string) $iqv2->Url : '';
-    //     $result['ImageQuickViewItems'][$dbid] = array(
-    //         'DbId' => $dbid,
-    //         'An' => $an,
-    //         'Type' => $type,
-    //         'Url' => $url,
-    //         //'Url'  => $this->toHTML($url, $an),
-    //     );
-    //   }
-    // }
-
-    // if($record->ImageQuickViewItems->ImageQuickViewItem){
-    //   $result['ImageQuickViewItems'] = array();
-    //   $result['ImageQuickViewItems']['ImageQuickViewItem'] = array();
-    //   $result['ImageQuickViewItem']['ImageQuickViewItem']=array(
-    //       'DbId'=>array(),
-    //       'An'=>array(),
-    //       'Type'=>array(),
-    //       'Url'=>array()
-    //   );
-
-
-    // }
-
-
-    // var_dump($record->ImageQuickViewItems);
-    // die();
-  
-     
-    //  if($record->ImageQuickViewItems){
-    //   $result['ImageQuickViewItems'] = array();
-    //   foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
-    //     $dbcode = $iqv->DbId ? (string) $iqv->DbId : '';
-    //     $an = $iqv->An ? (string) $iqv->An : '';
-    //     $type = $iqv->Type ? (string) $iqv->Type : '';
-    //     $url = $iqv->Url ? (string) $iqv->Url : '';
-    //     $result['ImageQuickViewItems'][$dbcode] = array(
-    //         'DbId' => $dbcode,
-    //         'An' => $an,
-    //         'Type' => $type,
-    //         'url'  => $url,
-    //         //'url'  => $this->toHTML($url, $an),
-    //     );
-    //   }
-    // }
-
-      // var_dump($record->ImageQuickViewItems);
-      // die();
-
-      // var_dump($record);
-      // die();
       
       $results[] = $result;
       
@@ -498,8 +418,6 @@ class EBSCOResponse {
     }
 
 
-    // var_dump($record);
-    // die();
     return $results;
 
     
@@ -620,15 +538,15 @@ class EBSCOResponse {
     }
 
      //ImageQuickView
-     $elements = $this->response->AvailableIncludeImageQuickView->IncludeImageQuickViewOptions->IncludeImageQuickViewOption; 
-     $includeImageQuickView = array();
-     foreach ($this->response->ViewResultSettings->IncludeImageQuickView as $element) {
-         $includeImageQuickView[] = array(
-             'Label'  => (string) $element->Label,
-             'Id' => (string) $element->Id,
-             'DefaultOn'     => (string) $element->DefaultOn
-         );
-     }
+    $elements = $this->response->AvailableIncludeImageQuickView->IncludeImageQuickViewOptions->IncludeImageQuickViewOption; 
+    $includeImageQuickView = array();
+    foreach ($this->response->ViewResultSettings->IncludeImageQuickView as $element) {
+        $includeImageQuickView[] = array(
+            'Label'  => (string) $element->Label,
+            'Id' => (string) $element->Id,
+            'DefaultOn'     => (string) $element->DefaultOn
+        );
+    }
 
 
     // Limiters.
@@ -670,7 +588,6 @@ class EBSCOResponse {
     return $result;
 
     
-   
   }
 
   
@@ -692,6 +609,7 @@ class EBSCOResponse {
         $record = $record[0];
       }
       
+    
       
       $result = array();
       $result['DbId'] = $record->Header->DbId ? (string) $record->Header->DbId : '';
@@ -932,7 +850,6 @@ class EBSCOResponse {
       }
     }
 
-   
     return $result;
 
   }
@@ -1023,13 +940,13 @@ class EBSCOResponse {
       if (!empty($group)) {
         $group = strtolower($group);
         if (in_array($group, $allowed_searchlink_groups)) {
-			$type = $xml_to_search_types[$group];
-			$path = \Drupal\Core\Url::fromRoute('ebsco.results',  array('type' => $type))->toString();
-			 $link_xml = '/<searchLink fieldCode="([^\"]*)" term="%22([^\"]*)%22">/';
-			 $link_html = "<a href=\"{$path}&lookfor=$2\">";
-			 $data = preg_replace($link_xml, $link_html, $data);
-			 $data = str_replace('</searchLink>', '</a>', $data);
-        }
+        $type = $xml_to_search_types[$group];
+        $path = \Drupal\Core\Url::fromRoute('ebsco.results',  array('type' => $type))->toString();
+        $link_xml = '/<searchLink fieldCode="([^\"]*)" term="%22([^\"]*)%22">/';
+        $link_html = "<a href=\"{$path}&lookfor=$2\">";
+        $data = preg_replace($link_xml, $link_html, $data);
+        $data = str_replace('</searchLink>', '</a>', $data);
+          }
       }
 
       // Replace the rest of searchLinks with simple spans.
@@ -1046,7 +963,7 @@ class EBSCOResponse {
     $sanitizer = new HTML_Sanitizer();
     $data = $sanitizer->sanitize($data);
 
-   
+
     return $data;
   }
 

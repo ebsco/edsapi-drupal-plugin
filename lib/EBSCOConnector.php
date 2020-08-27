@@ -337,6 +337,25 @@ class EBSCOConnector {
   }
 
   /**
+   * Export a specific record.
+   *
+   * @param array $params
+   *   Export specific parameters.
+   * @param array $headers
+   *   Authentication and session tokens.
+   *
+   * @return object SimpleXml or PEAR_Error
+   *
+   * @access public
+   */
+  public function requestExport($params, $headers) {
+    $url = self::$end_point . '/ExportFormat';
+
+    $response = $this->request($url, $params, $headers);
+    return $response;
+  }
+
+  /**
    * Request the info data.
    *
    * @param null $params

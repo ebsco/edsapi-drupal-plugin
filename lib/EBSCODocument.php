@@ -254,6 +254,20 @@ class EBSCODocument {
         
     }
 
+     /**
+     * Perform the API Export call.
+     *
+     * @return array
+     */
+    public function export() {
+        list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
+        
+        $this->result = $this->eds->apiExport($an, $db, 'format=ris');
+
+        return $this->result;
+        
+    }
+
     /**
      * Perform the API Search call.
      *
@@ -363,8 +377,6 @@ class EBSCODocument {
             }
         }
 
-        // var_dump($this->results);
-        // die();
         return $this->records;
     }
 
@@ -970,5 +982,5 @@ class EBSCODocument {
         }
         return null;
     }
- 
+
 }
