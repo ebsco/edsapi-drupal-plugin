@@ -210,6 +210,12 @@ class EBSCORecord {
    */
   public $imgtitle = NULL;
 
+    /**
+   *Citations styles
+   * * @global string
+   */
+  public $citationStylesRecord = NULL;
+
   /**
    * Constructor.
    *
@@ -246,9 +252,8 @@ class EBSCORecord {
     $this->cite = $this->cite();
     $this->permission = $this->permission();
     $this->imgtitle = $this->imgtitle();
+    $this->citationStylesRecord = $this->citationStylesRecord();
     
-    // var_dump($this->data);
-    // die();
     
   }
 
@@ -266,8 +271,6 @@ class EBSCORecord {
    * @return string
    */
   public function access_level() {
-    // var_dump($this->data);
-    // die();
     return isset($this->data['AccessLevel']) ?
             $this->data['AccessLevel'] : '';
   }
@@ -379,8 +382,6 @@ class EBSCORecord {
    * @return string
    */
   public function pdf_link() {
-    // var_dump($this->data['FullText']);
-    // die();
     return isset($this->data['FullText']) &&
             isset($this->data['FullText']['Links']) &&
             isset($this->data['FullText']['Links']['pdflink']) ?
@@ -517,10 +518,13 @@ class EBSCORecord {
 
 
   public function imgtitle() {
-    // var_dump($this->data);
-    // die();
     return isset($this->data['Items']['imgTitle']) ?
     $this->data['Items']['imgTitle'] : '';
+  }
+
+  public function citationStylesRecord() {
+    return isset($this->data['Citation']) ? $this->data['Citation'] : array();
+    
   }
 
 }

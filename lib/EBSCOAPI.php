@@ -406,6 +406,7 @@ class EBSCOAPI {
   $emp = FALSE,
   $autosuggest = FALSE,
   $includeimagequickview = FALSE,
+  $styles = '',
   $IllustrationInfo = FALSE
   ) {
     $query = array();
@@ -496,12 +497,12 @@ class EBSCOAPI {
       }
     }
     if (!empty($limiters)) {
-	  $query['limiter']='';
-      foreach ($limiters as $field => $limiter) {
-        // e.g. LA99:English,French,German.
-        $query['limiter'].= $field . ':' . implode(',', $limiter);
+      $query['limiter']='';
+        foreach ($limiters as $field => $limiter) {
+          // e.g. LA99:English,French,German.
+          $query['limiter'].= $field . ':' . implode(',', $limiter);
+        }
       }
-    }
     if (!empty($expanders)) {
       // e.g. fulltext, thesaurus.
       $query['expander'] = implode(',', $expanders);
@@ -552,9 +553,12 @@ class EBSCOAPI {
       
       'includeimagequickview' => $includeimagequickview,
 
+
       'format' => 'ris',
 
+      'styles'    => $styles,
 
+    
     );
 
     if ($autosuggest == TRUE) {
@@ -578,14 +582,15 @@ class EBSCOAPI {
       $params["includeimagequickview"] = "y";
     }
 
+    if ($styles == 'all') {
+      $params["styles"] = "all";
+    }
 
     $params = array_merge($params, $query);
 
 
     $result = $this->request('Search', $params);
 
-    // var_dump($params);
-    // die();
 
     return $result;
   }
@@ -615,10 +620,11 @@ class EBSCOAPI {
       //'IllustrationInfo' => 'y',
       'IllustrationInfo' => $IllustrationInfo,
       'format' => 'ris',
+      'styles'    => $styles,
     );
     
-    $result = $this->request('Retrieve', $params);
-    
+    $result = $this->request('Retrieve', $params);    
+        
     return $result;
     
   }
@@ -626,6 +632,7 @@ class EBSCOAPI {
   
 
   public function apiExport($an, $db) {
+
     $params = array(
       'an'        => $an,
       'dbid'      => $db,
@@ -633,6 +640,20 @@ class EBSCOAPI {
     );
     
     $result = $this->request('Export', $params);
+    
+    return $result;
+    
+  }
+
+  public function apiCitationStyles($an, $db, $styles) {
+
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'styles'    => $styles
+    );
+    
+    $result = $this->request('CitationStyles', $params);
     
     return $result;
     

@@ -89,6 +89,8 @@ class EBSCODocument {
 
     private $imageQuickViewTerms = array();
 
+  
+
     /**
      * The array of filters currently applied.
      *
@@ -234,8 +236,7 @@ class EBSCODocument {
      */
     public function info() {
         $this->info = $this->eds->apiInfo();
-        // var_dump($this->info);
-        // die();
+        
         return $this->info;
 
         
@@ -263,6 +264,23 @@ class EBSCODocument {
         list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
         
         $this->result = $this->eds->apiExport($an, $db, 'format=ris');
+
+        return $this->result;
+        
+    }
+
+    /**
+     * Perform the API CitationStyles call.
+     *
+     * @return array
+     */
+    public function citation() {
+        
+       
+
+        list($an, $db, $styles) = isset($this->params['id']) ? explode('|', $this->params['id'], 3) : array(NULL, NULL, NULL);
+        
+        $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
 
         return $this->result;
         
@@ -300,8 +318,7 @@ class EBSCODocument {
 
         // Check if research starters , EMP are active.
         $info = $this->info();
-        // var_dump($info);
-        // die();
+    
         if ($info instanceof EBSCOException) {
             return array();
         }
@@ -333,7 +350,16 @@ class EBSCODocument {
             }
         }
 
-        $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug, $iqv);
+        $stylesItem = '';
+        if (isset($info["styles"])) {
+            
+            if ($info["styles"] == "all") {
+                $stylesItem = TRUE;
+            }
+        }
+
+        $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug, $iqv, $stylesItem);
+
 
         return $this->results;
     }
@@ -349,8 +375,6 @@ class EBSCODocument {
 
         }
 
-        // var_dump($this->record);
-        // die();
         return $this->record;
     }
 
@@ -399,6 +423,8 @@ class EBSCODocument {
     public function autoSuggestTerms() {
 
         $this->autoSuggestTerms = isset($this->results['autoSuggestTerms']) ? $this->results['autoSuggestTerms'] : NULL;
+
+
         
         return $this->autoSuggestTerms;
 
@@ -413,6 +439,13 @@ class EBSCODocument {
         $this->imageQuickViewTerms = isset($this->results['imageQuickViewTerms']) ? $this->results['imageQuickViewTerms'] : NULL;
 
         return $this->imageQuickViewTerms;
+    }
+
+    public function citationStylesTerms() {
+
+        $this->citationStylesTerms = isset($this->results['citationStylesTerms']) ? $this->results['citationStylesTerms'] : NULL;
+
+        return $this->citationStylesTerms;
     }
     
     /**

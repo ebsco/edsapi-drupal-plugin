@@ -84,3 +84,19 @@ ebsco.exportformat_detail:
     _controller: '\Drupal\ebsco\Controller\EbscoController::exportformat_detail'
   requirements:
     _permission: 'access content'
+
+ebsco.citation_styles_detail:
+  path: '/ebsco/citation_styles_detail'
+  defaults:
+    _title: 'Citation Styles to Detail Record'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::citation_styles_detail'
+  requirements:
+    _permission: 'access content'
+
+ebsco.citation_styles:
+  path: '/ebsco/citation_styles'
+  defaults:
+    _title: 'Detailed RIS 2'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::citation_styles'
+  requirements:
+    _permission: 'access content'
