@@ -191,6 +191,62 @@ class EbscoController extends ControllerBase  {
 		
 	}
 
+
+	public function citation_styles_detail() {
+		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+		if (\Drupal::currentUser()->isAuthenticated()) {
+		if ($is_xhr) {
+			return [
+			'#theme' => 'ebsco_citation_styles_detail'
+			];
+			return true;
+		}
+		else {
+			return [
+			'#theme' => 'ebsco_citation_styles_detail'
+			];
+
+		}
+		}
+		else {
+		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+		if ($is_xhr) {
+			echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
+			return;
+		}
+		else {
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));		
+		}
+		}
+
+	}
+
+
+	public function citation_styles() {
+		global $_ebsco_document;
+		$params = $_REQUEST;
+
+		if (\Drupal::currentUser()->isAuthenticated()) {
+			if (empty($_ebsco_document)) {
+				$_ebsco_document = new \EBSCODocument();
+			}
+			$_ebsco_document->citation();
+			$record = $_ebsco_document->record();
+
+			$url = $_ebsco_document->citation();
+		
+			header('Location: '.$url);
+			die();
+		}
+		else 
+		{
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));
+		}
+		
+	}
+
 	public function image_quick_url() {
     global $_ebsco_document;
     $params = $_REQUEST;

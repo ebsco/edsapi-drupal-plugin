@@ -35,6 +35,8 @@ class EBSCOResponse {
    */
   private $response;
 
+
+
   /**
    * Constructor.
    *
@@ -44,10 +46,14 @@ class EBSCOResponse {
    *
    * @access public
    */
+
   public function __construct($response) {
     $this->response = $response;
+  
+    
   }
 
+  
   /**
    * Returns the XML as an associative array of data.
    *
@@ -58,31 +64,39 @@ class EBSCOResponse {
    * @access public
    */
   public function result() {
+
+    
     if (!empty($this->response->AuthToken)) {
       return $this->buildAuthenticationToken();
     }
+    
     elseif (!empty($this->response->SessionToken)) {
       return (string) $this->response->SessionToken;
     }
     elseif (!empty($this->response->SearchResult)) {
       return $this->buildSearch();
+      
     }
     elseif (!empty($this->response->Record)) {
-    
       return $this->buildRetrieve();
     }
     elseif (!empty($this->response->AvailableSearchCriteria)) {
       return $this->buildInfo();
     }
     elseif (!empty($this->response->Format) && $this->response->Format == 'RIS') {
-      return $this->response->Data;
+      return $this->response->Data;  
+    }
+    elseif (!empty($this->response)) {
+      return $this->buildCitationStyles(); 
+      
     }
     // Should not happen, it may be an exception.
     else {
+      
       return $this->response;
     }
 
-
+    
   }
 
   
@@ -149,7 +163,11 @@ class EBSCOResponse {
       $imageQuickViewTerms = $result;
     }
 
-    
+    $citationStylesTerms = NULL;
+    if ($this->response->SearchResult->citationStylesTerms) {
+      $result = json_decode(json_encode($this->response->SearchResult->citationStylesTerms), TRUE);;
+      $citationStylesTerms = $result;
+    }
     
     $results = array(
       'recordCount' => $hits,
@@ -161,9 +179,9 @@ class EBSCOResponse {
       'autoSuggestTerms'   => $autoSuggestTerms,
       'facets'      => $facets,
       'imageQuickViewTerms' => $imageQuickViewTerms,
+      'citationStylesTerms' => $citationStylesTerms,
     );
     
-
     return $results;
   }
 
@@ -392,8 +410,8 @@ class EBSCOResponse {
 
             
         }
-     }
-     }
+      }
+    }
 
      if($record->ImageQuickViewItems->ImageQuickViewItem){
       $result['iqv'] = array();
@@ -411,12 +429,12 @@ class EBSCOResponse {
       }
     }
 
-      
       $results[] = $result;
       
     
     }
 
+   
 
     return $results;
 
@@ -481,6 +499,7 @@ class EBSCOResponse {
   private function buildInfo() {
     // Sort options.
     $elements = $this->response->AvailableSearchCriteria->AvailableSorts->AvailableSort;
+    
     
     $sort = array();
     foreach ($elements as $element) {
@@ -603,13 +622,16 @@ class EBSCOResponse {
    * @access private
    */
   private function buildRetrieve() {
+
       $record = $this->response->Record;
+
+      // var_dump($this->response->Record);
+      // die();
+
       if ($record) {
         // There is only one record.
         $record = $record[0];
       }
-      
-    
       
       $result = array();
       $result['DbId'] = $record->Header->DbId ? (string) $record->Header->DbId : '';
@@ -621,7 +643,6 @@ class EBSCOResponse {
       $result['PLink'] = $record->PLink ? (string) $record->PLink : '';
       $result['IllustrationInfo'] = $record->IllustrationInfo ? (string) $record->IllustrationInfo : '';
       $result['Type'] = $record->ImageQuickViewItems->Type ? (string) $record->ImageQuickViewItems->Type : '';
-
       
       if (!empty($record->ImageInfo->CoverArt)) {
         foreach ($record->ImageInfo->CoverArt as $image) {
@@ -849,7 +870,41 @@ class EBSCOResponse {
           );
       }
     }
+      
+    return $result;
 
+  }
+
+ private function buildCitationStyles() {
+
+    $recordCitation = $this->response;
+
+      
+    $result = array();
+    
+  
+    if($recordCitation){
+
+      $result['Citation'] = array();
+
+      foreach($recordCitation->Citation as $key => $citationItem){
+
+          $id = $citationItem->Id ? (string) $citationItem->Id :'';
+          $label = $citationItem->Label ? (string) $citationItem->Label :'';
+          $sectionLabel = $citationItem->SectionLabel ? (string) $citationItem->SectionLabel :'';
+          $data = $citationItem->Data ? (string) $citationItem->Data :'';
+          $caption = $citationItem->Caption ? (string) $citationItem->Caption :'';
+          $result['Citation'][]=array(
+              'Id'=>$id,
+              'Label'=>$label,
+              'SectionLabel' => $sectionLabel,
+              'Data' => $data,
+              'Caption' => $caption
+          );
+      }
+    }
+
+        
     return $result;
 
   }

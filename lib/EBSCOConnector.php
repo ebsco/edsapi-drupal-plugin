@@ -333,6 +333,10 @@ class EBSCOConnector {
     $url = self::$end_point . '/Retrieve';
 
     $response = $this->request($url, $params, $headers);
+    
+    // var_dump($response);
+    // die();
+
     return $response;
   }
 
@@ -352,8 +356,39 @@ class EBSCOConnector {
     $url = self::$end_point . '/ExportFormat';
 
     $response = $this->request($url, $params, $headers);
+
+    // var_dump($response);
+    // die();
+
     return $response;
   }
+
+  /**
+   * CitationStyles a specific record.
+   *
+   * @param array $params
+   *   CitationStyles specific parameters.
+   * @param array $headers
+   *   Authentication and session tokens.
+   *
+   * @return object SimpleXml or PEAR_Error
+   *
+   * @access public
+   */
+  public function requestCitationStyles($params, $headers) {
+    $url = self::$end_point . '/CitationStyles';
+
+    
+    $responseCitation = $this->request($url, $params, $headers);
+    $response = $responseCitation->Citations;
+
+    return $response;
+    
+
+    
+  }
+
+  
 
   /**
    * Request the info data.

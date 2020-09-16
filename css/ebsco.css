@@ -642,3 +642,20 @@ label {
   padding: 5px;
   
 }
+
+.quote-style {
+  quotes: "“";
+  color: #018fe2;
+  font-size: 50px;
+  height: 0px;
+  margin-bottom: 5px;
+  
+}
+
+.quote-style::before {
+  content: open-quote;
+}
+
+.use-ajax {
+  margin-left: -13%;
+}

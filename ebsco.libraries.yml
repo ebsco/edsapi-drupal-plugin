@@ -10,3 +10,5 @@ global-scripts:
     dependencies:
       - core/jquery
       - core/jquery.once
+      - core/drupal.dialog.ajax
+      - core/jquery.form

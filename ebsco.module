@@ -119,6 +119,10 @@ function  ebsco_theme($existing, $type, $theme, $path) {
         'ebsco_exportformat_detail' => array(
             'render element' => 'elements',
             'template' => 'ebsco-export-format'
+        ),
+        'ebsco_citation_styles_detail' => array(
+            'render element' => 'elements',
+            'template' => 'ebsco-citation-styles'
         )
     );
     return $themes;
@@ -740,6 +744,7 @@ function template_preprocess_ebsco_results(&$variables) {
 
     $Document->search();
    
+ 
 
     $variables['records'] = $Document->records();
     $_SESSION['records'] = $Document->records();
@@ -751,10 +756,15 @@ function template_preprocess_ebsco_results(&$variables) {
     $variables['relatedContent'] = $Document->relatedContent();
     $variables['autoSuggestTerms'] = $Document->autoSuggestTerms();
     $variables['imageQuickViewTerms'] = $Document->imageQuickViewTerms();
+    $variables['citationStylesTerms'] = $Document->citationStylesTerms();
     $variables['facets'] =$Document->facets();
     $variables["relatedContent"]="";
     $variables["processHtmlRecords"]="";
     $variables['lookfor'] = '';
+
+    // var_dump($variables);
+    // die();
+
     if (isset($params['lookfor'])) {
         $variables['lookfor'] = $params['lookfor'];
     } else if (isset($params['group'])) {
@@ -812,6 +822,7 @@ function template_preprocess_ebsco_results(&$variables) {
                     $rsSubjects = "";
                     $rsDbLabel = "";
                     $rsImageQuickView = "";
+                    $rsCitationStyles = "";
                     $rsAbstract = "";
                     $rsSource = "";
                     $rsImage = "";
@@ -844,6 +855,9 @@ function template_preprocess_ebsco_results(&$variables) {
                                 break;
                             case "Dbl":
                                 $rsImageQuickView = $it["Data"];
+                                break;
+                            case "Dbl":
+                                $rsCitationStyles = $it["Data"];
                                 break;
                                 
                         }
@@ -878,6 +892,12 @@ function template_preprocess_ebsco_results(&$variables) {
                     if ($rsImageQuickView <> ""){
                         $tabsContent .= '<p><h1>' . $rsImageQuickView . '</h1></p>';
                     }
+
+                    if ($rsCitationStyles <> ""){
+                        $tabsContent .= '<p><h1>' . $rsCitationStyles . '</h1></p>';
+                    }
+
+                    
 
                     $tabsContent .= '</div></div>';
                 }
@@ -984,9 +1004,7 @@ function template_preprocess_ebsco_results(&$variables) {
             $recordHtml="<li>"
                 .'<div class="record-number floatleft">'.$record->result_id.'</div>'
 
-                .'<div class="result floatleft">'
-            ;
-
+                .'<div class="result floatleft">';
             // processing book jacket
             $recordHtml.='<div class="span-2">';
             if ($record->small_thumb_link){
@@ -1007,8 +1025,9 @@ function template_preprocess_ebsco_results(&$variables) {
                 $v= '<p>';
                 $label = '<strong>' . \Drupal\Component\Utility\Html::escape($record->db_label) . '</strong>';
                 $labelImageQuickView = '<strong>' . \Drupal\Component\Utility\Html::escape($record->image_quick_view) . '</strong>';
+                $labelcitation_styles_detail = '<strong>' . \Drupal\Component\Utility\Html::escape($record->citation_styles_detail) . '</strong>';
                 $link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
-                $v.=sprintf(t('This result from %s cannot be displayed to guests.'), $label, $labelImageQuickView) . "<br /><strong>" . sprintf(t('%s for full access.'), $link) . "</strong>";
+                $v.=sprintf(t('This result from %s cannot be displayed to guests.'), $label, $labelImageQuickView,  $labelcitation_styles_detail) . "<br /><strong>" . sprintf(t('%s for full access.'), $link) . "</strong>";
                 $v.="</p>";
 
 
@@ -1191,6 +1210,10 @@ function template_preprocess_ebsco_advanced_search(&$variables) {
 
 }
 
+function tmeplate_preprocess_ebsco__page(array &$variables) : void {
+	//Module name: 'mymodule', library name: 'mymodule'. 
+	$variables['#attached']['library'][] = 'ebsco/ebsco';
+}
 
 /**
  * Process variables for ebsco-result.tpl.php.
@@ -1219,24 +1242,37 @@ function template_preprocess_ebsco_result(&$variables) {
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
     $detailRecordHTML="";
     
-    
-    
-
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();;
+        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
         $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
         $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
 
         $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
-      
+
+        $citationStylesDetailRecord = \Drupal\Core\Url::fromRoute('ebsco.citation_styles_detail', array('id' => $id))->toString();
+
+        
         $detailRecordHTML.='<div class="ebsco-record detailrecord-2columns">'
             .'<div>'
             .'<div class="detailrecord-links">	'
 
             .'<ul class="external-links">';
         
+
+        if($record->record_id){
+            
+            $detailRecordHTML.= "
+            
+            <li>
+            <i class='quote-style'></i>
+            <a class='use-ajax' data-dialog-options='{&quot;width&quot;:800}' 
+            data-dialog-type='modal'  href='" . $citationStylesDetailRecord . "|all'>" . t('Citations Styles') . "</a>
+            </li>";
+
+        }
+
     
         if($record->record_id){
 
@@ -1378,8 +1414,11 @@ to IQV records
 */
 function template_preprocess_ebsco_image_quick_view(&$variables) {
     $params = $_REQUEST;
+
+  
     
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
+
 
     $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
@@ -1388,6 +1427,7 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     $Document->retrieve();
     $record = $Document->record();
 
+   
     $variables['record'] = $record;
     $lastSearch['count'] = $Document->record_count();
     $variables['count'] = $Document->record_count();
@@ -1396,12 +1436,13 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
     $detailImageQuickViewHTML="";
 
-
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
         
         $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+
+        
 
 
         $detailImageQuickViewHTML.='<div class="result-line5">';       
@@ -1482,7 +1523,6 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
     
     
     $Document->retrieve();
-    
     $record = $Document->record();
     $Document->export();
 
@@ -1525,9 +1565,68 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
 }
 
 
-// /*
-// to Ris Export Format
-// */
+
+function template_preprocess_ebsco_citation_styles_detail(&$variables) {
+
+    $params = $_REQUEST;
+    
+    
+    
+    $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
+
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+    if (empty($Document)) {
+        $Document = new EBSCODocument();
+    }
+
+   
+    
+    $Document->retrieve();
+    $record = $Document->record();
+    $recordCitation = $Document->citation();    
+
+    $variables['record'] = $recordCitation;
+    $lastSearch['count'] = $Document->record_count();
+    $variables['count'] = $Document->record_count();
+
+    $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
+    $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
+    $citationsStylesViewHTML="";
+    
+
+    if (isset($recordCitation) ){
+
+        
+       $id = \Drupal\Component\Utility\Html::escape($record->record_id());
+
+
+        if(!empty($recordCitation)) {
+            foreach($variables['record']['Citation'] as $citationIndex) {
+    
+                
+                $citationsStylesViewHTML.= '<div><strong><h2>' . $citationIndex['Label'] . '</h2></strong></div>';
+                $citationsStylesViewHTML.= '<div>' . $citationIndex['SectionLabel'] . '</div>';
+                $citationsStylesViewHTML.= '<div>' . $citationIndex['Data'] . '</div>';
+                $citationsStylesViewHTML.= '<div>' . $citationIndex['Caption'] . '</div>';        
+            }
+        
+
+        }
+
+
+    }
+
+
+    $variables['citationstylerecord'] = $citationsStylesViewHTML;
+
+    $request = \Drupal::request();
+    if ($route = $request->attributes->get(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT)) {
+        $route->setDefault('_title', $record->title);
+    }
+}
+
+
+
 function ebsco_side_facets($facetVars) {
 
     $params = $_REQUEST;
@@ -1635,8 +1734,7 @@ function ebsco_side_facets($facetVars) {
                 .'<dt>'
                 .'<span class="icon13 collapsed">'.\Drupal\Component\Utility\Html::escape(t($cluster['Label'])).'</span>'
                 .'</dt>'
-                .'</dl>'
-            ;
+                .'</dl>';
 
             $form.='<dl class="narrow-list navmenu offscreen" id="narrowGroupHidden_'.\Drupal\Component\Utility\Html::escape($cluster["Id"]).'">';
             foreach ($cluster['Values'] as $index => $facet){
@@ -1659,7 +1757,6 @@ function ebsco_side_facets($facetVars) {
                 .'<p class="submit">'
                 .'<input type="submit" class="button js-form-submit form-submit" name="submit" value="'.t('Update').'" />'
                 .'</p>'
-//								.'<a href="javascript:void(0)" class="expandable">'.t('Less').' ...</a>'
                 .'</dd>'
                 .'</dl>'
             ;
