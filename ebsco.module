@@ -1215,6 +1215,8 @@ function tmeplate_preprocess_ebsco__page(array &$variables) : void {
 	$variables['#attached']['library'][] = 'ebsco/ebsco';
 }
 
+
+
 /**
  * Process variables for ebsco-result.tpl.php.
  *
@@ -1240,6 +1242,7 @@ function template_preprocess_ebsco_result(&$variables) {
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
+   // $clipboardLibrary="";
     $detailRecordHTML="";
     
     if (isset($record) ){
@@ -1272,12 +1275,14 @@ function template_preprocess_ebsco_result(&$variables) {
             </li>";
 
         }
-
     
         if($record->record_id){
 
             $detailRecordHTML.= "<li> <a href='" . $exportFormatDetail . "&format=ris'>" . t('RIS Export') . "</a></li>";
         }
+
+    
+
 
         if($record->p_link){
             $detailRecordHTML.= "<li> <a href='" . $record->p_link . "'>" . t('View in EDS') . "</a></li>";
@@ -1339,6 +1344,51 @@ function template_preprocess_ebsco_result(&$variables) {
         }
         $detailRecordHTML.='</div>';
 
+        $detailRecordHTML.='</div class="span-13">';
+        if($record->p_link){
+            
+            $detailRecordHTML.= '
+            <input class="text-permalink" data-js="my-input" type="text" value="' . $record->p_link . '">
+            <div class="tooltip">
+                <button data-js="button-clipboard" class="button js-form-submit form-submit button-permalink">
+                    <span data-js="button-clipboard-out" class="tooltiptext" id="myTooltip">Copy Permalink</span>
+                    Copy Permalink
+                </button>
+                <script type="text/javascript">
+                    
+                    var $clipboard = document.querySelector(\'[data-js="button-clipboard"]\');
+                    var $clipboardout = document.getElementById("button-clipboard-out");
+                    var $clipboardout = document.querySelector(\'[data-js="button-clipboard-out"]\');
+                    console.log($clipboard);
+                    console.log($clipboardout);
+
+                    
+                    $clipboard.addEventListener(\'click\', handleClip, false);
+
+                    function handleClip() {
+                        var copyText = document.querySelector(\'[data-js="my-input"]\');
+                        copyText.select();
+                        copyText.setSelectionRange(0, 99999);
+                        document.execCommand("copy");
+                        var tooltip = document.querySelector(\'[data-js="button-clipboard-out"]\');
+                        tooltip.innerHTML = "Copied: " + copyText.value;  
+                    }
+
+
+                    $clipboardout.addEventListener(\'mouseout\', handleOut, false);
+
+                    function handleOut() {
+                        var tooltip = document.querySelector(\'[data-js="button-clipboard-out"]\');
+                        tooltip.innerHTML = "Copy to clipboard";
+                    }
+
+
+                </script>
+            </div>
+            ';
+        };
+
+        $detailRecordHTML.='</div>';
 
         $detailRecordHTML.='<div class="span-13">'
             .' <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="'.t('Bibliographic Details').'">';
@@ -1602,7 +1652,8 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
 
         if(!empty($recordCitation)) {
             foreach($variables['record']['Citation'] as $citationIndex) {
-    
+                // var_dump($citationIndex);
+                // die();
                 
                 $citationsStylesViewHTML.= '<div><strong><h2>' . $citationIndex['Label'] . '</h2></strong></div>';
                 $citationsStylesViewHTML.= '<div>' . $citationIndex['SectionLabel'] . '</div>';
