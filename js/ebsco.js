@@ -187,29 +187,7 @@ try
 
 
 	});
-	//})(jQuery);
-	// var $clipboard = document.querySelector('[data-js="button-clipboard"]');
-	// var $clipboardout = document.querySelector(
-	// '[data-js="button-clipboard-out"]'
-	// );
 
-	// $clipboard.addEventListener("click", handleClip, false);
-
-	// function handleClip() {
-	// var copyText = document.querySelector('[data-js="my-input"]');
-	// copyText.select();
-	// copyText.setSelectionRange(0, 99999);
-	// document.execCommand("copy");
-	// var tooltip = document.querySelector('[data-js="button-clipboard-out"]');
-	// tooltip.innerHTML = "Copied: " + copyText.value;
-	// }
-
-	// $clipboardout.addEventListener("mouseout", handleOut, false);
-
-	// function handleOut() {
-	// var tooltip = document.querySelector('[data-js="button-clipboard-out"]');
-	// tooltip.innerHTML = "Copy to clipboard";
-	// }
 	
 }
 catch( e)

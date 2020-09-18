@@ -1352,7 +1352,7 @@ function template_preprocess_ebsco_result(&$variables) {
             <div class="tooltip">
                 <button data-js="button-clipboard" class="button js-form-submit form-submit button-permalink">
                     <span data-js="button-clipboard-out" class="tooltiptext" id="myTooltip">Copy Permalink</span>
-                    Copy Permalink
+                    <i class="fa fa-paperclip" aria-hidden="true"></i>
                 </button>
                 <script type="text/javascript">
                     
