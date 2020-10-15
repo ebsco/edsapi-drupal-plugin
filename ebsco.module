@@ -1172,7 +1172,7 @@ function template_preprocess_ebsco_results(&$variables) {
                 }
             }
         }
-        $form=ebsco_basic_search_form() ;
+        
         $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
         $variables['advanced_search_url'] =  \Drupal\Core\Url::fromRoute('ebsco.advanced',  array())->toString();
         $variables['search_form'] = \Drupal::service('renderer')->render($form);
