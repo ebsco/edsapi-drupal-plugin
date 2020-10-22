@@ -236,8 +236,6 @@ class EBSCODocument {
      */
     public function info() {
         $this->info = $this->eds->apiInfo();
-        // var_dump($this->info);
-        // die();
         return $this->info;
 
         
@@ -277,15 +275,11 @@ class EBSCODocument {
      */
     public function citation() {
         
-        //list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
-
         list($an, $db, $styles) = isset($this->params['id']) ? explode('|', $this->params['id'], 3) : array(NULL, NULL, NULL);
         
         $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
-        //$this->result = $this->eds->apiCitationStyles($an, $db);
+   
 
-        // var_dump($this->result);
-        // die();
 
         return $this->result;
         
@@ -323,8 +317,7 @@ class EBSCODocument {
 
         // Check if research starters , EMP are active.
         $info = $this->info();
-        // var_dump($info);
-        // die();
+        
         if ($info instanceof EBSCOException) {
             return array();
         }
@@ -381,8 +374,6 @@ class EBSCODocument {
 
         }
 
-        // var_dump($this->record);
-        // die();
         return $this->record;
     }
 
@@ -421,9 +412,6 @@ class EBSCODocument {
             return NULL;
         }
         $this->relatedContent = isset($this->results['relatedContent']) ? $this->results['relatedContent'] : array();
-
-        // var_dump($this->relatedContent);
-        // die();
 
         return $this->relatedContent;
     }

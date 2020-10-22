@@ -368,8 +368,6 @@ class EBSCORecord {
    * @return bool
    */
   public function pdf_availability() {
-    // var_dump($this->data['FullText']['Links']['pdflink']);
-    // die();
     return isset($this->data['FullText']) &&
             isset($this->data['FullText']['Links']) &&
             isset($this->data['FullText']['Links']['pdflink']) &&
