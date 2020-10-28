@@ -271,6 +271,7 @@ class EBSCOConnector {
 					.'</UIDAuthRequestMessage>';
 
     $response = $this->request($url,$params, array(), 'POST');
+
     return $response;
   }
 
@@ -334,9 +335,6 @@ class EBSCOConnector {
 
     $response = $this->request($url, $params, $headers);
     
-    // var_dump($response);
-    // die();
-
     return $response;
   }
 
@@ -356,9 +354,6 @@ class EBSCOConnector {
     $url = self::$end_point . '/ExportFormat';
 
     $response = $this->request($url, $params, $headers);
-
-    // var_dump($response);
-    // die();
 
     return $response;
   }

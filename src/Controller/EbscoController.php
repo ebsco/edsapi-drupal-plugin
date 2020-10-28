@@ -164,8 +164,7 @@ class EbscoController extends ControllerBase  {
 
 	}		
 
-
-
+	
 	public function exportformat() {
 		global $_ebsco_document;
 		$params = $_REQUEST;

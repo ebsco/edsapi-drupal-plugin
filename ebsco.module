@@ -762,9 +762,6 @@ function template_preprocess_ebsco_results(&$variables) {
     $variables["processHtmlRecords"]="";
     $variables['lookfor'] = '';
 
-    // var_dump($variables);
-    // die();
-
     if (isset($params['lookfor'])) {
         $variables['lookfor'] = $params['lookfor'];
     } else if (isset($params['group'])) {
@@ -1585,8 +1582,6 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
     $risDetailViewHTML="";
     
     
-    
-
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
@@ -1596,14 +1591,17 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
 
         $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
 
-        $exportFormat = $Document->export();
-        $filename = $_REQUEST['an'].'delivery'.$_REQUEST['db'].'.ris';
-        header('Content-Type: application/x-research-info-systems');
-        header('Content-Disposition: inline; filename="'.$filename.'"');
-        echo (string)$exportFormat;
-
+        
             
-    }
+            $exportFormat = $Document->export();
+            $filename = $_REQUEST['an'].'delivery'.$_REQUEST['db'].'.ris';
+            header('Content-Type: application/x-research-info-systems');
+            header('Content-Disposition: inline; filename="'.$filename.'"');
+            echo (string)$exportFormat;
+            exit;
+            
+        }
+            
 
 
     $variables['exportformatrecord'] = $risDetailViewHTML;
@@ -1640,7 +1638,6 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
     $variables['count'] = $Document->record_count();
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
-    $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
     $citationsStylesViewHTML="";
     
 
@@ -1652,8 +1649,6 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
 
         if(!empty($recordCitation)) {
             foreach($variables['record']['Citation'] as $citationIndex) {
-                // var_dump($citationIndex);
-                // die();
                 
                 $citationsStylesViewHTML.= '<div><strong><h2>' . $citationIndex['Label'] . '</h2></strong></div>';
                 $citationsStylesViewHTML.= '<div>' . $citationIndex['SectionLabel'] . '</div>';
