@@ -26,19 +26,21 @@ class EbscoAdmin extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('ebsco.settings');
 
-	$values = $form_state->getValues();
-	$config->set("ebsco_guest", $values["ebsco_guest"]);
-	$config->set("ebsco_default_limit", $values["ebsco_default_limit"]);
-	$config->set("ebsco_default_sort", $values["ebsco_default_sort"]);
-	$config->set("ebsco_default_amount", $values["ebsco_default_amount"]);
-	$config->set("ebsco_default_mode", $values["ebsco_default_mode"]);
-	$config->set("ebsco_user", $values["ebsco_user"]);
-	$config->set("ebsco_password", $values["ebsco_password"]);
-	$config->set("ebsco_interface", $values["ebsco_interface"]);
-	$config->set("ebsco_organization", $values["ebsco_organization"]);
-	$config->set("ebsco_profile", $values["ebsco_profile"]);
-	$config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
-	$config->save(); 
+    $values = $form_state->getValues();
+    $config->set("ebsco_guest", $values["ebsco_guest"]);
+    $config->set("ebsco_default_limit", $values["ebsco_default_limit"]);
+    $config->set("ebsco_default_sort", $values["ebsco_default_sort"]);
+    $config->set("ebsco_default_amount", $values["ebsco_default_amount"]);
+    $config->set("ebsco_default_mode", $values["ebsco_default_mode"]);
+    $config->set("ebsco_user", $values["ebsco_user"]);
+    $config->set("ebsco_password", $values["ebsco_password"]);
+    $config->set("ebsco_interface", $values["ebsco_interface"]);
+    $config->set("ebsco_autocomplete", $values["ebsco_autocomplete"]);
+    $config->set("ebsco_organization", $values["ebsco_organization"]);
+    $config->set("ebsco_profile", $values["ebsco_profile"]);
+    $config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
+    $config->save(); 
+
 	
   }
 
@@ -93,6 +95,15 @@ class EbscoAdmin extends ConfigFormBase {
       '#size' => 50,
       '#description' => t("The API Interface Id."),
       '#required' => FALSE,
+    ];
+
+    $form['ebsco_credentials']['ebsco_autocomplete'] = [
+      '#type' => 'textfield',
+      '#title' => t('Autocomplete'),
+      '#default_value' => $config->get('ebsco_autocomplete'),
+      '#size' => 50,
+      '#description' => t("The API has Autocomplete."),
+      '#required' => TRUE,
     ];
 
     $form['ebsco_credentials']['ebsco_organization'] = [

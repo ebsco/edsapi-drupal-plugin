@@ -6,12 +6,11 @@ ebsco.admin:
   requirements:
     _permission: 'administer EDS '
 
-
 ebsco.content:
   path: '/ebsco'
   defaults:
     _title: 'EDS search page'
-    _controller: '\Drupal\ebsco\Controller\EbscoController::content'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
 
@@ -28,6 +27,7 @@ ebsco.results:
   defaults:
     _title: 'EDS results list'
     _controller: '\Drupal\ebsco\Controller\EbscoController::results'
+    #_controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
 
@@ -98,5 +98,13 @@ ebsco.citation_styles:
   defaults:
     _title: 'Detailed RIS 2'
     _controller: '\Drupal\ebsco\Controller\EbscoController::citation_styles'
+  requirements:
+    _permission: 'access content'
+
+ebsco.autocomplete:
+  path: '/ebsco/autocomplete'
+  defaults:
+    _title: 'Autocomplete Detail 2'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'

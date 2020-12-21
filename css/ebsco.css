@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@CHARSET "UTF-8";
+
 
 /** General ***/
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
@@ -561,10 +561,6 @@ label {
     display: inline ! important;
 }
 
-.resultslist-2columns{
-	
-}
-
 .resultslist-2columns:after {
     content: "";
     display: table;
@@ -606,10 +602,6 @@ label {
 		width: 100%;	
 		
 	}
-}
-
-.detailrecord-2columns{
-	
 }
 
 .detailrecord-2columns:after {
@@ -661,7 +653,6 @@ label {
   margin-left: -13%;
 }
 
-
 .tooltip {
   position: relative;
   display: inline-block;
@@ -707,3 +698,5 @@ label {
   width: 70%;
   color: #018fe2;
 }
+
+

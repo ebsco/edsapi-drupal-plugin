@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Asset\AttachedAssetsInterface;
 
 
 require_once __DIR__ . '/lib/EBSCODocument.php';
@@ -134,7 +135,6 @@ function  ebsco_theme($existing, $type, $theme, $path) {
  ******************************************************/
 
 
-
 /**
  * Form builder; Output a search form for the search block's search box.
  *
@@ -147,15 +147,22 @@ function ebsco_basic_search_form() {
     if (isset($params['lookfor'])) {
         $default_value =  $params['lookfor'] ;
     }
+
+    
+
     $form['basic']['lookfor'] = array(
         '#id'            => 'lookfor',
         '#name'            => 'lookfor',
+        '#class' => 'autocomplete',
         '#value' => $default_value,
         '#required'    => true,
         '#type'          => 'textfield',
         '#size'          => 40,
         '#attributes'    => array(
-            'title' => t('Enter the terms you wish to search for.')
+            'title' => t('Enter the terms you wish to search for.'),
+            'placeholder' => t('Search anything here.'),
+            'autocomplete' => 'off',
+            'class' => 'autocomplete'
         ),
     );
 
@@ -173,6 +180,18 @@ function ebsco_basic_search_form() {
         '#type'  => 'submit',
         '#value' => t('Search')
     );
+
+    $form['basic']['autocomplete'] = array(
+        '#id'    => 'autocomplete',
+        '#type'  => 'ul',
+        '#attributes'    => array(
+            'data-js'    => 'autocomplete'
+            
+        ),
+    );
+    $formautocomplete = '<div id="autocomplete" class="autocomplete" data-js="autocomplete"><ul></ul></div>';
+
+   
 
     if (isset($params['filter'])) {
         foreach($params['filter'] as $key => $value) {
@@ -192,7 +211,7 @@ function ebsco_basic_search_form() {
             '#default_value' => true
         );
     }
-    
+    echo $formautocomplete;
     
     return $form;
 }
@@ -231,7 +250,7 @@ function template_preprocess_ebsco_basic_search(&$variables) {
             }
         }
     }
-    $form=ebsco_basic_search_form() ;
+    $form=ebsco_basic_search_form();
     $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
     $variables['advanced_search_url'] =  \Drupal\Core\Url::fromRoute('ebsco.advanced',  array())->toString();
     $variables['search_form'] = \Drupal::service('renderer')->render($form);

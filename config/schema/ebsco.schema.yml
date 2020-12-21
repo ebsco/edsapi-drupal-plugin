@@ -20,6 +20,8 @@ ebsco.settings:
       type: string
     ebsco_interface:
       type: string
+    ebsco_autocomplete:
+      type: string
     ebsco_organization:
       type: string
     ebsco_local_ips:

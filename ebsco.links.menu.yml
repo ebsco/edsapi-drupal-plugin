@@ -4,7 +4,3 @@ ebsco.admin:
   description: 'Configure EBSCO Discovery Service.'
   parent: system.admin_config_search
 
-# ebsco.main:
-  # route_name: ebsco.content
-  # title: 'EBSCO Discovery Service'
-  # description: 'Search EBSCO Discovery Service.'

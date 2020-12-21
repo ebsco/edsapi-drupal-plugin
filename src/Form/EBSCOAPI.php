@@ -117,6 +117,7 @@ class EBSCOAPI {
    */
   public function __construct($config) {
     $this->config = $config;
+
   }
 
   /**

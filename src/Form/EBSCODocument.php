@@ -215,6 +215,7 @@ class EBSCODocument {
             'user'         => \Drupal::config('ebsco.settings')->get('ebsco_user'),
             'profile'      => \Drupal::config('ebsco.settings')->get('ebsco_profile'),
             'interface'    => \Drupal::config('ebsco.settings')->get('ebsco_interface'),
+            'autocomplete'    => \Drupal::config('ebsco.settings')->get('ebsco_autocomplete'),
             'organization' => \Drupal::config('ebsco.settings')->get('ebsco_organization'),
             'local_ip_address' => \Drupal::config('ebsco.settings')->get('ebsco_local_ips'),
             'guest'        => \Drupal::config('ebsco.settings')->get('ebsco_guest'),

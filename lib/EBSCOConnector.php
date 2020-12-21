@@ -183,6 +183,12 @@ class EBSCOConnector {
 
   private $logAPIRequests;
 
+    /**
+   * Autocomplete
+   * @global string
+   */
+  private $autoComplete;
+
 
   /**
    * The logger object.
@@ -205,14 +211,12 @@ class EBSCOConnector {
     $this->userId = $config['user'];
     $this->interfaceId = $config['interface'];
     $this->profileId = $config['profile'];
+    $this->autoComplete = $config['autocomplete'];
     $this->orgId = $config['organization'];
     $this->local_ip_address = $config['local_ip_address'];
     $this->isGuest = (\Drupal::currentUser()->isAuthenticated() || $this->isGuestIPAddress($_SERVER["REMOTE_ADDR"])) ? 'n' : 'y';
     $this->logAPIRequests = ($config['log'] == 1);
-    // if ($this->logAPIRequests) {
-      // $writer = new Zend_Log_Writer_Stream('php://output');
-      
-    // }
+    
   }
 
   /**
@@ -267,7 +271,10 @@ class EBSCOConnector {
     $params = '<UIDAuthRequestMessage xmlns="http://www.ebscohost.com/services/public/AuthService/Response/2012/06/01">'
 					.'<UserId>'.$this->userId.'</UserId>'
 					.'<Password>'.$this->password.'</Password>'
-					.'<InterfaceId>wsapi</InterfaceId>'
+          .'<InterfaceId>wsapi</InterfaceId>'
+          .'<Options>
+              <Option>'.$this->autoComplete.'</Option>
+            </Options>'
 					.'</UIDAuthRequestMessage>';
 
     $response = $this->request($url,$params, array(), 'POST');
@@ -292,10 +299,11 @@ class EBSCOConnector {
     $params = array(
       'profile' => $this->profileId,
       'org'     => $this->orgId,
-      'guest'   => $this->isGuest,
+      'guest'   => $this->isGuest
     );
 
     $response = $this->request($url, $params, $headers);
+
     return $response;
   }
 
@@ -334,7 +342,7 @@ class EBSCOConnector {
     $url = self::$end_point . '/Retrieve';
 
     $response = $this->request($url, $params, $headers);
-    
+
     return $response;
   }
 
@@ -379,11 +387,8 @@ class EBSCOConnector {
 
     return $response;
     
-
-    
   }
 
-  
 
   /**
    * Request the info data.
@@ -468,7 +473,7 @@ class EBSCOConnector {
 				}
 				break;
         }
-		//curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+		
 		
         $response = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);

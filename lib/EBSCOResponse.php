@@ -73,6 +73,11 @@ class EBSCOResponse {
     elseif (!empty($this->response->SessionToken)) {
       return (string) $this->response->SessionToken;
     }
+
+    elseif (!empty($this->response->AutocompleteToken)) {  
+      return (string) $this->response->AutocompleteToken;
+    } 
+
     elseif (!empty($this->response->SearchResult)) {
       return $this->buildSearch();
       
@@ -113,10 +118,18 @@ class EBSCOResponse {
   private function buildAuthenticationToken() {
     $token = (string) $this->response->AuthToken;
     $timeout = (integer) $this->response->AuthTimeout;
+    $autocompleteUrl = (string) $this->response->Autocomplete->Url;
+    $autoToken = (string) $this->response->Autocomplete->Token;
+    $autocompleteTokenTimeOut = (integer) $this->response->Autocomplete->TokenTimeOut;
+    $autocompleteCustId = (string) $this->response->Autocomplete->CustId;
 
     $result = array(
       'authenticationToken'   => $token,
       'authenticationTimeout' => $timeout,
+      'autocompleteUrl' => $autocompleteUrl,
+      'autocompleteToken' => $autoToken,
+      'autocompleteTokenTimeOut' => $autocompleteTokenTimeOut,
+      'autocompleteCustId' => $autocompleteCustId
     );
 
     return $result;
@@ -181,7 +194,7 @@ class EBSCOResponse {
       'imageQuickViewTerms' => $imageQuickViewTerms,
       'citationStylesTerms' => $citationStylesTerms,
     );
-    
+
     return $results;
   }
 
@@ -413,13 +426,13 @@ class EBSCOResponse {
       }
     }
 
-     if($record->ImageQuickViewItems->ImageQuickViewItem){
-      $result['iqv'] = array();
-      foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
-        $dbid = $iqv->DbId ? (string) $iqv->DbId : '';
-        $an = $iqv->An ? (string) $iqv->An : '';
-        $type = $iqv->Type ? (string) $iqv->Type : '';
-        $url = $iqv->Url ? (string) $iqv->Url : '';
+    if($record->ImageQuickViewItems->ImageQuickViewItem){
+    $result['iqv'] = array();
+    foreach($record->ImageQuickViewItems->ImageQuickViewItem as $iqv){
+      $dbid = $iqv->DbId ? (string) $iqv->DbId : '';
+      $an = $iqv->An ? (string) $iqv->An : '';
+      $type = $iqv->Type ? (string) $iqv->Type : '';
+      $url = $iqv->Url ? (string) $iqv->Url : '';
         $result['iqv'][] = array(
             'DbId' => $dbid,
             'An' => $an,
@@ -434,11 +447,7 @@ class EBSCOResponse {
     
     }
 
-   
-
-    return $results;
-
-    
+    return $results;    
   
   }
   
@@ -624,9 +633,6 @@ class EBSCOResponse {
   private function buildRetrieve() {
 
       $record = $this->response->Record;
-
-      // var_dump($this->response->Record);
-      // die();
 
       if ($record) {
         // There is only one record.
@@ -875,39 +881,39 @@ class EBSCOResponse {
 
   }
 
- private function buildCitationStyles() {
+  private function buildCitationStyles() {
 
-    $recordCitation = $this->response;
-
-      
-    $result = array();
-    
-  
-    if($recordCitation){
-
-      $result['Citation'] = array();
-
-      foreach($recordCitation->Citation as $key => $citationItem){
-
-          $id = $citationItem->Id ? (string) $citationItem->Id :'';
-          $label = $citationItem->Label ? (string) $citationItem->Label :'';
-          $sectionLabel = $citationItem->SectionLabel ? (string) $citationItem->SectionLabel :'';
-          $data = $citationItem->Data ? (string) $citationItem->Data :'';
-          $caption = $citationItem->Caption ? (string) $citationItem->Caption :'';
-          $result['Citation'][]=array(
-              'Id'=>$id,
-              'Label'=>$label,
-              'SectionLabel' => $sectionLabel,
-              'Data' => $data,
-              'Caption' => $caption
-          );
-      }
-    }
+      $recordCitation = $this->response;
 
         
-    return $result;
+      $result = array();
+      
+    
+      if($recordCitation){
 
-  }
+        $result['Citation'] = array();
+
+        foreach($recordCitation->Citation as $key => $citationItem){
+
+            $id = $citationItem->Id ? (string) $citationItem->Id :'';
+            $label = $citationItem->Label ? (string) $citationItem->Label :'';
+            $sectionLabel = $citationItem->SectionLabel ? (string) $citationItem->SectionLabel :'';
+            $data = $citationItem->Data ? (string) $citationItem->Data :'';
+            $caption = $citationItem->Caption ? (string) $citationItem->Caption :'';
+            $result['Citation'][]=array(
+                'Id'=>$id,
+                'Label'=>$label,
+                'SectionLabel' => $sectionLabel,
+                'Data' => $data,
+                'Caption' => $caption
+            );
+        }
+      }
+
+          
+      return $result;
+
+    }
   
   /**
    * Parse a SimpleXml element and
