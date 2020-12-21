@@ -7,8 +7,15 @@ global-scripts:
     version: 1.x
     js:
       js/ebsco.js: {}
+autocomplete:
+    js:
+      js/autocomplete.js: {}
     dependencies:
       - core/jquery
       - core/jquery.once
+      - core/drupalSettings
       - core/drupal.dialog.ajax
       - core/jquery.form
+      - core/drupal.ajax
+      - core/drupal
+      - core/jquery.ui.autocomplete

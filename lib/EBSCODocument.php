@@ -29,6 +29,7 @@
 require_once __DIR__ . '/EBSCOAPI.php';
 require_once __DIR__ . '/EBSCORecord.php';
 
+
 /**
  *
  */
@@ -88,8 +89,6 @@ class EBSCODocument {
     private $autoSuggestTerms = array();
 
     private $imageQuickViewTerms = array();
-
-  
 
     /**
      * The array of filters currently applied.
@@ -215,6 +214,7 @@ class EBSCODocument {
             'user'         => \Drupal::config('ebsco.settings')->get('ebsco_user'),
             'profile'      => \Drupal::config('ebsco.settings')->get('ebsco_profile'),
             'interface'    => \Drupal::config('ebsco.settings')->get('ebsco_interface'),
+            'autocomplete'    => \Drupal::config('ebsco.settings')->get('ebsco_autocomplete'),
             'organization' => \Drupal::config('ebsco.settings')->get('ebsco_organization'),
             'local_ip_address' => \Drupal::config('ebsco.settings')->get('ebsco_local_ips'),
             'guest'        => \Drupal::config('ebsco.settings')->get('ebsco_guest'),
@@ -275,15 +275,20 @@ class EBSCODocument {
      * @return array
      */
     public function citation() {
-        
-       
-
         list($an, $db, $styles) = isset($this->params['id']) ? explode('|', $this->params['id'], 3) : array(NULL, NULL, NULL);
         
         $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
 
+        // var_dump($this->result);
+        // die();
+
         return $this->result;
         
+    }
+
+    public function autocomplete() {
+        $this->result = $this->eds->apiAuthenticationToken($autocompleteUrl);
+        return $this->result;
     }
 
     /**
@@ -299,13 +304,15 @@ class EBSCODocument {
                 'lookfor' => $this->params['lookfor'],
                 'index'   => $this->params['type'],
             );
+            
         }
+        
         elseif (isset($this->params['group'])) {
             $search = $this->params;
-        }
-        else {
+            
+        }else {
             return array();
-        }
+            }
 
 
 
@@ -408,7 +415,6 @@ class EBSCODocument {
      *
      */
     public function relatedContent() {
-
         if ($this->results instanceof EBSCOException) {
             return NULL;
         }
@@ -421,32 +427,25 @@ class EBSCODocument {
      *
      */
     public function autoSuggestTerms() {
-
         $this->autoSuggestTerms = isset($this->results['autoSuggestTerms']) ? $this->results['autoSuggestTerms'] : NULL;
-
-
-        
         return $this->autoSuggestTerms;
-
-     
-        
     }
+
+
 
     
     
     public function imageQuickViewTerms() {
-
         $this->imageQuickViewTerms = isset($this->results['imageQuickViewTerms']) ? $this->results['imageQuickViewTerms'] : NULL;
-
         return $this->imageQuickViewTerms;
     }
 
     public function citationStylesTerms() {
-
         $this->citationStylesTerms = isset($this->results['citationStylesTerms']) ? $this->results['citationStylesTerms'] : NULL;
-
         return $this->citationStylesTerms;
     }
+
+  
     
     /**
      * Get the pagination HTML string.

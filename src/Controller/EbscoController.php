@@ -1,4 +1,6 @@
-<?php /**
+<?php
+
+/**
  * @file
  * Contains \Drupal\ebsco\Controller\EbscoController.
  */
@@ -12,25 +14,32 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 require_once __DIR__ . "/../../lib/EBSCODocument.php";
-			
+require_once __DIR__ . "/../../lib/EBSCOAPI.php";
+require_once __DIR__ . "/../../lib/EBSCOConnector.php";
+
+header('Access-Control-Allow-Origin "*"');
 /**
  * Default controller for the ebsco module.
  */
 class EbscoController extends ControllerBase  {
 
 	public function content() {
-		return [
-		'#theme' => 'ebsco_basic_search',
-		];
+		return [];
 	}
 	
 	public function advanced() {
+
+		
+
 		return [
 		'#theme' => 'ebsco_advanced_search'
 		];
 	}
 	
 	public function results() {
+
+		
+
 		return [
 		'#theme' => 'ebsco_results'
 		];
@@ -117,6 +126,7 @@ class EbscoController extends ControllerBase  {
 
 	public function image_quick_view() {
 		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+
 		if (\Drupal::currentUser()->isAuthenticated()) {
 		if ($is_xhr) {
 			return [
@@ -269,5 +279,68 @@ class EbscoController extends ControllerBase  {
 		}
 
 	}
+
+	
+	public function autocomplete() {
+		header('Access-Control-Allow-Origin "*"');
+		header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+		header('Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, 
+		Accept, x-client-key, x-client-token, x-client-secret, Authorization');
+		header('Content-Type: application/json');
+		header('Accept: application/json');
+		global $_ebsco_document;
+
+
+		$params = $_REQUEST;
+		
+	
+
+		if (\Drupal::currentUser()->isAuthenticated()) {
+			if (empty($_ebsco_document)) {
+				$_ebsco_document = new \EBSCODocument();
+			}
+
+	
+			$_ebsco_document->autocomplete();
+			
+			$autoCompleteRequest = $_ebsco_document->autocomplete();
+
+			$result = str_replace('&amp;','&',$autoCompleteRequest);
+		
+			
+			$url = $autoCompleteRequest;
+
+			$buildAutocomplete = [];
+	
+			$buildAutocomplete['#attached']['library'][] = 'ebsco/autocomplete';
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationToken'] = $url['authenticationToken'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationTimeout'] = $url['authenticationTimeout'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteUrl'] = $url['autocompleteUrl'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteToken'] = $url['autocompleteToken'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteTokenTimeOut'] = $url['autocompleteTokenTimeOut'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteCustId'] = $url['autocompleteCustId'];
+
+			$authenticationToken = $url['authenticationToken'];
+			$authenticationTimeout = $url['authenticationTimeout'];
+			$autocompleteUrl = $url['autocompleteUrl'];
+			$autocompleteToken = $url['autocompleteToken'];
+			$autocompleteTokenTimeOut = $url['autocompleteTokenTimeOut'];
+			$autocompleteCustId = $url['autocompleteCustId'];
+
+			return $buildAutocomplete;
+			
+			header('Location: '.$url);
+			//header('Location: '.$newurl);
+			die();
+		}
+		else 
+		{
+			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+			return new RedirectResponse(\Drupal::url('user.page'));
+		}
+
+	
+	}
+	
 	
 }

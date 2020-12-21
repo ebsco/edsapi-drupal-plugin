@@ -8,5 +8,6 @@ dependencies:
   - drupal:node
 libraries:
   - ebsco/global-styling 
+  - ebsco/autocomplete
 
 

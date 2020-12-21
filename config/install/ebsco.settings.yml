@@ -6,6 +6,7 @@ ebsco_default_mode: all
 ebsco_profile: "[Your EDS API profile name]"
 ebsco_user: "[Your api username]"
 ebsco_password: "[Your api password]"
-ebsco_interface: "Drupal EDS API module "
+ebsco_interface: "Drupal EDS API module"
+ebsco_autocomplete: "autocomplete"
 ebsco_organization: "[Institution name] "
 ebsco_local_ips: ""
