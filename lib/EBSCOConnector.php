@@ -109,7 +109,7 @@ class EBSCOConnector {
    *
    * @global string
    */
-  private static $end_point = 'http://eds-api.ebscohost.com/EDSAPI/rest';
+  private static $end_point = 'https://eds-api.ebscohost.com/EDSAPI/rest';
 
 
   /**
