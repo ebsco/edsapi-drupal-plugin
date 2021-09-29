@@ -246,7 +246,7 @@ class EBSCOResponse {
             $url = (string) $link->Url;
             // If we have an empty url when type is pdflink then just return something so
             // that the UI check for empty string will pass.
-            $url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
+            $url = empty($url) && $type == 'pdflink' ? 'https://content.ebscohost.com' : $url;
             $links[$type] = $url;
           }
         }
@@ -671,7 +671,7 @@ class EBSCOResponse {
         $url = (string) $link->Url;
         // If we have an empty url when type is pdflink then just return something so
         // that the UI check for empty string will pass.
-        $url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
+        $url = empty($url) && $type == 'pdflink' ? 'https//content.ebscohost.com' : $url;
         $links[$type] = $url;
         }
       }
