@@ -13,7 +13,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -129,55 +129,15 @@ class EBSCOAPI {
    *
    * @access public
    */
-  
-
-  public function authenticationToken(){
-
-    $autocompleteTokenTimeOut=time();
-		$authenticationTimeout=0;
-		if (isset($_SESSION["authenticationToken"])){
-            $token = $_SESSION["authenticationToken"];
-            $authenticationTimeout = $_SESSION["authenticationTimeout"]-600;
-            $timeout = $_SESSION["authenticationTimeout"];
-            $autocompleteUrl = $_SESSION["autocompleteUrl"];
-            $autoToken = $_SESSION["autocompleteToken"];
-            $autocompleteTokenTimeOut = $_SESSION["autocompleteTokenTimeOut"];
-            $autocompleteCustId = $_SESSION["autocompleteCustId"];
-		}else{
-			$result = $this->apiAuthenticationToken();
-      $_SESSION["authenticationToken"]= $result['authenticationToken'];
-      $_SESSION["authenticationTimeout"]= $result['authenticationTimeout'];
-      $_SESSION['autocompleteUrl'] = $result['autocompleteUrl'];
-      $_SESSION['autocompleteToken'] = $result['autocompleteToken'];
-      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];  
-      $_SESSION['autocompleteCustId'] = $result['autocompleteCustId'];
-		}
-
-    if(time()-$autocompleteTokenTimeOut >= $authenticationTimeout){
-      $result = $this->apiAuthenticationToken();
-      $_SESSION["authenticationToken"]= $result['authenticationToken'];
-      $_SESSION["authenticationTimeout"]= $result['authenticationTimeout'];
-      $_SESSION['autocompleteUrl'] = $result['autocompleteUrl'];
-      $_SESSION['autocompleteToken'] = $result['autocompleteToken'];
-      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];  
-      $_SESSION['autocompleteCustId'] = $result['autocompleteCustId'];
-
-
-    
-
-    $result = array(
-      'authenticationToken'   => $token,
-      'authenticationTimeout' => $timeout,
-      'autocompleteUrl' => $autocompleteUrl,
-      'autocompleteToken' => $autoToken,
-      'autocompleteTokenTimeOut' => $autocompleteTokenTimeOut,
-      'autocompleteCustId' => $autocompleteCustId
-    );
-
-      return $result['authenticationToken'];
-		}else{
-            return $this->token;
-        }
+  public function authenticationToken($token = NULL) {
+    if (empty($token)) {
+      $token = $this->readSession('authenticationToken');
+      return !empty($token) ? $token : $this->authenticationToken;
+    }
+    else {
+      $this->authenticationToken = $token;
+      $this->writeSession('authenticationToken', $token);
+    }
   }
 
   /**
@@ -340,12 +300,22 @@ class EBSCOAPI {
    *
    * @access public
    */
-
   public function apiAuthenticationToken() {
-      $response = $this->connector()->requestAuthenticationToken();
-      $result = $this->response($response)->result();
+    $response = $this->connector()->requestAuthenticationToken();
 
-      return $result;
+    if ($this->isError($response)) {
+      return $response;
+    }
+    else {
+      $result = $this->response($response)->result();
+      if (isset($result['authenticationToken'])) {
+        $this->authenticationToken($result['authenticationToken']);
+        return $result['authenticationToken'];
+      }
+      else {
+        return new EBSCOException("No authentication token was found in the response.");
+      }
+    }
   }
 
   /**
@@ -438,9 +408,7 @@ class EBSCOAPI {
   $autosuggest = FALSE,
   $includeimagequickview = FALSE,
   $styles = '',
-  //$autocompleteUrl = '', //adicionado por causa de um Warning on Drush ws
-  $IllustrationInfo = FALSE,
-  $autoComplete = FALSE
+  $IllustrationInfo = FALSE
   ) {
     $query = array();
 
@@ -619,10 +587,6 @@ class EBSCOAPI {
       $params["styles"] = "all";
     }
 
-    if ($autoComplete == TRUE) {
-      $params["autocomplete"] = "y";
-    }
-
     $params = array_merge($params, $query);
 
 
@@ -676,7 +640,7 @@ class EBSCOAPI {
     );
     
     $result = $this->request('Export', $params);
-    
+
     return $result;
     
   }
@@ -714,20 +678,9 @@ class EBSCOAPI {
     if (!$this->isError($result)) {
       $this->writeSession('info', $result);
     }
+
     return $result;
   }
-
-  public function apiAutoComplete(){
-      if(self::$autocomplete == 'y'){
-        // var_dump($autocomplete);
-        // die();
-        return true;
-      }
-      else{
-        return false;
-      }
-  }
-  
 
   /**
    * Handle a PEAR_Error. Return :

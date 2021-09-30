@@ -17,7 +17,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,20 +26,14 @@
  * limitations under the License.*
  */
 
-
 require_once __DIR__ . '/EBSCOAPI.php';
 require_once __DIR__ . '/EBSCORecord.php';
-
-use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Render\Element;
-use Drupal\Core\Pager\PagerManagerInterface;
 
 
 /**
  *
  */
-class EBSCODocument  {
-    
+class EBSCODocument {
     /**
      * The EBSCOAPI object that performs the API calls.
      *
@@ -207,14 +201,6 @@ class EBSCODocument  {
 
     private $local_ips = "";
 
-
-    /**
-     * PagerManager service object.
-     *
-     * @var \Drupal\Core\Pager\PagerManagerInterface
-     */
-    private $pagerManager;
-
     /**
      * Constructor.
      *
@@ -237,7 +223,7 @@ class EBSCODocument  {
 
         $this->params = $params ? $params : $_REQUEST;
         
-        
+
         $this->limit = \Drupal::config('ebsco.settings')->get('ebsco_default_limit') ? \Drupal::config('ebsco.settings')->get('ebsco_default_limit') : $this->limit;
 
         $this->amount = \Drupal::config('ebsco.settings')->get('ebsco_default_amount') ? \Drupal::config('ebsco.settings')->get('ebsco_default_amount') : $this->amount;
@@ -293,12 +279,14 @@ class EBSCODocument  {
         
         $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
 
+        // var_dump($this->result);
+        // die();
+
         return $this->result;
         
     }
 
     public function autocomplete() {
-        $autocompleteUrl = '';
         $this->result = $this->eds->apiAuthenticationToken($autocompleteUrl);
         return $this->result;
     }
@@ -466,13 +454,12 @@ class EBSCODocument  {
      */
     public function pager() {
         $pager = NULL;
-      
         try {
-            if (!empty($this->has_records())) {
-           
-                \Drupal::service('pager.manager')->createPager($this->record_count() / $this->limit, 1)->getCurrentPage();
-          
-                $pageId = 1;
+            if ($this->has_records()) {
+                pager_default_initialize($this->record_count() / $this->limit, 1);
+
+                //calculate pages
+                $pageId=1;
                 if (isset($_REQUEST["page"]))
                 {
                     if ($pageId>($this->record_count() * $this->limit))
@@ -485,31 +472,15 @@ class EBSCODocument  {
                     }
                 }
 
-           
-
-                $pagerVars = [
+                $pagerVars = array(
                     '#type' => 'pager',
-                    '#tags' => [],
+                    'tags' => NULL,
+                    //'#element' => "pageid",
                     '#route_name' => "ebsco.results",
-                    '#parameters' => array(),
+                    '#parameters' =>array(),
                     '#quantity' => self::$page_links
-                ];
-    
-                $arrayExample =  [  
-                    '#type' => 'pager',
-                    '#element' => 0,
-                    '#parameters' => [],
-                    '#quantity' => 5,
-                    '#tags' => [],
-                    '#route_name' => 'ebsco.results',
-                    
-                ];
-                
-                $renderer = \Drupal::service('renderer');
-                $renderer->render($pagerVars);
-                
-                $pager = $pagerVars; 
-                
+                );
+                $pager= drupal_render($pagerVars);
 
                 // remove last page navigation. Does not make sense in discovery navigation
                 $pi=@stripos((string)$pager,'<li class="pager__item pager__item--last">');
@@ -519,7 +490,7 @@ class EBSCODocument  {
                     $s=substr($pager,1,$pi-1).substr($pager,$pf+6,strlen($pager)-($pf+6));
                     $pager=$s;
                 }
-                
+                // $pager = preg_replace('/<li class="pager__item pager__item--last">(.*)<\/li>/', '', $pager);
             }
 
         }
@@ -527,9 +498,6 @@ class EBSCODocument  {
         }
         return $pager;
     }
-
-    
-
     
     /********************************************************
      *

@@ -22,7 +22,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with HTML Sanitizer; if not, see <http://www.gnu.org/licenses/>.
+// along with HTML Sanitizer; if not, see <https://www.gnu.org/licenses/>.
 //
 // ***** END LICENSE BLOCK *****.
 /**
