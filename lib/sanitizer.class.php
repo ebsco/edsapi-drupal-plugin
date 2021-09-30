@@ -32,7 +32,7 @@
  *
  * @author Frederic Minne <zefredz@gmail.com>
  * @copyright Copyright &copy; 2005-2011, Frederic Minne
- * @license http://www.gnu.org/licenses/lgpl.txt GNU Lesser General Public License version 3 or later
+ * @license https://www.gnu.org/licenses/lgpl.txt GNU Lesser General Public License version 3 or later
  * @version 1.1
  */
 class HTML_Sanitizer {

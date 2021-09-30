@@ -1,6 +1,6 @@
 {
-  "name": "ebsco/edsapi-drupal8-plugin",
-  "description": "A Drupal 8 module for the EBSCO Discovery Service.",
+  "name": "ebsco/edsapi-drupal-plugin",
+  "description": "A Drupal 9 module for the EBSCO Discovery Service.",
   "keywords": ["ebsco", "eds", "drupal8", "drupal"],
   "type": "drupal-module",
   "homepage": "https://github.com/ebsco/edsapi-drupal-plugin",

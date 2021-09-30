@@ -26,13 +26,20 @@
  * limitations under the License.*
  */
 
+
 require_once __DIR__ . '/EBSCOAPI.php';
 require_once __DIR__ . '/EBSCORecord.php';
+
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Pager\PagerManagerInterface;
+
 
 /**
  *
  */
-class EBSCODocument {
+class EBSCODocument  {
+    
     /**
      * The EBSCOAPI object that performs the API calls.
      *
@@ -88,8 +95,6 @@ class EBSCODocument {
     private $autoSuggestTerms = array();
 
     private $imageQuickViewTerms = array();
-
-  
 
     /**
      * The array of filters currently applied.
@@ -202,6 +207,14 @@ class EBSCODocument {
 
     private $local_ips = "";
 
+
+    /**
+     * PagerManager service object.
+     *
+     * @var \Drupal\Core\Pager\PagerManagerInterface
+     */
+    private $pagerManager;
+
     /**
      * Constructor.
      *
@@ -224,7 +237,7 @@ class EBSCODocument {
 
         $this->params = $params ? $params : $_REQUEST;
         
-
+        
         $this->limit = \Drupal::config('ebsco.settings')->get('ebsco_default_limit') ? \Drupal::config('ebsco.settings')->get('ebsco_default_limit') : $this->limit;
 
         $this->amount = \Drupal::config('ebsco.settings')->get('ebsco_default_amount') ? \Drupal::config('ebsco.settings')->get('ebsco_default_amount') : $this->amount;
@@ -237,6 +250,7 @@ class EBSCODocument {
      */
     public function info() {
         $this->info = $this->eds->apiInfo();
+        
         return $this->info;
 
         
@@ -275,15 +289,18 @@ class EBSCODocument {
      * @return array
      */
     public function citation() {
-        
         list($an, $db, $styles) = isset($this->params['id']) ? explode('|', $this->params['id'], 3) : array(NULL, NULL, NULL);
         
         $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
-   
-
 
         return $this->result;
         
+    }
+
+    public function autocomplete() {
+        $autocompleteUrl = '';
+        $this->result = $this->eds->apiAuthenticationToken($autocompleteUrl);
+        return $this->result;
     }
 
     /**
@@ -299,13 +316,15 @@ class EBSCODocument {
                 'lookfor' => $this->params['lookfor'],
                 'index'   => $this->params['type'],
             );
+            
         }
+        
         elseif (isset($this->params['group'])) {
             $search = $this->params;
-        }
-        else {
+            
+        }else {
             return array();
-        }
+            }
 
 
 
@@ -318,7 +337,7 @@ class EBSCODocument {
 
         // Check if research starters , EMP are active.
         $info = $this->info();
-        
+    
         if ($info instanceof EBSCOException) {
             return array();
         }
@@ -408,7 +427,6 @@ class EBSCODocument {
      *
      */
     public function relatedContent() {
-
         if ($this->results instanceof EBSCOException) {
             return NULL;
         }
@@ -422,28 +440,24 @@ class EBSCODocument {
      */
     public function autoSuggestTerms() {
         $this->autoSuggestTerms = isset($this->results['autoSuggestTerms']) ? $this->results['autoSuggestTerms'] : NULL;
-
         return $this->autoSuggestTerms;
-
-     
-        
     }
+
+
 
     
     
     public function imageQuickViewTerms() {
-
         $this->imageQuickViewTerms = isset($this->results['imageQuickViewTerms']) ? $this->results['imageQuickViewTerms'] : NULL;
-
         return $this->imageQuickViewTerms;
     }
 
     public function citationStylesTerms() {
-
         $this->citationStylesTerms = isset($this->results['citationStylesTerms']) ? $this->results['citationStylesTerms'] : NULL;
-
         return $this->citationStylesTerms;
     }
+
+  
     
     /**
      * Get the pagination HTML string.
@@ -452,12 +466,13 @@ class EBSCODocument {
      */
     public function pager() {
         $pager = NULL;
+      
         try {
-            if ($this->has_records()) {
-                pager_default_initialize($this->record_count() / $this->limit, 1);
-
-                //calculate pages
-                $pageId=1;
+            if (!empty($this->has_records())) {
+           
+                \Drupal::service('pager.manager')->createPager($this->record_count() / $this->limit, 1)->getCurrentPage();
+          
+                $pageId = 1;
                 if (isset($_REQUEST["page"]))
                 {
                     if ($pageId>($this->record_count() * $this->limit))
@@ -470,15 +485,31 @@ class EBSCODocument {
                     }
                 }
 
-                $pagerVars = array(
+           
+
+                $pagerVars = [
                     '#type' => 'pager',
-                    'tags' => NULL,
-                    //'#element' => "pageid",
+                    '#tags' => [],
                     '#route_name' => "ebsco.results",
-                    '#parameters' =>array(),
+                    '#parameters' => array(),
                     '#quantity' => self::$page_links
-                );
-                $pager= drupal_render($pagerVars);
+                ];
+    
+                $arrayExample =  [  
+                    '#type' => 'pager',
+                    '#element' => 0,
+                    '#parameters' => [],
+                    '#quantity' => 5,
+                    '#tags' => [],
+                    '#route_name' => 'ebsco.results',
+                    
+                ];
+                
+                $renderer = \Drupal::service('renderer');
+                $renderer->render($pagerVars);
+                
+                $pager = $pagerVars; 
+                
 
                 // remove last page navigation. Does not make sense in discovery navigation
                 $pi=@stripos((string)$pager,'<li class="pager__item pager__item--last">');
@@ -488,7 +519,7 @@ class EBSCODocument {
                     $s=substr($pager,1,$pi-1).substr($pager,$pf+6,strlen($pager)-($pf+6));
                     $pager=$s;
                 }
-                // $pager = preg_replace('/<li class="pager__item pager__item--last">(.*)<\/li>/', '', $pager);
+                
             }
 
         }
@@ -496,6 +527,9 @@ class EBSCODocument {
         }
         return $pager;
     }
+
+    
+
     
     /********************************************************
      *

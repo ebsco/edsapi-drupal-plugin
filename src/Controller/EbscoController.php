@@ -84,8 +84,9 @@ class EbscoController extends ControllerBase  {
 		}
 		else 
 		{
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		
 	}
@@ -110,14 +111,15 @@ class EbscoController extends ControllerBase  {
 		}
 		
 		else {
-		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+		$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 		if ($is_xhr) {
 			echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
 			return;
 		}
 		else {
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));		
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );		
 		}
 		}
 	}
@@ -142,14 +144,15 @@ class EbscoController extends ControllerBase  {
 		}
 		}
 		else {
-		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+		$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 		if ($is_xhr) {
 			echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
 			return;
 		}
 		else {
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));		
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));		
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		}
 
@@ -194,8 +197,9 @@ class EbscoController extends ControllerBase  {
 		}
 		else 
 		{
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		
 	}
@@ -218,14 +222,15 @@ class EbscoController extends ControllerBase  {
 		}
 		}
 		else {
-		$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+		$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 		if ($is_xhr) {
 			echo "<script type=\"text/javascript\">window.location.href = '" . \Drupal\Core\Url::fromRoute('user.page')->toString() . "';</script>";
 			return;
 		}
 		else {
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));		
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));		
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		}
 
@@ -250,8 +255,9 @@ class EbscoController extends ControllerBase  {
 		}
 		else 
 		{
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		
 	}
@@ -274,20 +280,21 @@ class EbscoController extends ControllerBase  {
 		}
 		else 
 		{
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 
 	}
 
 	
 	public function autocomplete() {
-		header('Access-Control-Allow-Origin "*"');
-		header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-		header('Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, 
-		Accept, x-client-key, x-client-token, x-client-secret, Authorization');
-		header('Content-Type: application/json');
-		header('Accept: application/json');
+		// header('Access-Control-Allow-Origin "*"');
+		// header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+		// header('Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, 
+		// Accept, x-client-key, x-client-token, x-client-secret, Authorization');
+		// header('Content-Type: application/json');
+		// header('Accept: application/json');
 		global $_ebsco_document;
 
 
@@ -335,8 +342,9 @@ class EbscoController extends ControllerBase  {
 		}
 		else 
 		{
-			$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-			return new RedirectResponse(\Drupal::url('user.page'));
+			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+			//return new RedirectResponse(\Drupal::url('user.page'));
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 
 	
