@@ -7,7 +7,7 @@
 ![Packagist](https://img.shields.io/packagist/v/ebsco/edsapi-drupal8-plugin.svg)
 
 ## Installation
-`$ composer require ebsco/edsapi-drupal9-plugin`
+`$ composer require ebsco/edsapi-drupal-plugin`
 
 ## Usage
 
