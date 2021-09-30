@@ -27,7 +27,6 @@ ebsco.results:
   defaults:
     _title: 'EDS results list'
     _controller: '\Drupal\ebsco\Controller\EbscoController::results'
-    #_controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
 

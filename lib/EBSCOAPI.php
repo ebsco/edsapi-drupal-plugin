@@ -133,8 +133,18 @@ class EBSCOAPI {
 
   public function authenticationToken(){
 
-    $autocompleteTokenTimeOut=time();
-		$authenticationTimeout=0;
+    $autocompleteTokenTimeOut = time();
+		$authenticationTimeout = 0;
+    //$authenticationTimeout;
+    // $autocompleteUrl = '';
+    // $token = '';
+    // $timeout = '';
+    // $autoToken = '';
+    // //$autocompleteTokenTimeOut = '';
+    // //$autocompleteTokenTimeOut;
+    // $autocompleteTokenTimeOut = 0;
+    // $autocompleteCustId ='';
+
 		if (isset($_SESSION["authenticationToken"])){
             $token = $_SESSION["authenticationToken"];
             $authenticationTimeout = $_SESSION["authenticationTimeout"]-600;
@@ -718,8 +728,8 @@ class EBSCOAPI {
 
   public function apiAutoComplete(){
       if(self::$autocomplete == 'y'){
-        var_dump($autocomplete);
-        die();
+        // var_dump($autocomplete);
+        // die();
         return true;
       }
       else{
