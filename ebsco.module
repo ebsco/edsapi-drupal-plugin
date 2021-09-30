@@ -8,7 +8,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*     http://www.apache.org/licenses/LICENSE-2.0
+*     https://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,6 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Asset\AttachedAssetsInterface;
-use Drupal\Core\Render\RendererInterface;
 
 
 require_once __DIR__ . '/lib/EBSCODocument.php';
@@ -47,6 +46,7 @@ $Document = null;
 function ebsco_user_login($account) {
     if (isset($_SESSION['EBSCO']['redirect'])) {
         $destination = urldecode($_SESSION['EBSCO']['redirect']['destination']);
+        //unset($_SESSION['EBSCO']['redirect']);
         $response = new RedirectResponse($destination, 302);
         $response->send();
         return;
@@ -166,8 +166,6 @@ function ebsco_basic_search_form() {
         ),
     );
 
-  
-
     $default_value = isset($params['type']) ? $params['type'] : '';
     $form['basic']['type'] = array(
         '#id'            => 'type',
@@ -214,7 +212,6 @@ function ebsco_basic_search_form() {
         );
     }
     echo $formautocomplete;
-    
     
     return $form;
 }
@@ -344,7 +341,7 @@ function hooks_ebsco_fulltext_page() {
             return theme('ebsco_result');
         }
     } else {
-        $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+        $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
         if ($is_xhr) {
             echo "<script type=\"text/javascript\">window.location.href = '" . url('user') . "';</script>";
             return;
@@ -512,6 +509,9 @@ function ebsco_advanced_search_form() {
         '#attributes ' => array ('#class' => 'button _add_row', '#id'=>'advanced_add_row', '#name'=>'advanced_add_row' ),
         '#value' =>  t('Add Search Field')
 
+        // '#class'  => '_add_row',
+        // '#type'  => 'button',
+        // '#value' =>  t('Add Search Field') ,
     );
 
     $items = array(
@@ -711,7 +711,7 @@ function ebsco_advanced_search_form() {
         '#type'  => 'reset',
         '#name'  => 'reset',
         '#value' => t('Clear')
-        
+        //'#markup'  => '<input id="ebsco-advanced-search-clear" class="form-submit" type="reset" value="' . t('Clear') . '" name="reset">'
     );
 
     return $form;
@@ -746,13 +746,11 @@ function ebsco_advanced_search_form_validate($form, &$form_state) {
 function template_preprocess_ebsco_results(&$variables) {
     global $Document;
     $params = $_REQUEST;
-
-    
     $variables['#attached']['library'][] = 'ebsco/global-styling';
     $variables['#attached']['library'][] = 'ebsco/global-scripts';
 
-    $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
-    $_SESSION['EBSCO']['lastsearch'] = \Drupal::destination()->getAsArray();
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+    $_SESSION['EBSCO']['lastsearch'] = drupal_get_destination();
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -1246,7 +1244,7 @@ function template_preprocess_ebsco_result(&$variables) {
 
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
-    $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -1447,10 +1445,9 @@ function template_preprocess_ebsco_result(&$variables) {
             .'</div>'
         ;
 
-        
+        $detailRecordHTML.='<div class="span-4">';
         if ($record->medium_thumb_link){
-        
-            $detailRecordHTML.='<img src="' . UrlHelper::filterBadProtocol($record->medium_thumb_link) . '" class="book-jacket" alt="' . t('Book jacket') . '"/>';
+            $detailRecordHTML.='<img src="' . check_url($record->medium_thumb_link) . '" class="book-jacket" alt="' . t('Book jacket') . '"/>';
         }
 
         if ($record->publication_type){
@@ -1459,7 +1456,7 @@ function template_preprocess_ebsco_result(&$variables) {
         $detailRecordHTML.='</div>'
 
             .'</div>'
-        
+            .'</div>'
         ;
 
         $detailRecordHTML.='<div class="clear"></div>';
@@ -1489,7 +1486,7 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
 
-    $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -1508,7 +1505,7 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-        $iqv = [];
+        
         $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
 
         
@@ -1584,7 +1581,7 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
 
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
-    $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -1644,7 +1641,7 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
     
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
-   $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
+    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -1872,8 +1869,8 @@ function remove_filter_link($filter)
             }
         }
     }
-    return url('ebsco/results', array('query' => $params));
-    //return \Drupal\Core\Url::fromRoute('ebsco.results',  $params)->toString();
+    //return url('ebsco/results', array('query' => $params));
+    return \Drupal\Core\Url::fromRoute('ebsco.results',  $params)->toString();
 }
 
 
@@ -1882,8 +1879,8 @@ function remove_filter_link($filter)
  *
  * @return string
  */
-
-function auto_link($string) {
+function auto_link($string)
+{
     $linkedString = preg_replace_callback(
         "/\b(https?):\/\/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]*)\b/i",
         create_function(
@@ -1894,7 +1891,3 @@ function auto_link($string) {
     );
     return $linkedString;
 }
-
-/**
- * 
- */

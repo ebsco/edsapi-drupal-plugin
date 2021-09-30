@@ -1,8 +1,7 @@
 name: 'EBSCO Discovery Service'
 type: module
 description: 'Full-text articles and eBooks from EBSCO Discovery Service'
-#core: 9.x
-core_version_requirement: ^8 || ^9
+core: 8.x
 dependencies:
   - drupal:block
   - drupal:views
