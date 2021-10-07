@@ -98,7 +98,7 @@ class EbscoAdmin extends ConfigFormBase {
     ];
 
     $form['ebsco_credentials']['ebsco_autocomplete'] = [
-      '#type' => 'textfield',
+      '#type' => 'hidden',
       '#title' => t('Autocomplete'),
       '#default_value' => $config->get('ebsco_autocomplete'),
       '#size' => 50,
