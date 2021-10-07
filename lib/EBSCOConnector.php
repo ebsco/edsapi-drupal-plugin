@@ -268,7 +268,7 @@ class EBSCOConnector {
     $url = self::$authentication_end_point .  '/uidauth';
 
     // Add the body of the request.
-    $params = '<UIDAuthRequestMessage xmlns="https://www.ebscohost.com/services/public/AuthService/Response/2012/06/01">'
+    $params = '<UIDAuthRequestMessage xmlns="http://www.ebscohost.com/services/public/AuthService/Response/2012/06/01">'
 					.'<UserId>'.$this->userId.'</UserId>'
 					.'<Password>'.$this->password.'</Password>'
           .'<InterfaceId>wsapi</InterfaceId>'
