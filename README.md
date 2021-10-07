@@ -8,6 +8,8 @@
 
 ## Installation
 `$ composer require ebsco/edsapi-drupal-plugin`
+## Installation to a specific branch
+git clone --branch edsapi-drupal8-release git@github.com:ebsco/edsapi-drupal-plugin.git
 
 ## Usage
 
