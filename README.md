@@ -7,7 +7,9 @@
 ![Packagist](https://img.shields.io/packagist/v/ebsco/edsapi-drupal8-plugin.svg)
 
 ## Installation
-`$ composer require ebsco/edsapi-drupal8-plugin`
+`$ composer require ebsco/edsapi-drupal-plugin`
+## Installation to a specific branch
+git clone --branch edsapi-drupal8-release git@github.com:ebsco/edsapi-drupal-plugin.git
 
 ## Usage
 

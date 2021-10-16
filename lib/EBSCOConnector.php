@@ -12,7 +12,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -85,7 +85,7 @@ class EBSCOConnector {
 
   /**
      * HTTP status codes constants
-     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html.
+     * https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html.
      *
      * @global integer HTTP_OK        The request has succeeded
      * @global integer HTTP_NOT_FOUND The server has not found anything matching the Request-URI
@@ -109,7 +109,7 @@ class EBSCOConnector {
    *
    * @global string
    */
-  private static $end_point = 'http://eds-api.ebscohost.com/EDSAPI/rest';
+  private static $end_point = 'https://eds-api.ebscohost.com/EDSAPI/rest';
 
 
   /**

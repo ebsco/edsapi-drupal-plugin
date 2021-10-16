@@ -1,54 +1,47 @@
 <?php
 /*
-*
-*
-* Copyright [2017] [EBSCO Information Services]
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
+ *
+ *
+ * Copyright [2017] [EBSCO Information Services]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Asset\AttachedAssetsInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
+require_once __DIR__.'/lib/EBSCODocument.php';
 
-require_once __DIR__ . '/lib/EBSCODocument.php';
-
-# global variable
+// global variable
 $Document = null;
-
-
-
 
 /******************************************
  * Hooks
  ******************************************/
 
-
 /**
  * Implements hook_user_login.
  *
  * Redirects after login
- *
  */
-function ebsco_user_login($account) {
+function ebsco_user_login($account)
+{
     if (isset($_SESSION['EBSCO']['redirect'])) {
         $destination = urldecode($_SESSION['EBSCO']['redirect']['destination']);
         //unset($_SESSION['EBSCO']['redirect']);
         $response = new RedirectResponse($destination, 302);
         $response->send();
+
         return;
         exit();
     }
@@ -64,155 +57,149 @@ function ebsco_user_login($account) {
  * @param arg
  *   Array that holds the current path as returned from arg() function
  */
-function hooks_ebsco_help($path, $arg) {
-    $output = "";
+function hooks_ebsco_help($path, $arg)
+{
+    $output = '';
     switch ($path) {
-        case "admin/help#ebsco":
-            $output .= '<h2>'.  t("Full-text articles and eBooks from EBSCOhost Discovery Services") .'</h2>';
-            $output .= '<p>'. t("EBSCO Discovery Service provides users with an easy, yet powerful means of accessing all of 
-                an institution's information resources through a single search.") .'</p>';
-            $output .= '<p>'. t("This is achieved by harvesting metadata from both internal (library) and external (database vendors) sources, 
-                and creating a pre-indexed service of unprecedented size and speed.") .'</p>';
-            $output .= '<p>'. t("Although the resulting collection can be massive in size and scope, the fact that it is indexed locally 
-                (on the EBSCOhost&reg; servers) allows for exceptionally fast search response times.") .'</p>';
-            $output .= '<p>'. t("As no two institutions are the same, EBSCO Discovery Service offers a vast array of customization options with 
-                regard to both the underlying collection of metadata as well as the front-end delivery of search results. 
-                All of this functionality is based upon the powerful EBSCOhost search experience familiar to researchers worldwide.") .'</p>';
+        case 'admin/help#ebsco':
+            $output .= '<h2>'.t('Full-text articles and eBooks from EBSCOhost Discovery Services').'</h2>';
+            $output .= '<p>'.t("EBSCO Discovery Service provides users with an easy, yet powerful means of accessing all of
+                an institution's information resources through a single search.").'</p>';
+            $output .= '<p>'.t('This is achieved by harvesting metadata from both internal (library) and external (database vendors) sources,
+                and creating a pre-indexed service of unprecedented size and speed.').'</p>';
+            $output .= '<p>'.t('Although the resulting collection can be massive in size and scope, the fact that it is indexed locally
+                (on the EBSCOhost&reg; servers) allows for exceptionally fast search response times.').'</p>';
+            $output .= '<p>'.t('As no two institutions are the same, EBSCO Discovery Service offers a vast array of customization options with
+                regard to both the underlying collection of metadata as well as the front-end delivery of search results.
+                All of this functionality is based upon the powerful EBSCOhost search experience familiar to researchers worldwide.').'</p>';
             break;
     }
+
     return $output;
 }
-
-
 /**
  * Implements hook_theme().
  */
 //function  hooks_ebsco_theme() {
-function  ebsco_theme($existing, $type, $theme, $path) {
+function ebsco_theme($existing, $type, $theme, $path)
+{
+    $variables[] = [];
 
-    $variables[]=array();
-
-    $themes = array(
-        'ebsco_result' => array(
+    $themes = [
+        'ebsco_result' => [
             'render element' => 'elements',
-            'template' => 'ebsco-result'
-        ),
-        'ebsco_results' => array(
+            'template' => 'ebsco-result',
+        ],
+        'ebsco_results' => [
             'render element' => 'elements',
-            'template' => 'ebsco-results'
-        ),
-        'ebsco_side_facets' => array(
+            'template' => 'ebsco-results',
+        ],
+        'ebsco_side_facets' => [
             'render element' => 'elements',
-            'template' => 'ebsco-side-facets'
-        ),
-        'ebsco_basic_search' => array(
+            'template' => 'ebsco-side-facets',
+        ],
+        'ebsco_basic_search' => [
             'render element' => 'elements',
             'template' => 'ebsco-basic-search',
-        ),
-        'ebsco_advanced_search' => array(
+        ],
+        'ebsco_advanced_search' => [
             'render element' => 'elements',
-            'template' => 'ebsco-advanced-search'
-        ),
-        'ebsco_image_quick_view' => array(
+            'template' => 'ebsco-advanced-search',
+        ],
+        'ebsco_image_quick_view' => [
             'render element' => 'elements',
-            'template' => 'ebsco-image-quick-view'
-        ),
-        'ebsco_exportformat_detail' => array(
+            'template' => 'ebsco-image-quick-view',
+        ],
+        'ebsco_exportformat_detail' => [
             'render element' => 'elements',
-            'template' => 'ebsco-export-format'
-        ),
-        'ebsco_citation_styles_detail' => array(
+            'template' => 'ebsco-export-format',
+        ],
+        'ebsco_citation_styles_detail' => [
             'render element' => 'elements',
-            'template' => 'ebsco-citation-styles'
-        )
-    );
-    return $themes;
+            'template' => 'ebsco-citation-styles',
+        ],
+    ];
 
+    return $themes;
 }
 
 /******************************************************
  * Form builders, form handlers and templates handlers
  ******************************************************/
 
-
 /**
  * Form builder; Output a search form for the search block's search box.
  *
  * @ingroup forms
  */
-function ebsco_basic_search_form() {
+function ebsco_basic_search_form()
+{
     $params = $_REQUEST;
 
     $default_value = isset($variables['lookfor']) ? $variables['lookfor'] : '';
     if (isset($params['lookfor'])) {
-        $default_value =  $params['lookfor'] ;
+        $default_value = $params['lookfor'];
     }
-
-    
-
-    $form['basic']['lookfor'] = array(
-        '#id'            => 'lookfor',
-        '#name'            => 'lookfor',
+    $form['basic']['lookfor'] = [
+        '#id' => 'lookfor',
+        '#name' => 'lookfor',
         '#class' => 'autocomplete',
         '#value' => $default_value,
-        '#required'    => true,
-        '#type'          => 'textfield',
-        '#size'          => 40,
-        '#attributes'    => array(
+        '#required' => true,
+        '#type' => 'textfield',
+        '#size' => 40,
+        '#attributes' => [
             'title' => t('Enter the terms you wish to search for.'),
             'placeholder' => t('Search anything here.'),
             'autocomplete' => 'off',
-            'class' => 'autocomplete'
-        ),
-    );
+            'class' => 'autocomplete',
+        ],
+    ];
 
     $default_value = isset($params['type']) ? $params['type'] : '';
-    $form['basic']['type'] = array(
-        '#id'            => 'type',
-        '#name'            => 'type',
-        '#type'          => 'select',
-        '#options'       => EBSCODocument::basic_search_type_options(),
-        '#default_value' => $default_value
-    );
+    $form['basic']['type'] = [
+        '#id' => 'type',
+        '#name' => 'type',
+        '#type' => 'select',
+        '#options' => EBSCODocument::basic_search_type_options(),
+        '#default_value' => $default_value,
+    ];
 
-    $form['basic']['submit'] = array(
-        '#id'    => 'ebsco-basic-search-submit',
-        '#type'  => 'submit',
-        '#value' => t('Search')
-    );
+    $form['basic']['submit'] = [
+        '#id' => 'ebsco-basic-search-submit',
+        '#type' => 'submit',
+        '#value' => t('Search'),
+    ];
 
-    $form['basic']['autocomplete'] = array(
-        '#id'    => 'autocomplete',
-        '#type'  => 'ul',
-        '#attributes'    => array(
-            'data-js'    => 'autocomplete'
-            
-        ),
-    );
+    $form['basic']['autocomplete'] = [
+        '#id' => 'autocomplete',
+        '#type' => 'ul',
+        '#attributes' => [
+            'data-js' => 'autocomplete',
+        ],
+    ];
     $formautocomplete = '<div id="autocomplete" class="autocomplete" data-js="autocomplete"><ul></ul></div>';
 
-   
-
     if (isset($params['filter'])) {
-        foreach($params['filter'] as $key => $value) {
-            $form['basic']['group'.$key]['filter[]'] = array(
-                '#id'            => 'ebsco-basic-search-filter' . $key,
-                '#type'          => 'hidden',
+        foreach ($params['filter'] as $key => $value) {
+            $form['basic']['group'.$key]['filter[]'] = [
+                '#id' => 'ebsco-basic-search-filter'.$key,
+                '#type' => 'hidden',
                 '#default_value' => $value, // doesn't work
-                '#attributes'    => array('checked' => 'checked', 'value' => $value)
-
-            );
+                '#attributes' => ['checked' => 'checked', 'value' => $value],
+            ];
         }
 
-        $form['basic']['remember'] = array(
-            '#type'          => 'checkbox',
-            '#title'         => t('Retain my current filters'),
-            '#prefix'        => '<br />',
-            '#default_value' => true
-        );
+        $form['basic']['remember'] = [
+            '#type' => 'checkbox',
+            '#title' => t('Retain my current filters'),
+            '#prefix' => '<br />',
+            '#default_value' => true,
+        ];
     }
+
     echo $formautocomplete;
-    
+
     return $form;
 }
 
@@ -221,40 +208,43 @@ function ebsco_basic_search_form() {
  *
  * @see ebsco-basic-search.html.twig
  */
-function template_preprocess_ebsco_basic_search(&$variables) {
+function template_preprocess_ebsco_basic_search(&$variables)
+{
     global $Document;
     $params = $_REQUEST;
-    
+
     $variables['#attached']['library'][] = 'ebsco/global-styling';
 
-    
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
-    $edsInfo=$Document->info();
-
+    $edsInfo = $Document->info();
 
     //check if api information is working
     if ($edsInfo instanceof EBSCOException) {
-        $variables['error_message']=$edsInfo;
+        $variables['error_message'] = $edsInfo;
     }
 
     if (isset($params['lookfor'])) {
         $variables['lookfor'] = $params['lookfor'];
-    } else if (isset($params['group'])) {
+    } elseif (isset($params['group'])) {
         $types = EBSCODocument::basic_search_type_options();
         foreach ($params['group'] as $key => $group) {
             if (!empty($group['lookfor'])) {
                 $pre = $key == 0 ? '' : " {$group['bool']} ";
-                $variables['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+                $variables['lookfor'] .= $pre.$types[$group['type']].':'.$group['lookfor'];
             }
         }
     }
-    $form=ebsco_basic_search_form();
-    $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
-    $variables['advanced_search_url'] =  \Drupal\Core\Url::fromRoute('ebsco.advanced',  array())->toString();
-    $variables['search_form'] = \Drupal::service('renderer')->render($form);
-
+    $form = ebsco_basic_search_form();
+    $variables['results_url'] = \Drupal\Core\Url::fromRoute('ebsco.results', [])->toString();
+    $variables['advanced_search_url'] = \Drupal\Core\Url::fromRoute('ebsco.advanced', [])->toString();
+    //$variables['search_form'] = \Drupal::service('renderer')->render($form);
+    //$variables['search_form'] = array_merge()
+    //$element['#attributes']['class'] = array_merge($element['#attributes']['class'], $class);
+    $variables['search_form'] = array_merge($form);
+    // var_dump($variables['search_form']);
+    // die();
 }
 
 /**
@@ -262,12 +252,15 @@ function template_preprocess_ebsco_basic_search(&$variables) {
  *
  * @see ebsco_basic_search_form_submit()
  */
-function ebsco_basic_search_form_validate($form, &$form_state) {
+function ebsco_basic_search_form_validate($form, &$form_state)
+{
     $params = $form_state['values'];
     if (empty($params['lookfor'])) {
         $form_state->setErrorByName('lookfor', t('Please enter some keywords.'));
+
         return false;
     }
+
     return true;
 }
 
@@ -276,51 +269,53 @@ function ebsco_basic_search_form_validate($form, &$form_state) {
  *
  * @see ebsco_basic_search_form_validate()
  */
-function ebsco_basic_search_form_submit($form, &$form_state) {
+function ebsco_basic_search_form_submit($form, &$form_state)
+{
     $params = $form_state['values'];
-    $allowed_keys = array('lookfor', 'type');
-    foreach($params as $key => $value) {
+    $allowed_keys = ['lookfor', 'type'];
+    foreach ($params as $key => $value) {
         if (!in_array($key, $allowed_keys)) {
             unset($params[$key]);
         }
     }
     $form_state['rebuild'] = false;
-    $form_state['redirect'] = array('ebsco/results', array('query' => $params));
+    $form_state['redirect'] = ['ebsco/results', ['query' => $params]];
 }
-
 
 /**
  * Implements hook_block_info().
  */
-function hooks_ebsco_block_info() {
-    $blocks['ebsco_main'] = array(
-        'info'  => $this->t('EBSCO Search Form'),
+function hooks_ebsco_block_info()
+{
+    $blocks['ebsco_main'] = [
+        'info' => $this->t('EBSCO Search Form'),
 //        'cache' => DRUPAL_CACHE_PER_PAGE
-    );
+    ];
 
-    $blocks['ebscofacets'] = array(
-        'info'  => $this->t('EBSCO Narrow Search'),
+    $blocks['ebscofacets'] = [
+        'info' => $this->t('EBSCO Narrow Search'),
 //        'cache' => DRUPAL_CACHE_PER_PAGE
-    );
+    ];
 
     return $blocks;
 }
-
 
 /**
  * Implements hook_block_view().
  *
  * Prepares the content of the block.
  */
-function hooks_ebsco_block_view($delta = '') {
+function hooks_ebsco_block_view($delta = '')
+{
     $params = $_GET;
 
     switch ($delta) {
         case 'ebsco_main':
             $reject = isset($params['q']) && strpos('ebsco/advanced', $params['q']) !== false;
-            return array(
-                'content' => $reject ? '' : ebsco_basic_search_block()
-            );
+
+            return [
+                'content' => $reject ? '' : ebsco_basic_search_block(),
+            ];
             break;
     }
 }
@@ -329,13 +324,13 @@ function hooks_ebsco_block_view($delta = '') {
 // * Page callbacks
 // ******************************************************/
 
-
-
-function hooks_ebsco_fulltext_page() {
+function hooks_ebsco_fulltext_page()
+{
     $is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
     if (user_is_logged_in()) {
         if ($is_xhr) {
-            print theme('ebsco_result');
+            echo theme('ebsco_result');
+
             return true;
         } else {
             return theme('ebsco_result');
@@ -343,7 +338,8 @@ function hooks_ebsco_fulltext_page() {
     } else {
         $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
         if ($is_xhr) {
-            echo "<script type=\"text/javascript\">window.location.href = '" . url('user') . "';</script>";
+            echo "<script type=\"text/javascript\">window.location.href = '".url('user')."';</script>";
+
             return;
         } else {
             drupal_goto('user');
@@ -351,78 +347,72 @@ function hooks_ebsco_fulltext_page() {
     }
 }
 
-
-
-
-function hooks_ebsco_basic_search_block() {
+function hooks_ebsco_basic_search_block()
+{
     return theme('ebsco_basic_search');
 }
 
-
-function hooks_ebsco_side_facets_block() {
+function hooks_ebsco_side_facets_block()
+{
     return theme('ebsco_side_facets');
 }
-
-
 
 /******************************************************
  * Form builders, form handlers and templates handlers
  ******************************************************/
-
 
 /**
  * Form builder; Output a sort form for the search results.
  *
  * @ingroup forms
  */
-function ebsco_sort_form() {
+function ebsco_sort_form()
+{
     $params = $_REQUEST;
 
-    $form = array(
-        '#attributes' => array('class' => 'sort-form'),
-        '#method'     => 'get'
-    );
+    $form = [
+        '#attributes' => ['class' => 'sort-form'],
+        '#method' => 'get',
+    ];
 
     $options = EBSCODocument::amount_options();
     $values = array_values($options);
     $default_value = isset($params['amount']) ? $params['amount'] : \Drupal::config('ebsco.settings')->get('ebsco_default_amount', 'brief');
-    $form['mode'] = array(
-        '#id'            => 'ebsco-amount',
-        '#type'          => 'select',
-        '#title'         => t('Page options'),
-        '#value' => 	$default_value,
-        '#options'       => $options,
-        '#attributes'    => array('class' => array('form-select', '_jump_menu'))
-    );
+    $form['mode'] = [
+        '#id' => 'ebsco-amount',
+        '#type' => 'select',
+        '#title' => t('Page options'),
+        '#value' => $default_value,
+        '#options' => $options,
+        '#attributes' => ['class' => ['form-select', '_jump_menu']],
+    ];
 
     $options = EBSCODocument::sort_options();
     $values = array_values($options);
     $default_value = isset($params['sort']) ? $params['sort'] : $values[0];
-    $form['sort'] = array(
-        '#id'            => 'ebsco-sort',
-        '#type'          => 'select',
-        '#title'         => t('Sort'),
-        '#value' => 	$default_value,
-        '#options'       => $options,
-        '#attributes'    => array('class' => array('form-select', '_jump_menu'))
-    );
+    $form['sort'] = [
+        '#id' => 'ebsco-sort',
+        '#type' => 'select',
+        '#title' => t('Sort'),
+        '#value' => $default_value,
+        '#options' => $options,
+        '#attributes' => ['class' => ['form-select', '_jump_menu']],
+    ];
 
     return $form;
 }
-
-
 
 /**
  * Form builder; Output a search form for the search block's search box.
  *
  * @ingroup forms
  */
-function ebsco_advanced_search_form() {
+function ebsco_advanced_search_form()
+{
     global $Document;
     $params = $_REQUEST;
     $variables['#attached']['library'][] = 'ebsco/global-styling';
     $variables['#attached']['library'][] = 'ebsco/global-scripts';
-
 
     if (isset($params['edit']) && !empty($params['edit'])) {
         $query = $_SESSION['EBSCO']['last-search']['query'];
@@ -431,134 +421,133 @@ function ebsco_advanced_search_form() {
     }
     $counter = isset($params['group']) ? count($params['group']) : 3;
 
-    $form = array(
-        '#attributes' => array('class' => 'search-form'),
-        '#action'     => \Drupal\Core\Url::fromRoute('ebsco.results')->toString(),
-        '#method'     => "get",
-    );
+    $form = [
+        '#attributes' => ['class' => 'search-form'],
+        '#action' => \Drupal\Core\Url::fromRoute('ebsco.results')->toString(),
+        '#method' => 'get',
+    ];
 
-    $form['advanced'] = array(
-        '#type'        => 'fieldset',
-        '#title'       => t('Advanced Search'),
+    $form['advanced'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Advanced Search'),
         '#collapsible' => false,
-        '#collapsed'   => false
-    );
+        '#collapsed' => false,
+    ];
 
-    $form['advanced']['rows'] = array(
-        '#type'        => 'fieldset',
-        '#title'       => ''
-    );
+    $form['advanced']['rows'] = [
+        '#type' => 'fieldset',
+        '#title' => '',
+    ];
 
-    for ($i = 0; $i < $counter; $i++) {
-        $form['advanced']['rows']['group' . $i] = array(
-            '#type'       => 'fieldset',
-            '#tree'       => false,
-            '#attributes' => array('class' => array('_advanced-row'))
-        );
+    for ($i = 0; $i < $counter; ++$i) {
+        $form['advanced']['rows']['group'.$i] = [
+            '#type' => 'fieldset',
+            '#tree' => false,
+            '#attributes' => ['class' => ['_advanced-row']],
+        ];
 
         $default_value = isset($params['group'][$i]['bool']) ? $params['group'][$i]['bool'] : '';
         if ($i > 0) {
-            $form['advanced']['rows']['group' . $i]['bool'] = array(
-                '#id'            => 'ebsco-advanced-search-bool' . $i,
-                '#name'            => 'group['.$i.'][bool]' ,
-                '#type'          => 'select',
+            $form['advanced']['rows']['group'.$i]['bool'] = [
+                '#id' => 'ebsco-advanced-search-bool'.$i,
+                '#name' => 'group['.$i.'][bool]',
+                '#type' => 'select',
                 '#value' => $default_value,
-                '#options'       => EBSCODocument::bool_options()
-            );
+                '#options' => EBSCODocument::bool_options(),
+            ];
         } else {
-            $form['advanced']['rows']['group' . $i]['bool'] = array(
-                '#id'            => 'ebsco-advanced-search-bool' . $i,
-                '#name'            => 'group['.$i.'][bool]' ,
-                '#type'          => 'hidden',
-                '#default_value' => 'AND'
-            );
+            $form['advanced']['rows']['group'.$i]['bool'] = [
+                '#id' => 'ebsco-advanced-search-bool'.$i,
+                '#name' => 'group['.$i.'][bool]',
+                '#type' => 'hidden',
+                '#default_value' => 'AND',
+            ];
         }
 
         $title = $i == 0 ? t('Search for :') : '';
         $default_value = isset($params['group'][$i]['lookfor']) ? $params['group'][$i]['lookfor'] : '';
-        $form['advanced']['rows']['group' . $i]['lookfor'] = array(
-            '#id'            => 'ebsco-advanced-search-lookfor' . $i,
-            '#name'            => 'group['.$i.'][lookfor]' ,
-            '#type'          => 'textfield',
-            '#size'          => 30,
+        $form['advanced']['rows']['group'.$i]['lookfor'] = [
+            '#id' => 'ebsco-advanced-search-lookfor'.$i,
+            '#name' => 'group['.$i.'][lookfor]',
+            '#type' => 'textfield',
+            '#size' => 30,
             '#value' => $default_value,
-            '#title'         => $title,
-            '#attributes'    => array('title' => t('Enter the terms you wish to search for.'))
-        );
+            '#title' => $title,
+            '#attributes' => ['title' => t('Enter the terms you wish to search for.')],
+        ];
 
         $default_value = isset($params['group'][$i]['type']) ? $params['group'][$i]['type'] : '';
-        $form['advanced']['rows']['group' . $i]['type'] = array(
-            '#id'            => 'ebsco-advanced-search-type' . $i,
-            '#name'            => 'group['.$i.'][type]' ,
-            '#type'          => 'select',
+        $form['advanced']['rows']['group'.$i]['type'] = [
+            '#id' => 'ebsco-advanced-search-type'.$i,
+            '#name' => 'group['.$i.'][type]',
+            '#type' => 'select',
             '#value' => $default_value,
-            '#title'         => t('in'),
-            '#options'       => EBSCODocument::advanced_search_type_options()
-        );
+            '#title' => t('in'),
+            '#options' => EBSCODocument::advanced_search_type_options(),
+        ];
 
         if ($i > 2) {
-            $form['advanced']['rows']['group' . $i]['remove'] = array(
-                '#markup' => '<button class="delete _delete_row" id="delete_search_link_' . $i . '">' . t('Remove Search Field') . '</button>'
-            );
+            $form['advanced']['rows']['group'.$i]['remove'] = [
+                '#markup' => '<button class="delete _delete_row" id="delete_search_link_'.$i.'">'.t('Remove Search Field').'</button>',
+            ];
         }
     }
 
-    $form['advanced']['rows']['add_row'] = array(
+    $form['advanced']['rows']['add_row'] = [
         '#type' => 'html_tag',
         '#tag' => 'button',
-        '#attributes ' => array ('#class' => 'button _add_row', '#id'=>'advanced_add_row', '#name'=>'advanced_add_row' ),
-        '#value' =>  t('Add Search Field')
+        '#attributes ' => ['#class' => 'button _add_row', '#id' => 'advanced_add_row', '#name' => 'advanced_add_row'],
+        '#value' => t('Add Search Field'),
 
         // '#class'  => '_add_row',
         // '#type'  => 'button',
         // '#value' =>  t('Add Search Field') ,
-    );
+    ];
 
-    $items = array(
-        array(
-            'url'   => \Drupal\Core\Url::fromRoute('ebsco.content')->toString(),
-            'title' => t('Basic search')
-        ),
-        array(
-            'url'   => \Drupal\Core\Url::fromRoute('ebsco.advanced')->toString(),
-            'title' => t('Advanced search')
-        )
-    );
+    $items = [
+        [
+            'url' => \Drupal\Core\Url::fromRoute('ebsco.content')->toString(),
+            'title' => t('Basic search'),
+        ],
+        [
+            'url' => \Drupal\Core\Url::fromRoute('ebsco.advanced')->toString(),
+            'title' => t('Advanced search'),
+        ],
+    ];
 
-    $links = array();
+    $links = [];
     foreach ($items as $item) {
         $links[] = "<a href=\"{$item['url']}\">{$item['title']}</a>";
     }
-    $form['advanced']['links'] = array(
+    $form['advanced']['links'] = [
 //        '#type'  => 'fieldset',
-        '#markup' => implode(' | ', $links)."<br/>"
-    );
+        '#markup' => implode(' | ', $links).'<br/>',
+    ];
 
-    $form['advanced']['modes'] = array(
-        '#type'  => 'fieldset',
-        '#title' => t('Search modes')
-    );
+    $form['advanced']['modes'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Search modes'),
+    ];
 
-    $form['advanced']['modes']['mode'] = array(
-        '#type'          => 'select',
-        '#title'          => t('Search modes'),
+    $form['advanced']['modes']['mode'] = [
+        '#type' => 'select',
+        '#title' => t('Search modes'),
         '#value' => 'all',
-        '#id'          => 'mode',
-        '#name'          => 'mode',
-        '#options'       => EBSCODocument::mode_options()
-    );
-
+        '#id' => 'mode',
+        '#name' => 'mode',
+        '#options' => EBSCODocument::mode_options(),
+    ];
 
     $expanders = $Document->expanders();
     $limiters = $Document->limiters();
-    $options = array('' => true);
-    foreach($expanders as $key => $expander) {
+    $options = ['' => true];
+    foreach ($expanders as $key => $expander) {
         $options[$expander['Action']] = true;
     }
-    foreach($limiters as $key => $limiter) {
+    foreach ($limiters as $key => $limiter) {
         if (!empty($limiter['Values'])) {
             $options[$limiter['Id']] = true;
-            foreach($limiter['Values'] as $value) {
+            foreach ($limiter['Values'] as $value) {
                 $options[str_replace('value', $value['Value'], $value['Action'])] = true;
             }
         } else {
@@ -567,165 +556,151 @@ function ebsco_advanced_search_form() {
     }
 
     //expanders
-    $form['advanced']['expanders'] = array(
-        '#type'  => 'fieldset',
-        '#title' => t('Expand results')
-    );
+    $form['advanced']['expanders'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Expand results'),
+    ];
 
-    $children = array();
-    foreach($expanders as $key => $expander) {
-        $element = array(
-            '#type'          => 'checkbox',
-            '#id'            => 'ebsco-advanced-search-expander' . $key,
-            '#title'         => $expander['Label'],
+    $children = [];
+    foreach ($expanders as $key => $expander) {
+        $element = [
+            '#type' => 'checkbox',
+            '#id' => 'ebsco-advanced-search-expander'.$key,
+            '#title' => $expander['Label'],
             '#title_display' => 'after',
-            '#name'          => 'filter[]',
-            '#attributes'    => array('value' => $expander['Action']),
-            '#checked'       => $expander['selected']	,
-            '#suffix'       => '<br />'
-        );
+            '#name' => 'filter[]',
+            '#attributes' => ['value' => $expander['Action']],
+            '#checked' => $expander['selected'],
+            '#suffix' => '<br />',
+        ];
         $children[] = $element;
     }
 
-    $form['advanced']['expanders']['filter'] = array(
-        '#type'      => 'checkboxes',
+    $form['advanced']['expanders']['filter'] = [
+        '#type' => 'checkboxes',
         '#validated' => true,
-        '#options'   => $options,
-        '#children'  => $children
-    );
-
+        '#options' => $options,
+        '#children' => $children,
+    ];
 
     // limiters
 
-    $form['advanced']['limiters'] = array(
-        '#type'  => 'fieldset',
-        '#title' => t('Limit results')
-    );
+    $form['advanced']['limiters'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Limit results'),
+    ];
 
-    $checkboxes = $selects = $dates = array();
-    foreach($limiters as $key => $limiter) {
-
-        if ($limiter['Type'] == 'text'){
-            $element = array(
-                '#type'          => 'textfield',
-                '#id'            => 'ebsco-advanced-search-limiter' . $limiter['Id'],
-                '#title'         => $limiter['Label'],
+    $checkboxes = $selects = $dates = [];
+    foreach ($limiters as $key => $limiter) {
+        if ($limiter['Type'] == 'text') {
+            $element = [
+                '#type' => 'textfield',
+                '#id' => 'ebsco-advanced-search-limiter'.$limiter['Id'],
+                '#title' => $limiter['Label'],
                 '#title_display' => 'before',
-                '#name'          => 'filter[]',
-                '#suffix'       => "<br/>"
-
-            );
+                '#name' => 'filter[]',
+                '#suffix' => '<br/>',
+            ];
             $checkboxes[] = $element;
-
-        }
-        else if ( $limiter['Type'] == 'select') {
-            $element = array(
-                '#type'          => 'checkbox',
-                '#id'            => 'ebsco-advanced-search-limiter' . $limiter['Id'],
-                '#title'         => $limiter['Label'],
+        } elseif ($limiter['Type'] == 'select') {
+            $element = [
+                '#type' => 'checkbox',
+                '#id' => 'ebsco-advanced-search-limiter'.$limiter['Id'],
+                '#title' => $limiter['Label'],
                 '#title_display' => 'after',
-                '#name'          => 'filter[]',
-                '#attributes'    => array('value' => str_replace('value', 'y', $limiter['Action'])),
-                '#checked'       => $limiter['selected'],
-                '#suffix'       => "<br/>"
-
-            );
+                '#name' => 'filter[]',
+                '#attributes' => ['value' => str_replace('value', 'y', $limiter['Action'])],
+                '#checked' => $limiter['selected'],
+                '#suffix' => '<br/>',
+            ];
             $checkboxes[] = $element;
-        }
-        else if ($limiter['Type'] == 'multiselectvalue') {
-
-            $opts = array('' => t('All'));
-            foreach($limiter['Values'] as $value) {
+        } elseif ($limiter['Type'] == 'multiselectvalue') {
+            $opts = ['' => t('All')];
+            foreach ($limiter['Values'] as $value) {
                 $opts[$value['Action']] = $value['Value'];
             }
-            $element = array(
-                '#type'          => 'select',
-                '#multiple'      => true,
-                '#size'          => 4,
-                '#id'            => 'ebsco-advanced-search-limiter' . $limiter['Id'],
-                '#title'         => $limiter['Label'],
-                '#name'          => 'filter[]',
-                '#options'       => $opts,
+            $element = [
+                '#type' => 'select',
+                '#multiple' => true,
+                '#size' => 4,
+                '#id' => 'ebsco-advanced-search-limiter'.$limiter['Id'],
+                '#title' => $limiter['Label'],
+                '#name' => 'filter[]',
+                '#options' => $opts,
                 '#value' => $limiter['selected'], // empty value means "All"
-                '#value'         => $limiter['selected'],
-                '#attributes'    => array('class' => array('multiselectvalue'), 'multiple' => 'multiple')
-            );
+                '#value' => $limiter['selected'],
+                '#attributes' => ['class' => ['multiselectvalue'], 'multiple' => 'multiple'],
+            ];
             $element['#children'] = $element;
             $selects[] = $element;
-
-        }
-        else if ($limiter['Type'] == 'ymrange') {
-
+        } elseif ($limiter['Type'] == 'ymrange') {
             $value = $limiter['selected'] ? $limiter['selected'] : '';
-            $displayValue = str_replace(array('addlimiter(DT1:', '-1/2018-1)'), array('', ''), $value);
-            $element = array(
-                '#type'              => 'textfield',
-                '#id'                => $limiter['Id'],
-                '#title'             => $limiter['Label'],
-                '#value'             => '1000',
-                '#name'              => $limiter['Id'],
+            $displayValue = str_replace(['addlimiter(DT1:', '-1/2018-1)'], ['', ''], $value);
+            $element = [
+                '#type' => 'textfield',
+                '#id' => $limiter['Id'],
+                '#title' => $limiter['Label'],
+                '#value' => '1000',
+                '#name' => $limiter['Id'],
                 '#autocomplete_path' => null,
-                '#attributes'        => array('size' => 4, 'maxlength' => 4, 'class' => array('yearbox'))
-            );
+                '#attributes' => ['size' => 4, 'maxlength' => 4, 'class' => ['yearbox']],
+            ];
             $dates[] = $element;
 
-            $element = array(
-                '#type'              => 'range',
-                '#min'             => 1000,
-                '#max'              => date("Y"),
-            );
+            $element = [
+                '#type' => 'range',
+                '#min' => 1000,
+                '#max' => date('Y'),
+            ];
             $dates[] = $element;
-
         }
     }
 
-    $form['advanced']['limiters']['checkboxes'] = array(
-        '#type'      => 'container',
+    $form['advanced']['limiters']['checkboxes'] = [
+        '#type' => 'container',
         '#validated' => true,
-        '#options'   => $options,
-        '#children'  => $checkboxes,
-    );
+        '#options' => $options,
+        '#children' => $checkboxes,
+    ];
 
-    $form['advanced']['limiters']['dates'] = array(
-        '#type'      => 'container',
+    $form['advanced']['limiters']['dates'] = [
+        '#type' => 'container',
         '#validated' => true,
-        '#prefix'    => '<hr />',
-        '#children'  =>  $dates
-    );
+        '#prefix' => '<hr />',
+        '#children' => $dates,
+    ];
 
-    $form['advanced']['limiters']['selects'] = array(
-        '#type'      => 'container',
-        '#prefix'    => '<hr />',
+    $form['advanced']['limiters']['selects'] = [
+        '#type' => 'container',
+        '#prefix' => '<hr />',
         '#validated' => true,
-        '#children'  => $selects
-    );
+        '#children' => $selects,
+    ];
 
-    $form['advanced']['submit'] = array(
-        '#id'    => 'ebsco-advanced-search-submit',
-        '#type'  => 'submit',
-        '#value' => t('Search')
-    );
+    $form['advanced']['submit'] = [
+        '#id' => 'ebsco-advanced-search-submit',
+        '#type' => 'submit',
+        '#value' => t('Search'),
+    ];
 
-    $form['advanced']['clear'] = array(
-        '#id'    => 'ebsco-advanced-search-clear',
-        '#type'  => 'reset',
-        '#name'  => 'reset',
-        '#value' => t('Clear')
+    $form['advanced']['clear'] = [
+        '#id' => 'ebsco-advanced-search-clear',
+        '#type' => 'reset',
+        '#name' => 'reset',
+        '#value' => t('Clear'),
         //'#markup'  => '<input id="ebsco-advanced-search-clear" class="form-submit" type="reset" value="' . t('Clear') . '" name="reset">'
-    );
+    ];
 
     return $form;
 }
-
-
-
 
 /**
  * Form validation handler for ebsco_advanced_search_form().
  *
  * @see ebsco_advanced_search_form_submit()
  */
-function ebsco_advanced_search_form_validate($form, &$form_state) {
+function ebsco_advanced_search_form_validate($form, &$form_state)
+{
     $params = $form_state['values'];
     if (empty($params['group0']['lookfor']) &&
         empty($params['group1']['lookfor']) &&
@@ -734,16 +709,13 @@ function ebsco_advanced_search_form_validate($form, &$form_state) {
     }
 }
 
-
-
-
-
 /**
  * Process variables for ebsco-results.tpl.php.
  *
  * @see ebsco-results.tpl.php
  */
-function template_preprocess_ebsco_results(&$variables) {
+function template_preprocess_ebsco_results(&$variables)
+{
     global $Document;
     $params = $_REQUEST;
     $variables['#attached']['library'][] = 'ebsco/global-styling';
@@ -755,15 +727,13 @@ function template_preprocess_ebsco_results(&$variables) {
         $Document = new EBSCODocument();
     }
 
-    $title = !empty($params['lookfor']) ? ' - ' . $params['lookfor'] : '';
+    $title = !empty($params['lookfor']) ? ' - '.$params['lookfor'] : '';
     $request = \Drupal::request();
     if ($route = $request->attributes->get(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT)) {
-        $route->setDefault('_title', 'Search results' . $title);
+        $route->setDefault('_title', 'Search results'.$title);
     }
 
     $Document->search();
-   
- 
 
     $variables['records'] = $Document->records();
     $_SESSION['records'] = $Document->records();
@@ -776,189 +746,175 @@ function template_preprocess_ebsco_results(&$variables) {
     $variables['autoSuggestTerms'] = $Document->autoSuggestTerms();
     $variables['imageQuickViewTerms'] = $Document->imageQuickViewTerms();
     $variables['citationStylesTerms'] = $Document->citationStylesTerms();
-    $variables['facets'] =$Document->facets();
-    $variables["relatedContent"]="";
-    $variables["processHtmlRecords"]="";
+    $variables['facets'] = $Document->facets();
+    $variables['relatedContent'] = '';
+    $variables['processHtmlRecords'] = '';
     $variables['lookfor'] = '';
 
     if (isset($params['lookfor'])) {
         $variables['lookfor'] = $params['lookfor'];
-    } else if (isset($params['group'])) {
+    } elseif (isset($params['group'])) {
         $types = EBSCODocument::basic_search_type_options();
         foreach ($params['group'] as $key => $group) {
             if (!empty($group['lookfor'])) {
                 $pre = $key == 0 ? '' : " {$group['bool']} ";
-                $variables['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+                $variables['lookfor'] .= $pre.$types[$group['type']].':'.$group['lookfor'];
             }
         }
     }
     $variables['pager'] = $Document->pager();
-    $variables['sort_form'] =ebsco_sort_form();
+    $variables['sort_form'] = ebsco_sort_form();
 
-    $variables["msg_no_results"]=t("No results found");
+    $variables['msg_no_results'] = t('No results found');
 
     // process records
-    if ($Document->has_records()){
-        
+    if ($Document->has_records()) {
         if (!\Drupal::currentUser()->isAuthenticated()) {
-            
-            $link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
-            $variables["guestbanner"] ='<p class="top-login-message">'
-                . sprintf(t('Hello, Guest. %s for full access.'), $link)
+            $link = '<a href="'.\Drupal\Core\Url::fromRoute('user.page')->toString().'">'.t('Login').'</a>';
+            $variables['guestbanner'] = '<p class="top-login-message">'
+            .sprintf(t('Hello, Guest. %s for full access.'), $link)
                 .'</p>';
-
-                
         }
 
-        $tabs = "";
-        $tabsContent = "";
+        $tabs = '';
+        $tabsContent = '';
 
         $counter = 0;
-        $rsItem = NULL;
-
+        $rsItem = null;
 
         if (isset($relatedContent)) {
             foreach ($relatedContent as $item) {
-                if  (isset($item["RelatedRecord"])) {
-                    $tabs .= '<li data-target="#researchstarters" data-slide-to="' . $counter . '" ' . ($counter == 0 ? ' class="active" ' : ' ') . '></li>';
-                    $counter++;
-                    if (isset($item["RelatedRecord"]["Records"]["Record"][0])) {
-                        $rsItem = $item["RelatedRecord"]["Records"]["Record"][0];
-                    }
-                    else
-                    {
-                        if (isset($item["Records"]["Record"])) {
-                            $rsItem = $item["Records"]["Record"];
+                if (isset($item['RelatedRecord'])) {
+                    $tabs .= '<li data-target="#researchstarters" data-slide-to="'.$counter.'" '.($counter == 0 ? ' class="active" ' : ' ').'></li>';
+                    ++$counter;
+                    if (isset($item['RelatedRecord']['Records']['Record'][0])) {
+                        $rsItem = $item['RelatedRecord']['Records']['Record'][0];
+                    } else {
+                        if (isset($item['Records']['Record'])) {
+                            $rsItem = $item['Records']['Record'];
                         }
                     }
-                    if ($rsItem == NULL) {
+                    if ($rsItem == null) {
                         continue;
                     }
-                    $rsTitle = "";
-                    $rsSubjects = "";
-                    $rsDbLabel = "";
-                    $rsImageQuickView = "";
-                    $rsCitationStyles = "";
-                    $rsAbstract = "";
-                    $rsSource = "";
-                    $rsImage = "";
-                    $rsAN = $rsItem["Header"]["An"];
-                    $rsDB = $rsItem["Header"]["DbId"];
-                    $rsUrl= \Drupal\Core\Url::fromRoute('ebsco.results',  array('id' => $rsAN . "|" . $rsDB))->toString();
-                    if (isset($rsItem["ImageInfo"]["CoverArt"])) {
-                        $rsImage = $rsItem["ImageInfo"]["CoverArt"]["Target"];
+                    $rsTitle = '';
+                    $rsSubjects = '';
+                    $rsDbLabel = '';
+                    $rsImageQuickView = '';
+                    $rsCitationStyles = '';
+                    $rsAbstract = '';
+                    $rsSource = '';
+                    $rsImage = '';
+                    $rsAN = $rsItem['Header']['An'];
+                    $rsDB = $rsItem['Header']['DbId'];
+                    $rsUrl = \Drupal\Core\Url::fromRoute('ebsco.results', ['id' => $rsAN.'|'.$rsDB])->toString();
+                    if (isset($rsItem['ImageInfo']['CoverArt'])) {
+                        $rsImage = $rsItem['ImageInfo']['CoverArt']['Target'];
                     }
-                    foreach($rsItem["Items"]["Item"] as $it) {
-                        switch ($it["Group"]) {
-                            case "Ti":
-                                $rsTitle = $it["Data"];
+                    foreach ($rsItem['Items']['Item'] as $it) {
+                        switch ($it['Group']) {
+                            case 'Ti':
+                                $rsTitle = $it['Data'];
                                 break;
 
-                            case "Src":
-                                $rsSource = $it["Data"];
+                            case 'Src':
+                                $rsSource = $it['Data'];
                                 break;
 
-                            case "Su":
-                                $rsSubjects = $it["Data"];
+                            case 'Su':
+                                $rsSubjects = $it['Data'];
                                 break;
 
-                            case "Ab":
-                                $rsAbstract = $it["Data"];
+                            case 'Ab':
+                                $rsAbstract = $it['Data'];
                                 break;
-                            
-                            case "Dbl":
-                                $rsDbLabel = $it["Data"];
+
+                            case 'Dbl':
+                                $rsDbLabel = $it['Data'];
                                 break;
-                            case "Dbl":
-                                $rsImageQuickView = $it["Data"];
+                            case 'Dbl':
+                                $rsImageQuickView = $it['Data'];
                                 break;
-                            case "Dbl":
-                                $rsCitationStyles = $it["Data"];
+                            case 'Dbl':
+                                $rsCitationStyles = $it['Data'];
                                 break;
-                                
                         }
                     }
 
                     $tabsContent .= '<div class="item" ><div class="carousel-caption">';
-                    if ($rsImage <> "") {
-                        $tabsContent .= '<img src="' . $rsImage . '" alt="' . $rsTitle . '" style="float:left">';
+                    if ($rsImage != '') {
+                        $tabsContent .= '<img src="'.$rsImage.'" alt="'.$rsTitle.'" style="float:left">';
                     }
-                    if ($rsTitle <> ""){
-                        $tabsContent .= '<h3 class="relatedTitle"><a href="' . $rsUrl . '" class="title _record_link">' . $rsTitle . '</a></h3>';
+                    if ($rsTitle != '') {
+                        $tabsContent .= '<h3 class="relatedTitle"><a href="'.$rsUrl.'" class="title _record_link">'.$rsTitle.'</a></h3>';
                     }
-                    if ($rsSubjects <> ""){
-                        $path= \Drupal\Core\Url::fromRoute('ebsco/results', array('type' => "Subject"));
+                    if ($rsSubjects != '') {
+                        $path = \Drupal\Core\Url::fromRoute('ebsco/results', ['type' => 'Subject']);
                         $link_xml = '/<searchLink fieldCode="([^\"]*)" term="%22([^\"]*)%22">/';
                         $link_html = "<a href=\"{$path}&lookfor=$2\">";
                         $rsSubjects = preg_replace($link_xml, $link_html, $rsSubjects);
                         $rsSubjects = str_replace('</searchLink>', '</a>', $rsSubjects);
-                        $tabsContent .= '<p><strong>' . t('Subjects') . '</strong>:<span class="quotestart">' . str_replace(array("<br>", "<br />"), ', ', $rsSubjects) . '</span></p>';
+                        $tabsContent .= '<p><strong>'.t('Subjects').'</strong>:<span class="quotestart">'.str_replace(['<br>', '<br />'], ', ', $rsSubjects).'</span></p>';
                     }
-                    if ($rsSource <> ""){
-                        $tabsContent .= '<p>' . $rsSource . '</p>';
+                    if ($rsSource != '') {
+                        $tabsContent .= '<p>'.$rsSource.'</p>';
                     }
-                    if ($rsAbstract <> ""){
-                        $tabsContent .= '<p><cite>' . $rsAbstract . '</cite></p>';
-                    }
-                    
-                    if ($rsDbLabel <> ""){
-                        $tabsContent .= '<p><h1>' . $rsDbLabel . '</h1></p>';
+                    if ($rsAbstract != '') {
+                        $tabsContent .= '<p><cite>'.$rsAbstract.'</cite></p>';
                     }
 
-                    if ($rsImageQuickView <> ""){
-                        $tabsContent .= '<p><h1>' . $rsImageQuickView . '</h1></p>';
+                    if ($rsDbLabel != '') {
+                        $tabsContent .= '<p><h1>'.$rsDbLabel.'</h1></p>';
                     }
 
-                    if ($rsCitationStyles <> ""){
-                        $tabsContent .= '<p><h1>' . $rsCitationStyles . '</h1></p>';
+                    if ($rsImageQuickView != '') {
+                        $tabsContent .= '<p><h1>'.$rsImageQuickView.'</h1></p>';
                     }
 
-                    
+                    if ($rsCitationStyles != '') {
+                        $tabsContent .= '<p><h1>'.$rsCitationStyles.'</h1></p>';
+                    }
 
                     $tabsContent .= '</div></div>';
                 }
 
                 // Replated publications.
-                if  (isset($item["RelatedPublication"])) {
-                    
-                    $tabs .= '<li data-target="#ematchplacard" data-slide-to="' . $counter . '" ' . ($counter == 0 ? ' class="active" ' : ' ') . '></li>';
-                    $counter++;
+                if (isset($item['RelatedPublication'])) {
+                    $tabs .= '<li data-target="#ematchplacard" data-slide-to="'.$counter.'" '.($counter == 0 ? ' class="active" ' : ' ').'></li>';
+                    ++$counter;
 
                     $tabsContent .= '<div class="item" ><div class="carousel-caption">';
                     $tabsContent .= '
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
                         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
                         ';
-                    foreach ($item["RelatedPublication"]["PublicationRecords"] as $pub){
-                        $plink = $pub["PLink"];
-                        foreach($pub["Items"]["Item"] as $item) {
-                            if ($item["Group"] == "Ti")
-                            {
-                                $tabsContent .= '<h3 class="relatedTitle"><a href="' . $plink . ' target="_blank" >' . $item["Data"] . '</a></h3>';
-                            }
-                            else
-                            {
-                                $tabsContent .= "<strong>" . $item["Label"] . "</strong> : " . $item["Data"] . "<br/>";
+                    foreach ($item['RelatedPublication']['PublicationRecords'] as $pub) {
+                        $plink = $pub['PLink'];
+                        foreach ($pub['Items']['Item'] as $item) {
+                            if ($item['Group'] == 'Ti') {
+                                $tabsContent .= '<h3 class="relatedTitle"><a href="'.$plink.' target="_blank" >'.$item['Data'].'</a></h3>';
+                            } else {
+                                $tabsContent .= '<strong>'.$item['Label'].'</strong> : '.$item['Data'].'<br/>';
                             }
                         }
                         $tabsContent .= '<div id="publicationList"><ul>';
-                        foreach($pub["FullTextHoldings"]["FullTextHolding"] as $itemHoldings) {
-                            $hURL = isset($itemHoldings["URL"]) ? $itemHoldings["URL"] : "";
-                            $hName = isset($itemHoldings["Name"]) ? $itemHoldings["Name"] : "";
-                            $hCoverage = isset($itemHoldings["CoverageStatement"]) ? $itemHoldings["CoverageStatement"] : "";
-                            $hEmbargo = "";
-                            if (isset($itemHoldings["EmbargoDescription"])) {
+                        foreach ($pub['FullTextHoldings']['FullTextHolding'] as $itemHoldings) {
+                            $hURL = isset($itemHoldings['URL']) ? $itemHoldings['URL'] : '';
+                            $hName = isset($itemHoldings['Name']) ? $itemHoldings['Name'] : '';
+                            $hCoverage = isset($itemHoldings['CoverageStatement']) ? $itemHoldings['CoverageStatement'] : '';
+                            $hEmbargo = '';
+                            if (isset($itemHoldings['EmbargoDescription'])) {
                                 // If no embargo, zero size array.
-                                if (!is_array($itemHoldings["EmbargoDescription"])) {
-                                    $hEmbargo = $itemHoldings["EmbargoDescription"];
+                                if (!is_array($itemHoldings['EmbargoDescription'])) {
+                                    $hEmbargo = $itemHoldings['EmbargoDescription'];
                                 }
                             }
                             $tabsContent .= '<li>
-									<a href="' . $hURL . '" target="_blank">' . $hName . '</a>;
-									<ul><li>Coverage:' . $hCoverage . '; ';
+									<a href="'.$hURL.'" target="_blank">'.$hName.'</a>;
+									<ul><li>Coverage:'.$hCoverage.'; ';
 
-                            if ($hEmbargo <> '') {
-                                $tabsContent .= '</li><li>Embargo:' . $hEmbargo;
+                            if ($hEmbargo != '') {
+                                $tabsContent .= '</li><li>Embargo:'.$hEmbargo;
                             }
                             $tabsContent .= '</li></ul></li>';
                             // Notes.
@@ -978,18 +934,18 @@ function template_preprocess_ebsco_results(&$variables) {
                     break;
                 }
             }
-        } 
-        
-        if ($tabsContent <> "") {
-            $variables["relatedContent"].= '<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+        }
+
+        if ($tabsContent != '') {
+            $variables['relatedContent'] .= '<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
                 <div id="relatedInformation" class="carousel slide" data-ride="carousel" style="display:block;">
                     <!-- Indicators -->
-                    <ol class="carousel-indicators">' . $tabs . '</ol>';
-                $variables["relatedContent"].= '<div class="carousel-inner" role="listbox" >' . $tabsContent . '</div>';
-                $variables["relatedContent"].= '<!-- Left and right controls -->
+                    <ol class="carousel-indicators">'.$tabs.'</ol>';
+            $variables['relatedContent'] .= '<div class="carousel-inner" role="listbox" >'.$tabsContent.'</div>';
+            $variables['relatedContent'] .= '<!-- Left and right controls -->
                 <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
                     <span class="glyphicon glyphicon-chevron-left" ></span>
                 </a>
@@ -1003,217 +959,195 @@ function template_preprocess_ebsco_results(&$variables) {
                     interval:4000
                 })
                 </script>';
-
         }
 
-        $variables["processHtmlRecords"]='<ol class="search-results ebsco">';
-
+        $variables['processHtmlRecords'] = '<ol class="search-results ebsco">';
 
         foreach ($Document->records() as $record) {
-
             $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-            $recordUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $id))->toString();
-            $fulltextUrl= \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
-            $pdfUrl= \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-                        
+            $recordUrl = \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', ['id' => $id])->toString();
+            $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', ['id' => $id])->toString();
+            $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', ['id' => $id])->toString();
 
-            $recordHtml="<li>"
-                .'<div class="record-number floatleft">'.$record->result_id.'</div>'
+            $recordHtml = '<li>'
+            .'<div class="record-number floatleft">'.$record->result_id.'</div>'
 
                 .'<div class="result floatleft">';
             // processing book jacket
-            $recordHtml.='<div class="span-2">';
-            if ($record->small_thumb_link){
-                $recordHtml.='<a href="' . $recordUrl . '" class="_record_link">'
-                    .'        <img src="' . $record->small_thumb_link . '" class="book-jacket" alt="' . t('Book jacket') . '"/>'
+            $recordHtml .= '<div class="span-2">';
+            if ($record->small_thumb_link) {
+                $recordHtml .= '<a href="'.$recordUrl.'" class="_record_link">'
+                .'        <img src="'.$record->small_thumb_link.'" class="book-jacket" alt="'.t('Book jacket').'"/>'
                     .'</a>';
             }
-            $recordHtml.='</div>';
-
+            $recordHtml .= '</div>';
 
             // record metadata processing block
 
-            $recordHtml.='<div class="span-9">'
+            $recordHtml .= '<div class="span-9">'
                 .' 	<div class="result-line1">'
             ;
             // title
-            if ($record->access_level == '1'){
-                $v= '<p>';
-                $label = '<strong>' . \Drupal\Component\Utility\Html::escape($record->db_label) . '</strong>';
-                $labelImageQuickView = '<strong>' . \Drupal\Component\Utility\Html::escape($record->image_quick_view) . '</strong>';
-                $labelcitation_styles_detail = '<strong>' . \Drupal\Component\Utility\Html::escape($record->citation_styles_detail) . '</strong>';
-                $link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
-                $v.=sprintf(t('This result from %s cannot be displayed to guests.'), $label, $labelImageQuickView,  $labelcitation_styles_detail) . "<br /><strong>" . sprintf(t('%s for full access.'), $link) . "</strong>";
-                $v.="</p>";
+            if ($record->access_level == '1') {
+                $v = '<p>';
+                $label = '<strong>'.\Drupal\Component\Utility\Html::escape($record->db_label).'</strong>';
+                $labelImageQuickView = '<strong>'.\Drupal\Component\Utility\Html::escape($record->image_quick_view).'</strong>';
+                $labelcitation_styles_detail = '<strong>'.\Drupal\Component\Utility\Html::escape($record->citation_styles_detail).'</strong>';
+                $link = '<a href="'.\Drupal\Core\Url::fromRoute('user.page')->toString().'">'.t('Login').'</a>';
+                $v .= sprintf(t('This result from %s cannot be displayed to guests.'), $label, $labelImageQuickView, $labelcitation_styles_detail).'<br /><strong>'.sprintf(t('%s for full access.'), $link).'</strong>';
+                $v .= '</p>';
 
-
-                $recordHtml.=$v;
+                $recordHtml .= $v;
+            } elseif ($record->title) {
+                $recordHtml .= '<a href="'.$recordUrl.'" class="title _record_link">'.$record->title.'</a>';
             }
-            elseif ($record->title){
-                $recordHtml.= '<a href="' . $recordUrl . '" class="title _record_link">' . $record->title . '</a>';
-            }
-            $recordHtml.='     </div>';
+            $recordHtml .= '     </div>';
 
             // authors and source
-            $recordHtml.='<div class="result-line2">';
+            $recordHtml .= '<div class="result-line2">';
 
-            if (!empty($record->authors)){
-                $recordHtml.="<span>" . t('by') . " " . str_replace(array("<br>", "<br />"), ', ', $record->authors) . " </span>";
+            if (!empty($record->authors)) {
+                $recordHtml .= '<span>'.t('by').' '.str_replace(['<br>', '<br />'], ', ', $record->authors).' </span>';
             }
 
-            if (!empty($record->source)){
-                $recordHtml.='<p>' . t('Published in') . " " . $record->source . '</p>';
+            if (!empty($record->source)) {
+                $recordHtml .= '<p>'.t('Published in').' '.$record->source.'</p>';
             }
 
-            $recordHtml.='</div>';
-
+            $recordHtml .= '</div>';
 
             // abstract and subjects and database label
-            $recordHtml.='<div class="result-line3">';
+            $recordHtml .= '<div class="result-line3">';
 
-            if (!empty($record->summary)){
-                $recordHtml.= '<cite>' . $record->summary . '</cite><br />';
+            if (!empty($record->summary)) {
+                $recordHtml .= '<cite>'.$record->summary.'</cite><br />';
             }
 
-            if (!empty($record->subjects)){
-                $recordHtml.='<strong>' . t('Subjects') . '</strong>:<span class="quotestart">' . str_replace('<br />', ', ', $record->subjects) . '</span>';
+            if (!empty($record->subjects)) {
+                $recordHtml .= '<strong>'.t('Subjects').'</strong>:<span class="quotestart">'.str_replace('<br />', ', ', $record->subjects).'</span>';
             }
-            $recordHtml.='</div>';
+            $recordHtml .= '</div>';
 
-            $recordHtml.='<div class="result-line4">';
+            $recordHtml .= '<div class="result-line4">';
 
-            if (!empty($record->db_label)){
-                $recordHtml.='<br><strong>' . t('Database') . '</strong>:<span class="quotestart">' . str_replace('<br />', ', ', $record->db_label) . '</span>';
+            if (!empty($record->db_label)) {
+                $recordHtml .= '<br><strong>'.t('Database').'</strong>:<span class="quotestart">'.str_replace('<br />', ', ', $record->db_label).'</span>';
             }
-            
-            $recordHtml.='</div>';
 
+            $recordHtml .= '</div>';
 
-            $recordHtml.='<div class="result-line5">';       
-            if (!empty($record->image_quick_view)){
-                $recordHtml.='<div><strong>' . t('Images') . ':</strong></div>';
-                $recordHtml.='<div class="iqv-custom">';
-                foreach($record->image_quick_view as $iqv) {
+            $recordHtml .= '<div class="result-line5">';
+            if (!empty($record->image_quick_view)) {
+                $recordHtml .= '<div><strong>'.t('Images').':</strong></div>';
+                $recordHtml .= '<div class="iqv-custom">';
+                foreach ($record->image_quick_view as $iqv) {
+                    $iqvUrl = \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', ['id' => $iqv['An'].'|'.$iqv['DbId']])->toString();
 
-                    $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
-
-                    $recordHtml.='<a href="' . $iqvUrl . '" target="_blank">
-                    <img class="iqv-item"  src="' . $iqv['Url'] . '" alt="' . $iqv['Type'] . '" title="' . $iqv['Type'] . '">
+                    $recordHtml .= '<a href="'.$iqvUrl.'" target="_blank">
+                    <img class="iqv-item"  src="'.$iqv['Url'].'" alt="'.$iqv['Type'].'" title="'.$iqv['Type'].'">
                 </a>';
                 }
-                $recordHtml.='</div>';    
-            }    
-            $recordHtml.='</div>';
+                $recordHtml .= '</div>';
+            }
+            $recordHtml .= '</div>';
 
             // custom link processing
 
-            if (!empty($record->custom_links)){
-
-                $recordHtml.='<div class="result-line4">'
+            if (!empty($record->custom_links)) {
+                $recordHtml .= '<div class="result-line4">'
                     .'      <ul class="custom-links">'
                 ;
-                foreach ($record->custom_links as $link){
-                    $recordHtml.='<li>'
-                        .'    <a href="'. $link['Url'].'" target="_blank" title="'.$link['MouseOverText'].'" class="external-link">'
+                foreach ($record->custom_links as $link) {
+                    $recordHtml .= '<li>'
+                        .'    <a href="'.$link['Url'].'" target="_blank" title="'.$link['MouseOverText'].'" class="external-link">'
                     ;
                     if ($link['Icon']) {
-                        $recordHtml.='<img src="'.$link['Icon'].'" />';
+                        $recordHtml .= '<img src="'.$link['Icon'].'" />';
                     }
-                    $recordHtml.=$link['Name'];
-                    $recordHtml.='    </a>'
+                    $recordHtml .= $link['Name'];
+                    $recordHtml .= '    </a>'
                         .'</li>';
                 }
-                $recordHtml.='  	</ul>'
+                $recordHtml .= '  	</ul>'
                     .'</div>'
                 ;
             }
 
-
             // PDF and HTML processing
-            $recordHtml.='<div class="result-line5">';
-            if ($record->full_text_availability){
-                $recordHtml.= '<a href="' . $fulltextUrl . '#html" class="icon html fulltext _record_link">'.t('HTML full text')."</a>&nbsp; &nbsp;";
-                
+            $recordHtml .= '<div class="result-line5">';
+            if ($record->full_text_availability) {
+                $recordHtml .= '<a href="'.$fulltextUrl.'#html" class="icon html fulltext _record_link">'.t('HTML full text').'</a>&nbsp; &nbsp;';
             }
 
-            if ($record->pdf_availability){
-                $recordHtml.= ' <a href="' . $pdfUrl . '" class="icon pdf fulltext" target="_blank">'.t('PDF full text')."</a>";
-
+            if ($record->pdf_availability) {
+                $recordHtml .= ' <a href="'.$pdfUrl.'" class="icon pdf fulltext" target="_blank">'.t('PDF full text').'</a>';
             }
 
+            $recordHtml .= '</div>'
 
-            $recordHtml.='</div>'
-
-                .'</div>' // floatleft of the image
-                .'</div>' // record
+            .'</div>' // floatleft of the image
+             .'</div>' // record
             ;
 
-            $recordHtml.='<div class="clear"></div>';
+            $recordHtml .= '<div class="clear"></div>';
 
-            $recordHtml.="</li>";
+            $recordHtml .= '</li>';
 
-            $variables["processHtmlRecords"].=$recordHtml;
+            $variables['processHtmlRecords'] .= $recordHtml;
         } // foreach records
 
         //*********************************
         // facet information
 
-        $facetVars = array(
-            'filter_results' => t("Narrow results"),
+        $facetVars = [
+            'filter_results' => t('Narrow results'),
             'record_count' => $Document->record_count(),
             'expanders' => $Document->expanders(),
             'limiters' => $Document->limiters(),
             'facets' => $Document->facets(),
-            'filters' => $Document->filters(),     // applied facets, limiters or expanders
+            'filters' => $Document->filters(), // applied facets, limiters or expanders
             'search_params' => $Document->search_params(), // hidden parameters
-            'link_search_params' => $Document->link_search_params() // hidden parameters
-        );
+            'link_search_params' => $Document->link_search_params(), // hidden parameters
+        ];
 
-        $variables["processHtmlFacets"]= ebsco_side_facets($facetVars);
+        $variables['processHtmlFacets'] = ebsco_side_facets($facetVars);
 
         //*********************************
         //     also add search box to the top
 
         $params = $_REQUEST;
 
-
         if (isset($params['lookfor'])) {
             $variables['lookfor'] = $params['lookfor'];
-        } else if (isset($params['group'])) {
+        } elseif (isset($params['group'])) {
             $types = EBSCODocument::basic_search_type_options();
             foreach ($params['group'] as $key => $group) {
                 if (!empty($group['lookfor'])) {
                     $pre = $key == 0 ? '' : " {$group['bool']} ";
-                    $variables['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+                    $variables['lookfor'] .= $pre.$types[$group['type']].':'.$group['lookfor'];
                 }
             }
         }
-        
-        $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
-        $variables['advanced_search_url'] =  \Drupal\Core\Url::fromRoute('ebsco.advanced',  array())->toString();
+
+        $variables['results_url'] = \Drupal\Core\Url::fromRoute('ebsco.results', [])->toString();
+        $variables['advanced_search_url'] = \Drupal\Core\Url::fromRoute('ebsco.advanced', [])->toString();
         $variables['search_form'] = \Drupal::service('renderer')->render($form);
 
-        $variables["processHtmlRecords"].="</ol>";
-
-
+        $variables['processHtmlRecords'] .= '</ol>';
     }
-
 }
-
-
 
 /**
  * Process variables for ebsco-advanced-search.tpl.php.
  *
  * @see ebsco-advanced-search.tpl.php
  */
-
-function template_preprocess_ebsco_advanced_search(&$variables) {
+function template_preprocess_ebsco_advanced_search(&$variables)
+{
 //    drupal_add_library('system','ui.slider');
     global $Document;
     $params = $_REQUEST;
     $variables['#attached']['library'][] = 'ebsco/global-styling';
-
 
     if (empty($Document)) {
         $Document = new EBSCODocument();
@@ -1221,28 +1155,28 @@ function template_preprocess_ebsco_advanced_search(&$variables) {
     $Document->info();
     $form = ebsco_advanced_search_form();
 
-    $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results');
+    $variables['results_url'] = \Drupal\Core\Url::fromRoute('ebsco.results');
     $variables['search_form'] = $form;
-
 }
 
-function tmeplate_preprocess_ebsco__page(array &$variables) : void {
-	//Module name: 'mymodule', library name: 'mymodule'. 
-	$variables['#attached']['library'][] = 'ebsco/ebsco';
+function tmeplate_preprocess_ebsco__page(array &$variables): void
+{
+    //Module name: 'mymodule', library name: 'mymodule'.
+    $variables['#attached']['library'][] = 'ebsco/ebsco';
 }
-
-
 
 /**
  * Process variables for ebsco-result.tpl.php.
  *
  * @see ebsco-result.tpl.php
  */
-function template_preprocess_ebsco_result(&$variables) {
-
+function template_preprocess_ebsco_result(&$variables)
+{
     $params = $_REQUEST;
 
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
+
+    $iqv = ['An', 'DbId'];
 
     $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
@@ -1258,127 +1192,113 @@ function template_preprocess_ebsco_result(&$variables) {
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
-   // $clipboardLibrary="";
-    $detailRecordHTML="";
-    
-    if (isset($record) ){
+    // $clipboardLibrary="";
+    $detailRecordHTML = '';
 
+    if (isset($record)) {
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
-        $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', ['id' => $id])->toString();
+        $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', ['id' => $id])->toString();
+        $iqvUrl = \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', ['id' => $iqv['An'].'|'.$iqv['DbId']])->toString();
 
-        $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
+        $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', ['id' => $id])->toString();
 
-        $citationStylesDetailRecord = \Drupal\Core\Url::fromRoute('ebsco.citation_styles_detail', array('id' => $id))->toString();
+        $citationStylesDetailRecord = \Drupal\Core\Url::fromRoute('ebsco.citation_styles_detail', ['id' => $id])->toString();
 
-        
-        $detailRecordHTML.='<div class="ebsco-record detailrecord-2columns">'
+        $detailRecordHTML .= '<div class="ebsco-record detailrecord-2columns">'
             .'<div>'
             .'<div class="detailrecord-links">	'
 
             .'<ul class="external-links">';
-        
 
-        if($record->record_id){
-            
-            $detailRecordHTML.= "
-            
+        if ($record->record_id) {
+            $detailRecordHTML .= "
+
             <li>
             <i class='quote-style'></i>
-            <a class='use-ajax' data-dialog-options='{&quot;width&quot;:800}' 
-            data-dialog-type='modal'  href='" . $citationStylesDetailRecord . "|all'>" . t('Citations Styles') . "</a>
-            </li>";
-
-        }
-    
-        if($record->record_id){
-
-            $detailRecordHTML.= "<li> <a href='" . $exportFormatDetail . "&format=ris'>" . t('RIS Export') . "</a></li>";
+            <a class='use-ajax' data-dialog-options='{&quot;width&quot;:800}'
+            data-dialog-type='modal'  href='".$citationStylesDetailRecord."|all'>".t('Citations Styles').'</a>
+            </li>';
         }
 
-    
-
-
-        if($record->p_link){
-            $detailRecordHTML.= "<li> <a href='" . $record->p_link . "'>" . t('View in EDS') . "</a></li>";
+        if ($record->record_id) {
+            $detailRecordHTML .= "<li> <a href='".$exportFormatDetail."&format=ris'>".t('RIS Export').'</a></li>';
         }
 
-        if ($record->pdf_link){
-            $detailRecordHTML.= '
+        if ($record->p_link) {
+            $detailRecordHTML .= "<li> <a href='".$record->p_link."'>".t('View in EDS').'</a></li>';
+        }
+
+        if ($record->pdf_link) {
+            $detailRecordHTML .= '
                 <li>
-                <a href="' . $pdfUrl . '" class="icon pdf fulltext">' . t('PDF full text') . '</a>
+                <a href="'.$pdfUrl.'" class="icon pdf fulltext">'.t('PDF full text').'</a>
                 </li>';
         }
 
-
-        if ($record->full_text_availability){
-
-            $detailRecordHTML.= '
+        if ($record->full_text_availability) {
+            $detailRecordHTML .= '
                 <li>
-                <a href="' . ((!\Drupal::currentUser()->isAuthenticated()) ? $fulltextUrl : "") . '#html" class="icon html fulltext">' . t('HTML full text') . '</a>
+                <a href="'.((!\Drupal::currentUser()->isAuthenticated()) ? $fulltextUrl : '').'#html" class="icon html fulltext">'.t('HTML full text').'</a>
                 </li>';
         }
 
-        if (!empty($record->custom_links)){
-            foreach ($record->custom_links as $link){
-                $detailRecordHTML.= '
+        if (!empty($record->custom_links)) {
+            foreach ($record->custom_links as $link) {
+                $detailRecordHTML .= '
                     <li>
-                        <a href="' . $link['Url'] . '" target="_blank" title="' . $link['MouseOverText'] . '" class="external-link">' . ($link['Icon']) ? '<img src="' . $link['Icon'] . '" />' : '' . $link['Name'] . '</a>
+                        <a href="'.$link['Url'].'" target="_blank" title="'.$link['MouseOverText'].'" class="external-link">'.($link['Icon']) ? '<img src="'.$link['Icon'].'" />' : ''.$link['Name'].'</a>
                     </li>';
             }
         }
-        $detailRecordHTML.='</ul>';
+        $detailRecordHTML .= '</ul>';
 
-        $detailRecordHTML.='</div>'
-
+        $detailRecordHTML .= '</div>'
 
             .'<div class="detailrecord-recordmetadata">'
             .'<div class="record-toolbar">';
-        if ($lastSearch){
-            $detailRecordHTML.='<div class="floatright">';
-            if ($lastSearch['previous']){
-                $previousUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $lastSearch['previous']->record_id, 'op' => 'Previous'))->toString();
-                $detailRecordHTML.= '<a href="' . $previousUrl. '" class="_record_link">&laquo; ' . t('Previous') . '</a> ';
+        if ($lastSearch) {
+            $detailRecordHTML .= '<div class="floatright">';
+            if ($lastSearch['previous']) {
+                $previousUrl = \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', ['id' => $lastSearch['previous']->record_id, 'op' => 'Previous'])->toString();
+                $detailRecordHTML .= '<a href="'.$previousUrl.'" class="_record_link">&laquo; '.t('Previous').'</a> ';
             }
-            $detailRecordHTML.= $lastSearch['current_index'].' of ' . $_SESSION['search_total'];
+            $detailRecordHTML .= $lastSearch['current_index'].' of '.$_SESSION['search_total'];
 
-            if ($lastSearch['next']!==''){
-                $nextUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $lastSearch['next']->record_id, 'op' => 'Next'))->toString();
-                $detailRecordHTML.= ' <a href="' . $nextUrl . '" class="_record_link">' . t('Next') . ' &raquo;</a>';
+            if ($lastSearch['next'] !== '') {
+                $nextUrl = \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', ['id' => $lastSearch['next']->record_id, 'op' => 'Next'])->toString();
+                $detailRecordHTML .= ' <a href="'.$nextUrl.'" class="_record_link">'.t('Next').' &raquo;</a>';
             }
-            $detailRecordHTML.='</div>'
+            $detailRecordHTML .= '</div>'
             ;
-            if (isset($_SESSION['EBSCO']['lastsearch']["destination"])) {
+            if (isset($_SESSION['EBSCO']['lastsearch']['destination'])) {
                 $detailRecordHTML.'<div class="floatleft">'
-                .'<a href="'.$_SESSION['EBSCO']['lastsearch']["destination"].'"> &laquo; '.t('Back to Results list').'</a>'
-                .'</div>'
-                .'<div class="clear"></div>'
+                .'<a href="'.$_SESSION['EBSCO']['lastsearch']['destination'].'"> &laquo; '.t('Back to Results list').'</a>'
+                    .'</div>'
+                    .'<div class="clear"></div>'
                 ;
             }
-
         }
-        $detailRecordHTML.='</div>';
+        $detailRecordHTML .= '</div>';
 
-        $detailRecordHTML.='</div class="span-13">';
-        if($record->p_link){
-            
-            $detailRecordHTML.= '
-            <input class="text-permalink" data-js="my-input" type="text" value="' . $record->p_link . '">
+        $detailRecordHTML .= '</div class="span-13">';
+        if ($record->p_link) {
+            $detailRecordHTML .= '
+            <input class="text-permalink" data-js="my-input" type="text" value="'.$record->p_link.'">
             <div class="tooltip">
                 <button data-js="button-clipboard" class="button js-form-submit form-submit button-permalink">
                     <span data-js="button-clipboard-out" class="tooltiptext" id="myTooltip">Copy Permalink</span>
                     <i class="fa fa-paperclip" aria-hidden="true"></i>
                 </button>
                 <script type="text/javascript">
-                    
+
                     var $clipboard = document.querySelector(\'[data-js="button-clipboard"]\');
                     var $clipboardout = document.getElementById("button-clipboard-out");
                     var $clipboardout = document.querySelector(\'[data-js="button-clipboard-out"]\');
                     console.log($clipboard);
                     console.log($clipboardout);
 
-                    
+
                     $clipboard.addEventListener(\'click\', handleClip, false);
 
                     function handleClip() {
@@ -1387,7 +1307,7 @@ function template_preprocess_ebsco_result(&$variables) {
                         copyText.setSelectionRange(0, 99999);
                         document.execCommand("copy");
                         var tooltip = document.querySelector(\'[data-js="button-clipboard-out"]\');
-                        tooltip.innerHTML = "Copied: " + copyText.value;  
+                        tooltip.innerHTML = "Copied: " + copyText.value;
                     }
 
 
@@ -1402,70 +1322,64 @@ function template_preprocess_ebsco_result(&$variables) {
                 </script>
             </div>
             ';
-        };
+        }
 
-        $detailRecordHTML.='</div>';
+        $detailRecordHTML .= '</div>';
 
-        $detailRecordHTML.='<div class="span-13">'
-            .' <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="'.t('Bibliographic Details').'">';
-    
+        $detailRecordHTML .= '<div class="span-13">'
+        .' <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="'.t('Bibliographic Details').'">';
 
-        foreach ($record->items as $item){
-            if (!empty($item['Data'])){
-                $detailRecordHTML.='<tr valign="top">'
-                    .'<th width="150">' . t($item['Label']) . ':</th>'
-                    .'<td>'. auto_link($item['Data']) . '</td>'
+        foreach ($record->items as $item) {
+            if (!empty($item['Data'])) {
+                $detailRecordHTML .= '<tr valign="top">'
+                .'<th width="150">'.t($item['Label']).':</th>'
+                .'<td>'.auto_link($item['Data']).'</td>'
                     .'</tr>';
             }
         }
 
-        if ($record->db_label){
-            $detailRecordHTML.='<tr valign="top">'
-                .'<th width="150">' . t('Database') . ':</th><td>' . \Drupal\Component\Utility\Html::escape($record->db_label) . '</td>'
-                .'</tr>';
-        }        
-
-        if ($record->full_text){
-            $detailRecordHTML.='<tr id="html" valign="top">'
-                .'<td colspan="2" class="html">' . $record->full_text . '</td>'
+        if ($record->db_label) {
+            $detailRecordHTML .= '<tr valign="top">'
+            .'<th width="150">'.t('Database').':</th><td>'.\Drupal\Component\Utility\Html::escape($record->db_label).'</td>'
                 .'</tr>';
         }
-        elseif ($record->access_level && !\Drupal::currentUser()->isAuthenticated()){
 
-            $link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
-            $detailRecordHTML.='<tr id="html" valign="top">'
-                .'<td colspan="2" class="html">'
-                .'<p>' . t('The full text cannot be displayed to guests.') . '<br />'
-                .'<strong>' . sprintf(t('%s for full access.'), $link) . '</strong>'
+        if ($record->full_text) {
+            $detailRecordHTML .= '<tr id="html" valign="top">'
+            .'<td colspan="2" class="html">'.$record->full_text.'</td>'
+                .'</tr>';
+        } elseif ($record->access_level && !\Drupal::currentUser()->isAuthenticated()) {
+            $link = '<a href="'.\Drupal\Core\Url::fromRoute('user.page')->toString().'">'.t('Login').'</a>';
+            $detailRecordHTML .= '<tr id="html" valign="top">'
+            .'<td colspan="2" class="html">'
+            .'<p>'.t('The full text cannot be displayed to guests.').'<br />'
+            .'<strong>'.sprintf(t('%s for full access.'), $link).'</strong>'
                 .'</p>'
                 .'</td>'
                 .'</tr>';
         }
-        $detailRecordHTML.='</table>'
+        $detailRecordHTML .= '</table>'
             .'</div>'
         ;
 
-        $detailRecordHTML.='<div class="span-4">';
-        if ($record->medium_thumb_link){
-            $detailRecordHTML.='<img src="' . check_url($record->medium_thumb_link) . '" class="book-jacket" alt="' . t('Book jacket') . '"/>';
+        $detailRecordHTML .= '<div class="span-4">';
+        if ($record->medium_thumb_link) {
+            $detailRecordHTML .= '<img src="'.check_url($record->medium_thumb_link).'" class="book-jacket" alt="'.t('Book jacket').'"/>';
         }
 
-        if ($record->publication_type){
-            $detailRecordHTML.= '<p>' . \Drupal\Component\Utility\Html::escape($record->publication_type) . '</p>';
+        if ($record->publication_type) {
+            $detailRecordHTML .= '<p>'.\Drupal\Component\Utility\Html::escape($record->publication_type).'</p>';
         }
-        $detailRecordHTML.='</div>'
+        $detailRecordHTML .= '</div>'
 
             .'</div>'
             .'</div>'
         ;
 
-        $detailRecordHTML.='<div class="clear"></div>';
+        $detailRecordHTML .= '<div class="clear"></div>';
 
-        $detailRecordHTML.='</div>';
-
-            
+        $detailRecordHTML .= '</div>';
     }
-
 
     $variables['detailrecord'] = $detailRecordHTML;
 
@@ -1477,14 +1391,12 @@ function template_preprocess_ebsco_result(&$variables) {
 /*
 to IQV records
 
-*/
-function template_preprocess_ebsco_image_quick_view(&$variables) {
+ */
+function template_preprocess_ebsco_image_quick_view(&$variables)
+{
     $params = $_REQUEST;
 
-  
-    
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
-
 
     $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
@@ -1493,74 +1405,61 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     $Document->retrieve();
     $record = $Document->record();
 
-   
     $variables['record'] = $record;
     $lastSearch['count'] = $Document->record_count();
     $variables['count'] = $Document->record_count();
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
-    $detailImageQuickViewHTML="";
+    $detailImageQuickViewHTML = '';
 
-    if (isset($record) ){
-
+    if (isset($record)) {
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-        
-        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
 
-        
+        $iqvUrl = \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', ['id' => $iqv['An'].'|'.$iqv['DbId']])->toString();
 
+        $detailImageQuickViewHTML .= '<div class="result-line5">';
+        if (!empty($record->title) &&
+            !empty($record->source) &&
+            !empty($record->type) &&
+            !empty($record->cite) &&
+            !empty($record->permission) &&
+            !empty($record->imgtitle) &&
+            !empty($record->illustrationinfo)) {
+            $detailImageQuickViewHTML .= '<div><strong>'.t('Images Informations').':</strong></div>';
+            $detailImageQuickViewHTML .= '<a href="'.$record->illustrationinfo['Target'].'" target="_blank"><img class="iqv-item" src="'.$record->illustrationinfo['Target'].'"></a>';
 
-        $detailImageQuickViewHTML.='<div class="result-line5">';       
-            if (!empty($record->title) &&
-                !empty($record->source) &&
-                !empty($record->type) &&
-                !empty($record->cite) &&
-                !empty($record->permission) &&
-                !empty($record->imgtitle) &&
-                !empty($record->illustrationinfo) ){
-
-
-
-                    $detailImageQuickViewHTML.='<div><strong>' . t('Images Informations') . ':</strong></div>';
-                    $detailImageQuickViewHTML.='<a href="' . $record->illustrationinfo['Target'] . '" target="_blank"><img class="iqv-item" src="' . $record->illustrationinfo['Target'] . '"></a>';
-
-                    
-                    $detailImageQuickViewHTML.='<div><table>
+            $detailImageQuickViewHTML .= '<div><table>
                         <tr>
                             <th>Descriptions</th>
                             <th>Images Informations</th>
                         </tr>
                         <tr>
-                            <td><strong>' . t('Article Title') . ':</strong></td>
-                            <td>' . $record->title . '</td>
+                            <td><strong>'.t('Article Title').':</strong></td>
+                            <td>'.$record->title.'</td>
                         </tr>
                         <tr>
-                            <td><strong>' . t('Source') . ':</strong></td>
-                            <td>' . $record->source . '</td>
+                            <td><strong>'.t('Source').':</strong></td>
+                            <td>'.$record->source.'</td>
                         </tr>
                         <tr>
-                            <td><strong>' . t('Image Type') . ':</strong></td>
-                            <td>' . $record->type['Data'] . '</td>
+                            <td><strong>'.t('Image Type').':</strong></td>
+                            <td>'.$record->type['Data'].'</td>
                         </tr>
                             <tr>
-                            <td><strong>' . t('Cite') . ':</strong></td>
-                            <td>' . $record->cite['Data'] . '</td>
+                            <td><strong>'.t('Cite').':</strong></td>
+                            <td>'.$record->cite['Data'].'</td>
                         </tr>
                         <tr>
-                            <td><strong>' . t('Permission') . ':</strong></td>
-                            <td>' . $record->permission['Data'] . '</td>
+                            <td><strong>'.t('Permission').':</strong></td>
+                            <td>'.$record->permission['Data'].'</td>
                         </tr>
                 </table></div>';
-                    
-            }    
-        $detailImageQuickViewHTML.='</div>';
-
-            
+        }
+        $detailImageQuickViewHTML .= '</div>';
     }
 
     $variables['imagequickviewrecord'] = $detailImageQuickViewHTML;
-
 
     $request = \Drupal::request();
     if ($route = $request->attributes->get(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT)) {
@@ -1570,13 +1469,13 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
 
 /*
 to IQV records
-*/
+ */
 
 // /*
 // to Ris Export Format
 
-function template_preprocess_ebsco_exportformat_detail(&$variables) {
-
+function template_preprocess_ebsco_exportformat_detail(&$variables)
+{
     $params = $_REQUEST;
 
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
@@ -1586,8 +1485,6 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
         $Document = new EBSCODocument();
     }
 
-    
-    
     $Document->retrieve();
     $record = $Document->record();
     $Document->export();
@@ -1598,30 +1495,23 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
-    $risDetailViewHTML="";
-    
-    
-    if (isset($record) ){
+    $risDetailViewHTML = '';
 
+    if (isset($record)) {
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();;
-        $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+        $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', ['id' => $id])->toString();
+        $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', ['id' => $id])->toString();
+        $iqvUrl = \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', ['id' => $iqv['An'].'|'.$iqv['DbId']])->toString();
 
-        $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
+        $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', ['id' => $id])->toString();
 
-        
-            
-            $exportFormat = $Document->export();
-            $filename = $_REQUEST['an'].'delivery'.$_REQUEST['db'].'.ris';
-            header('Content-Type: application/x-research-info-systems');
-            header('Content-Disposition: inline; filename="'.$filename.'"');
-            echo (string)$exportFormat;
-            exit;
-            
-        }
-            
-
+        $exportFormat = $Document->export();
+        $filename = $_REQUEST['an'].'delivery'.$_REQUEST['db'].'.ris';
+        header('Content-Type: application/x-research-info-systems');
+        header('Content-Disposition: inline; filename="'.$filename.'"');
+        echo (string) $exportFormat;
+        exit;
+    }
 
     $variables['exportformatrecord'] = $risDetailViewHTML;
 
@@ -1631,14 +1521,10 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
     }
 }
 
-
-
-function template_preprocess_ebsco_citation_styles_detail(&$variables) {
-
+function template_preprocess_ebsco_citation_styles_detail(&$variables)
+{
     $params = $_REQUEST;
-    
-    
-    
+
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
     $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
@@ -1646,41 +1532,29 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
         $Document = new EBSCODocument();
     }
 
-   
-    
     $Document->retrieve();
     $record = $Document->record();
-    $recordCitation = $Document->citation();    
+    $recordCitation = $Document->citation();
 
     $variables['record'] = $recordCitation;
     $lastSearch['count'] = $Document->record_count();
     $variables['count'] = $Document->record_count();
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
-    $citationsStylesViewHTML="";
-    
+    $citationsStylesViewHTML = '';
 
-    if (isset($recordCitation) ){
+    if (isset($recordCitation)) {
+        $id = \Drupal\Component\Utility\Html::escape($record->record_id());
 
-        
-       $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-
-
-        if(!empty($recordCitation)) {
-            foreach($variables['record']['Citation'] as $citationIndex) {
-                
-                $citationsStylesViewHTML.= '<div><strong><h2>' . $citationIndex['Label'] . '</h2></strong></div>';
-                $citationsStylesViewHTML.= '<div>' . $citationIndex['SectionLabel'] . '</div>';
-                $citationsStylesViewHTML.= '<div>' . $citationIndex['Data'] . '</div>';
-                $citationsStylesViewHTML.= '<div>' . $citationIndex['Caption'] . '</div>';        
+        if (!empty($recordCitation)) {
+            foreach ($variables['record']['Citation'] as $citationIndex) {
+                $citationsStylesViewHTML .= '<div><strong><h2>'.$citationIndex['Label'].'</h2></strong></div>';
+                $citationsStylesViewHTML .= '<div>'.$citationIndex['SectionLabel'].'</div>';
+                $citationsStylesViewHTML .= '<div>'.$citationIndex['Data'].'</div>';
+                $citationsStylesViewHTML .= '<div>'.$citationIndex['Caption'].'</div>';
             }
-        
-
         }
-
-
     }
-
 
     $variables['citationstylerecord'] = $citationsStylesViewHTML;
 
@@ -1690,172 +1564,157 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
     }
 }
 
-
-
-function ebsco_side_facets($facetVars) {
-
+function ebsco_side_facets($facetVars)
+{
     $params = $_REQUEST;
-    $form ="";
-    $form.='<form name="updateForm" action="'.\Drupal\Core\Url::fromRoute('ebsco.results',array($params))->toString().'" method="get">';
-    if (isset($facetVars["search_params"])) {
-        $form.="<span>";
-        foreach($facetVars["search_params"] as $k1 => $v1) {
+    $form = '';
+    $form .= '<form name="updateForm" action="'.\Drupal\Core\Url::fromRoute('ebsco.results', [$params])->toString().'" method="get">';
+    if (isset($facetVars['search_params'])) {
+        $form .= '<span>';
+        foreach ($facetVars['search_params'] as $k1 => $v1) {
             if (is_array($v1)) {
-                foreach($v1 as $k2 => $v2) {
+                foreach ($v1 as $k2 => $v2) {
                     if (is_array($v2)) {
-                        foreach($v2 as $k3 => $v3) {
-                            $form.='<input type="hidden" name="'.$k1.'['.$k2.']['.$k3.']" value="'.\Drupal\Component\Utility\Html::escape($v3).'" />';
+                        foreach ($v2 as $k3 => $v3) {
+                            $form .= '<input type="hidden" name="'.$k1.'['.$k2.']['.$k3.']" value="'.\Drupal\Component\Utility\Html::escape($v3).'" />';
                         }
-                    }
-                    else
-                    {
-                        $form.='<input type="hidden" name="'.$k1.'['.$k2.']" value="'.\Drupal\Component\Utility\Html::escape($v2).'" />';
+                    } else {
+                        $form .= '<input type="hidden" name="'.$k1.'['.$k2.']" value="'.\Drupal\Component\Utility\Html::escape($v2).'" />';
                     }
                 }
-            }
-            else
-            {
-                $form.='<input type="hidden" name="'.$k1.'" value="'.\Drupal\Component\Utility\Html::escape($v1).'" />';
+            } else {
+                $form .= '<input type="hidden" name="'.$k1.'" value="'.\Drupal\Component\Utility\Html::escape($v1).'" />';
             }
         }
-        $form.="</span>";
+        $form .= '</span>';
     }
 
-
     // current filters
-    if (!empty($facetVars["filters"])) {
-        $form.='<dl class="narrow-list navmenu filters">'
-            .'<dt>'.t('Remove Filters').'</dt>'
+    if (!empty($facetVars['filters'])) {
+        $form .= '<dl class="narrow-list navmenu filters">'
+        .'<dt>'.t('Remove Filters').'</dt>'
         ;
-        foreach ($facetVars["filters"] as $filter){
+        foreach ($facetVars['filters'] as $filter) {
             $removeLink = remove_filter_link($filter);
-            $form.='<dd>'
-                .'<a href="'.$removeLink.'" class="icon13 expanded">'.t($filter['displayField']).':'.t($filter['displayValue']).'</a>'
+            $form .= '<dd>'
+            .'<a href="'.$removeLink.'" class="icon13 expanded">'.t($filter['displayField']).':'.t($filter['displayValue']).'</a>'
                 .'</dd>'
             ;
         }
-        $form.='</dl>';
+        $form .= '</dl>';
     }
 
-    $form.='<dl class="narrow-list navmenu">'
-        .	'<dt>'.t('Limit Results').'</dt>'
+    $form .= '<dl class="narrow-list navmenu">'
+    .'<dt>'.t('Limit Results').'</dt>'
     ;
     // show first 3 limiters as in EDS interface
-    $i=0;
-    foreach ($facetVars["limiters"] as $limiter) {
-        $form.='<dd>';
+    $i = 0;
+    foreach ($facetVars['limiters'] as $limiter) {
+        $form .= '<dd>';
         if ($limiter['Type'] == 'multiselectvalue') {
-            $form.='<label for="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'">'.t($limiter['Label']).'</label><br />'
-                .'<select name="filter[]" multiple="multiple" id="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'" style="width:80%;">'
-                .'<option value="">'.t('All').'</option>'
+            $form .= '<label for="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'">'.t($limiter['Label']).'</label><br />'
+            .'<select name="filter[]" multiple="multiple" id="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'" style="width:80%;">'
+            .'<option value="">'.t('All').'</option>'
             ;
-            foreach ($limiter['Values'] as $option){
-                $form.='<option value="'.\Drupal\Component\Utility\Html::escape($option['Action']).'" '.($option['selected'] ? ' selected ' : " ") .'>'. \Drupal\Component\Utility\Html::escape($option['Value']).'</option>';
+            foreach ($limiter['Values'] as $option) {
+                $form .= '<option value="'.\Drupal\Component\Utility\Html::escape($option['Action']).'" '.($option['selected'] ? ' selected ' : ' ').'>'.\Drupal\Component\Utility\Html::escape($option['Value']).'</option>';
             }
-            $form.='</select>';
-        }
-        else
-        {
-            $form.='<input type="checkbox" name="filter[]" value="'.\Drupal\Component\Utility\Html::escape(str_replace('value', 'y', $limiter['Action'])).'" '
-                .($limiter['selected'] ? ' checked ' : ' ').' id="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'"/>'
-                .'<label for="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'" >'. \Drupal\Component\Utility\Html::escape(t($limiter['Label'])).'</label>';
+            $form .= '</select>';
+        } else {
+            $form .= '<input type="checkbox" name="filter[]" value="'.\Drupal\Component\Utility\Html::escape(str_replace('value', 'y', $limiter['Action'])).'" '
+            .($limiter['selected'] ? ' checked ' : ' ').' id="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'"/>'
+            .'<label for="'.\Drupal\Component\Utility\Html::escape($limiter['Id']).'" >'.\Drupal\Component\Utility\Html::escape(t($limiter['Label'])).'</label>';
         }
 
-        $form.='</dd>';
-        $i++;
-        if ($i>=3)
-        {break;}
+        $form .= '</dd>';
+        ++$i;
+        if ($i >= 3) {
+            break;
+        }
     }
-    $form.='</dl>';
-
+    $form .= '</dl>';
 
     // expanders
-    $form.='<dl class="narrow-list navmenu">';
+    $form .= '<dl class="narrow-list navmenu">';
 
-    if ($facetVars ["expanders"]){
-        $form.='<dt>'.t('Expand Results').'</dt>';
+    if ($facetVars['expanders']) {
+        $form .= '<dt>'.t('Expand Results').'</dt>';
     }
-    foreach($facetVars ["expanders"] as $expander) {
-        $form.='<dd>'
-            .'<input type="checkbox" name="filter[]" value="'.\Drupal\Component\Utility\Html::escape($expander['Action']).'"'
-            .($expander['selected'] ? ' checked="checked" ' : ' ' ) .' id="'.\Drupal\Component\Utility\Html::escape($expander['Id']).'"/>'
+    foreach ($facetVars['expanders'] as $expander) {
+        $form .= '<dd>'
+        .'<input type="checkbox" name="filter[]" value="'.\Drupal\Component\Utility\Html::escape($expander['Action']).'"'
+        .($expander['selected'] ? ' checked="checked" ' : ' ').' id="'.\Drupal\Component\Utility\Html::escape($expander['Id']).'"/>'
 
-            .'<label for="'.\Drupal\Component\Utility\Html::escape($expander['Id']).'">'.\Drupal\Component\Utility\Html::escape(t($expander['Label'])).'</label>'
+        .'<label for="'.\Drupal\Component\Utility\Html::escape($expander['Id']).'">'.\Drupal\Component\Utility\Html::escape(t($expander['Label'])).'</label>'
             .'</dd>'
         ;
     }
 
-    $form.='<dd class="submit">'
-        .'<input type="submit" name="submit" class="button js-form-submit form-submit" value="'.t('Update').'" />'
+    $form .= '<dd class="submit">'
+    .'<input type="submit" name="submit" class="button js-form-submit form-submit" value="'.t('Update').'" />'
         .'</dd>'
         .'</dl>'
     ;
 
-
     //other facets
-    if (!empty($facetVars["facets"])) {
-        foreach ($facetVars["facets"] as $title => $cluster){
-            $form.='<dl id="facet-'.\Drupal\Component\Utility\Html::escape($cluster['Id']).'" class="narrow-list navmenu expandable">'
-                .'<dt>'
-                .'<span class="icon13 collapsed">'.\Drupal\Component\Utility\Html::escape(t($cluster['Label'])).'</span>'
+    if (!empty($facetVars['facets'])) {
+        foreach ($facetVars['facets'] as $title => $cluster) {
+            $form .= '<dl id="facet-'.\Drupal\Component\Utility\Html::escape($cluster['Id']).'" class="narrow-list navmenu expandable">'
+            .'<dt>'
+            .'<span class="icon13 collapsed">'.\Drupal\Component\Utility\Html::escape(t($cluster['Label'])).'</span>'
                 .'</dt>'
                 .'</dl>';
 
-            $form.='<dl class="narrow-list navmenu offscreen" id="narrowGroupHidden_'.\Drupal\Component\Utility\Html::escape($cluster["Id"]).'">';
-            foreach ($cluster['Values'] as $index => $facet){
-                if ($facet['applied']){
-                    $form.='<dd>'.\Drupal\Component\Utility\Html::escape($facet['Value']).'<span class="icon16 tick"></span></dd>';
-                }
-                else
-                {
-                    $form.='<dd>'
-                        .'<input type="checkbox" name="filter[]" value="'.\Drupal\Component\Utility\Html::escape($facet['Action']).'" id="filter'.\Drupal\Component\Utility\Html::escape($index).'" />'
-                        .'<label for="filter'.\Drupal\Component\Utility\Html::escape($index).'">'
-                        .'<a href="'.\Drupal\Core\Url::fromRoute('ebsco.results', array_merge($facetVars["link_search_params"], array('filter[]' => $facet['Action'])))->toString().'"> '
-                        .\Drupal\Component\Utility\Html::escape($facet['Value']).'</a>('.\Drupal\Component\Utility\Html::escape($facet['Count']).')'
+            $form .= '<dl class="narrow-list navmenu offscreen" id="narrowGroupHidden_'.\Drupal\Component\Utility\Html::escape($cluster['Id']).'">';
+            foreach ($cluster['Values'] as $index => $facet) {
+                if ($facet['applied']) {
+                    $form .= '<dd>'.\Drupal\Component\Utility\Html::escape($facet['Value']).'<span class="icon16 tick"></span></dd>';
+                } else {
+                    $form .= '<dd>'
+                    .'<input type="checkbox" name="filter[]" value="'.\Drupal\Component\Utility\Html::escape($facet['Action']).'" id="filter'.\Drupal\Component\Utility\Html::escape($index).'" />'
+                    .'<label for="filter'.\Drupal\Component\Utility\Html::escape($index).'">'
+                    .'<a href="'.\Drupal\Core\Url::fromRoute('ebsco.results', array_merge($facetVars['link_search_params'], ['filter[]' => $facet['Action']]))->toString().'"> '
+                    .\Drupal\Component\Utility\Html::escape($facet['Value']).'</a>('.\Drupal\Component\Utility\Html::escape($facet['Count']).')'
                         .'</label>'
                         .'</dd>'
                     ;
                 }
             }
-            $form.='<dd>'
-                .'<p class="submit">'
-                .'<input type="submit" class="button js-form-submit form-submit" name="submit" value="'.t('Update').'" />'
+            $form .= '<dd>'
+            .'<p class="submit">'
+            .'<input type="submit" class="button js-form-submit form-submit" name="submit" value="'.t('Update').'" />'
                 .'</p>'
                 .'</dd>'
                 .'</dl>'
             ;
         }
     }
-    $form.="</form>";
+    $form .= '</form>';
+
     return $form;
 }
-
 
 /**
  * Process variables for ebsco-basic-search.html.twig.
  *
  * @see ebsco-basic-search.html.twig
  */
-function template_preprocess_ebsco_side_facets(&$variables) {
+function template_preprocess_ebsco_side_facets(&$variables)
+{
     global $Document;
     $params = $_REQUEST;
     $variables['#attached']['library'][] = 'ebsco/global-styling';
-    $variables["filter_results"]=t('Narrow Search');
-    $form=ebsco_side_facets() ;
-    $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
-
+    $variables['filter_results'] = t('Narrow Search');
+    $form = ebsco_side_facets();
+    $variables['results_url'] = \Drupal\Core\Url::fromRoute('ebsco.results', [])->toString();
 }
-
-
-
 
 /******************************************
  * View Helpers
  ******************************************/
 
 /**
- * Returns an URL without the given filter parameter
+ * Returns an URL without the given filter parameter.
  *
  * @return string
  */
@@ -1863,19 +1722,18 @@ function remove_filter_link($filter)
 {
     $params = $_REQUEST;
     if (isset($params['filter'])) {
-        foreach($params['filter'] as $key => $value) {
+        foreach ($params['filter'] as $key => $value) {
             if ($value == $filter['action']) {
                 unset($params['filter'][$key]);
             }
         }
     }
     //return url('ebsco/results', array('query' => $params));
-    return \Drupal\Core\Url::fromRoute('ebsco.results',  $params)->toString();
+    return \Drupal\Core\Url::fromRoute('ebsco.results', $params)->toString();
 }
 
-
 /**
- * Performs a regex and replaces any url's with links containing themselves as the text
+ * Performs a regex and replaces any url's with links containing themselves as the text.
  *
  * @return string
  */
@@ -1889,5 +1747,16 @@ function auto_link($string)
         ),
         $string
     );
+
+    // var_dump($linkedString);
+    // die();
+
     return $linkedString;
 }
+
+// $myMatches = '$matches';
+//     $myReturn = 'return "<a href="' . $myMatches[0] . '">"' . $myMatches[0] . '"</a>"';
+
+//     function testFunc($myMatches, $myReturn) {
+//             return;
+//         }
