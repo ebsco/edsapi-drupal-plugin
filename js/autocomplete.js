@@ -40,11 +40,11 @@
                 jQuery("#lookfor").autocomplete({
                     source: terms
                     });
-                return terms;            
+                return terms;
             }
 
             function startTerm(wrapper) {
-                console.log("wrapper.term: ", wrapper.term);
+                //console.log("wrapper.term: ", wrapper.term);
 
                 var result = wrapper.term;
                 return result;
