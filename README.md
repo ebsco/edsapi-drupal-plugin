@@ -8,7 +8,7 @@
 
 # Installation
 
-Setup EDS API Drupal 8 Plugin <a href="https://github.com/ebsco/edsapi-drupal-plugin/releases/tag/8.1.3">Release 8</a>.
+Setup EDS API Drupal 8 Plugin <a href="https://github.com/ebsco/edsapi-drupal-plugin/tree/edsapi-drupal8-release">Release 8</a>.
 
 Setup EDS API Drupal 9 Plugin <a href="https://github.com/ebsco/edsapi-drupal-plugin/tree/9.1.1">Release 9</a>.
 
