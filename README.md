@@ -1,4 +1,4 @@
-# A Drupal 8 module for the EBSCO Discovery Services API.
+# A Drupal 9 module for the EBSCO Discovery Services API.
 
 ## By EBSCO
 
