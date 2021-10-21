@@ -216,7 +216,7 @@ class EBSCOConnector {
     $this->local_ip_address = $config['local_ip_address'];
     $this->isGuest = (\Drupal::currentUser()->isAuthenticated() || $this->isGuestIPAddress($_SERVER["REMOTE_ADDR"])) ? 'n' : 'y';
     $this->logAPIRequests = ($config['log'] == 1);
-    
+
   }
 
   /**
@@ -236,10 +236,10 @@ class EBSCOConnector {
     foreach ($m as $ip) {
       if (strcmp(substr($ipUser, 0, strlen(trim($ip))), trim($ip)) == 0) {
         // Inside of ip address range of customer.
-        return TRUE;
+        return true;
       }
     }
-    return FALSE;
+    return false;
   }
 
   /**
@@ -271,11 +271,11 @@ class EBSCOConnector {
     $params = '<UIDAuthRequestMessage xmlns="http://www.ebscohost.com/services/public/AuthService/Response/2012/06/01">'
 					.'<UserId>'.$this->userId.'</UserId>'
 					.'<Password>'.$this->password.'</Password>'
-          .'<InterfaceId>wsapi</InterfaceId>'
-          .'<Options>
-              <Option>'.$this->autoComplete.'</Option>
-            </Options>'
-					.'</UIDAuthRequestMessage>';
+                    .'<InterfaceId>wsapi</InterfaceId>'
+                    .'<Options>
+                        <Option>'.$this->autoComplete.'</Option>
+                    </Options>'
+                    .'</UIDAuthRequestMessage>';
 
     $response = $this->request($url,$params, array(), 'POST');
 
@@ -381,12 +381,12 @@ class EBSCOConnector {
   public function requestCitationStyles($params, $headers) {
     $url = self::$end_point . '/CitationStyles';
 
-    
+
     $responseCitation = $this->request($url, $params, $headers);
     $response = $responseCitation->Citations;
 
     return $response;
-    
+
   }
 
 
@@ -405,7 +405,7 @@ class EBSCOConnector {
   public function requestInfo($params, $headers) {
     $url = self::$end_point . '/Info';
 
-	
+
     $response = $this->request($url, $params, $headers);
     return $response;
   }
@@ -438,34 +438,34 @@ class EBSCOConnector {
 	$data=$params;
     // Send the request.
 	$response=null;
- 
+
 
     try {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		    curl_setopt($curl, CURLOPT_MAXREDIRS, 10 );		
-		    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-		    curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-		    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-					
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 10 );
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
         switch ($method)
         {
             case 'GET':
                 if ($data) { $url = sprintf('%s?%s', $url, http_build_query($data)); }
 				curl_setopt($curl, CURLOPT_URL, $url);
 				break;
-				
+
             case 'POST':
-                if ($data) { 
+                if ($data) {
 					curl_setopt($curl,CURLOPT_POST, 1);
 					curl_setopt($curl,CURLOPT_POSTFIELDS, $data);
-				}            
+				}
 				break;
-				
+
 			case 'DELETE':
-                if ($data) { 
+                if ($data) {
 					if (count($headers)>0) {
 						curl_setopt($curl,CURLOPT_HTTPHEADER, $headers);
 					}
@@ -473,12 +473,12 @@ class EBSCOConnector {
 				}
 				break;
         }
-		
-		
+
+
         $response = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-		
+
       switch ($code) {
         case self::HTTP_OK:
 

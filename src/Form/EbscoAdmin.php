@@ -39,9 +39,9 @@ class EbscoAdmin extends ConfigFormBase {
     $config->set("ebsco_organization", $values["ebsco_organization"]);
     $config->set("ebsco_profile", $values["ebsco_profile"]);
     $config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
-    $config->save(); 
+    $config->save();
 
-	
+
   }
 
   /**
@@ -55,7 +55,7 @@ class EbscoAdmin extends ConfigFormBase {
     $form = [];
 
 	$config = $this->config('ebsco.settings');
-	
+
     $form['ebsco_credentials'] = [
       '#type' => 'fieldset',
       '#title' => t('EDS API credentials'),
@@ -66,7 +66,10 @@ class EbscoAdmin extends ConfigFormBase {
       '#title' => t('Profile Id'),
       '#default_value' => $config->get('ebsco_profile'),
       '#size' => 50,
-      '#description' => t("The API Profile Id."),
+      #'#description' => t("The API Profile Id."),
+      '#attributes' => array(
+        'placeholder' => t('The API Profile Id.'),
+      ),
       '#required' => TRUE,
     ];
 
@@ -75,16 +78,22 @@ class EbscoAdmin extends ConfigFormBase {
       '#title' => t('User Id'),
       '#default_value' => $config->get('ebsco_user'),
       '#size' => 50,
-      '#description' => t("The API User Id."),
+      #'#description' => t("User ID."),
+      '#attributes' => array(
+        'placeholder' => t('User ID.'),
+      ),
       '#required' => TRUE,
     ];
 
     $form['ebsco_credentials']['ebsco_password'] = [
-      '#type' => 'textfield',
+      '#type' => 'password',
       '#title' => t('Password'),
       '#default_value' => $config->get('ebsco_password'),
       '#size' => 50,
-      '#description' => t("The API password."),
+      #'#description' => t("The API password."),
+      '#attributes' => array(
+        'placeholder' => t('The API password.'),
+      ),
       '#required' => TRUE,
     ];
 
@@ -93,7 +102,10 @@ class EbscoAdmin extends ConfigFormBase {
       '#title' => t('Interface Id'),
       '#default_value' => $config->get('ebsco_interface'),
       '#size' => 50,
-      '#description' => t("The API Interface Id."),
+      #'#description' => t("The API Interface Id."),
+      '#attributes' => array(
+        'placeholder' => t('The API Interface Id.'),
+      ),
       '#required' => FALSE,
     ];
 
@@ -111,7 +123,10 @@ class EbscoAdmin extends ConfigFormBase {
       '#title' => t('Organization Id'),
       '#default_value' => $config->get('ebsco_organization'),
       '#size' => 50,
-      '#description' => t("The API Organization Id."),
+      #'#description' => t("The API Organization Id."),
+      '#attributes' => array(
+        'placeholder' => t('The API Organization Id.'),
+      ),
       '#required' => FALSE,
     ];
 

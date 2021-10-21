@@ -26,45 +26,132 @@ class EbscoController extends ControllerBase  {
 	public function content() {
 		return [];
 	}
-	
-	public function advanced() {
 
-		
+	public function advanced()
+	{
+			$is_xhr_results = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 
-		return [
-		'#theme' => 'ebsco_advanced_search'
-		];
-	}
-	
-	public function results() {
-
-		
-
-		return [
-		'#theme' => 'ebsco_results'
-		];
-	}
-
-	public function detailed_record() {
-		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-
-		if ($is_xhr) {
-			return [
-			'#theme' => 'ebsco_result'
-			];
-			return true;
-		}
-		else {
-		// @FIXME
-			return [
-			'#theme' => 'ebsco_result'
+			$resultsFinal = [
+					'#theme' => 'ebsco_advanced_search',
 			];
 
-		}
-		
+			if (empty($_ebsco_document)) {
+					$_ebsco_document = new \EBSCODocument();
+			}
 
+			$_ebsco_document->autocomplete();
+			$autoCompleteRequest = $_ebsco_document->autocomplete();
+			$result = str_replace('&amp;', '&', $autoCompleteRequest);
+			$url = $autoCompleteRequest;
+			$buildAutocomplete = [];
+			$buildAutocomplete['#attached']['library'][] = 'ebsco/autocomplete';
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationToken'] = $url['authenticationToken'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationTimeout'] = $url['authenticationTimeout'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteUrl'] = $url['autocompleteUrl'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteToken'] = $url['autocompleteToken'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteTokenTimeOut'] = $url['autocompleteTokenTimeOut'];
+			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteCustId'] = $url['autocompleteCustId'];
+			$authenticationToken = $url['authenticationToken'];
+			$authenticationTimeout = $url['authenticationTimeout'];
+			$autocompleteUrl = $url['autocompleteUrl'];
+			$autocompleteToken = $url['autocompleteToken'];
+			$autocompleteTokenTimeOut = $url['autocompleteTokenTimeOut'];
+			$autocompleteCustId = $url['autocompleteCustId'];
+
+			if (!$is_xhr_results) {
+					$result = $resultsFinal + $buildAutocomplete;
+
+					return $result;
+			} else {
+					return $result;
+			}
+
+			return $resultsFinal;
 	}
 
+	public function results()
+    {
+        $is_xhr_results = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+
+        $resultsFinal = [
+            '#theme' => 'ebsco_results',
+        ];
+
+        if (empty($_ebsco_document)) {
+            $_ebsco_document = new \EBSCODocument();
+        }
+
+        $_ebsco_document->autocomplete();
+        $autoCompleteRequest = $_ebsco_document->autocomplete();
+        $result = str_replace('&amp;', '&', $autoCompleteRequest);
+        $url = $autoCompleteRequest;
+        $buildAutocomplete = [];
+        $buildAutocomplete['#attached']['library'][] = 'ebsco/autocomplete';
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationToken'] = $url['authenticationToken'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationTimeout'] = $url['authenticationTimeout'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteUrl'] = $url['autocompleteUrl'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteToken'] = $url['autocompleteToken'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteTokenTimeOut'] = $url['autocompleteTokenTimeOut'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteCustId'] = $url['autocompleteCustId'];
+        $authenticationToken = $url['authenticationToken'];
+        $authenticationTimeout = $url['authenticationTimeout'];
+        $autocompleteUrl = $url['autocompleteUrl'];
+        $autocompleteToken = $url['autocompleteToken'];
+        $autocompleteTokenTimeOut = $url['autocompleteTokenTimeOut'];
+        $autocompleteCustId = $url['autocompleteCustId'];
+
+        if (!$is_xhr_results) {
+            $result = $resultsFinal + $buildAutocomplete;
+
+            return $result;
+        } else {
+            return $result;
+        }
+
+        return $resultsFinal;
+    }
+
+		public function detailed_record()
+    {
+        $is_xhr_results = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+
+        $resultsFinal = [
+            '#theme' => 'ebsco_result',
+        ];
+
+        if (empty($_ebsco_document)) {
+            $_ebsco_document = new \EBSCODocument();
+        }
+
+        $_ebsco_document->autocomplete();
+        $autoCompleteRequest = $_ebsco_document->autocomplete();
+        $result = str_replace('&amp;', '&', $autoCompleteRequest);
+        $url = $autoCompleteRequest;
+        $buildAutocomplete = [];
+        $buildAutocomplete['#attached']['library'][] = 'ebsco/autocomplete';
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationToken'] = $url['authenticationToken'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationTimeout'] = $url['authenticationTimeout'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteUrl'] = $url['autocompleteUrl'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteToken'] = $url['autocompleteToken'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteTokenTimeOut'] = $url['autocompleteTokenTimeOut'];
+        $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['autocompleteCustId'] = $url['autocompleteCustId'];
+        $authenticationToken = $url['authenticationToken'];
+        $authenticationTimeout = $url['authenticationTimeout'];
+        $autocompleteUrl = $url['autocompleteUrl'];
+        $autocompleteToken = $url['autocompleteToken'];
+        $autocompleteTokenTimeOut = $url['autocompleteTokenTimeOut'];
+        $autocompleteCustId = $url['autocompleteCustId'];
+
+        if (!$is_xhr_results) {
+            $result = $resultsFinal + $buildAutocomplete;
+
+            return $result;
+        } else {
+            return $result;
+        }
+
+        return $resultsFinal;
+  }
 
 	public function pdf_page() {
 		global $_ebsco_document;
@@ -76,19 +163,19 @@ class EbscoController extends ControllerBase  {
 			}
 			$_ebsco_document->retrieve();
 			$record = $_ebsco_document->record();
-			
+
 			$url=str_replace('&amp;','&',$record->pdf_link);
 
 			header('Location: '.$url);
 			die();
 		}
-		else 
+		else
 		{
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 			//return new RedirectResponse(\Drupal::url('user.page'));
 			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
-		
+
 	}
 
 
@@ -109,7 +196,7 @@ class EbscoController extends ControllerBase  {
 
 		}
 		}
-		
+
 		else {
 		$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 		if ($is_xhr) {
@@ -118,8 +205,7 @@ class EbscoController extends ControllerBase  {
 		}
 		else {
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
-			//return new RedirectResponse(\Drupal::url('user.page'));
-			return new RedirectResponse( Url::fromRoute('user.page')->toString() );		
+			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		}
 	}
@@ -151,7 +237,7 @@ class EbscoController extends ControllerBase  {
 		}
 		else {
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
-			//return new RedirectResponse(\Drupal::url('user.page'));		
+			//return new RedirectResponse(\Drupal::url('user.page'));
 			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		}
@@ -161,7 +247,7 @@ class EbscoController extends ControllerBase  {
 
 	public function exportformat_detail() {
 		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-		
+
 		if ($is_xhr) {
 			return [
 			'#theme' => 'ebsco_exportformat_detail'
@@ -175,9 +261,9 @@ class EbscoController extends ControllerBase  {
 
 		}
 
-	}		
+	}
 
-	
+
 	public function exportformat() {
 		global $_ebsco_document;
 		$params = $_REQUEST;
@@ -190,18 +276,18 @@ class EbscoController extends ControllerBase  {
 			$record = $_ebsco_document->record();
 
 			$url = $_ebsco_document->export();
-			
-		
+
+
 			header('Location: '.$url);
 			die();
 		}
-		else 
+		else
 		{
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 			//return new RedirectResponse(\Drupal::url('user.page'));
 			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
-		
+
 	}
 
 
@@ -229,7 +315,7 @@ class EbscoController extends ControllerBase  {
 		}
 		else {
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
-			//return new RedirectResponse(\Drupal::url('user.page'));		
+			//return new RedirectResponse(\Drupal::url('user.page'));
 			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 		}
@@ -249,17 +335,17 @@ class EbscoController extends ControllerBase  {
 			$record = $_ebsco_document->record();
 
 			$url = $_ebsco_document->citation();
-		
+
 			header('Location: '.$url);
 			die();
 		}
-		else 
+		else
 		{
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
 			//return new RedirectResponse(\Drupal::url('user.page'));
 			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
-		
+
 	}
 
 	public function image_quick_url() {
@@ -273,52 +359,47 @@ class EbscoController extends ControllerBase  {
 			$_ebsco_document->retrieve();
 			$record = $_ebsco_document->record();
 			$url=str_replace('&amp;','&',$record->image_quick_url);
-		
+
 			// redirect on the new window
 			header('Location: '.$url);
 			die();
 		}
-		else 
+		else
 		{
 			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
-			//return new RedirectResponse(\Drupal::url('user.page'));
+
 			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
 		}
 
 	}
 
-	
+
 	public function autocomplete() {
-		// header('Access-Control-Allow-Origin "*"');
-		// header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-		// header('Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, 
-		// Accept, x-client-key, x-client-token, x-client-secret, Authorization');
-		// header('Content-Type: application/json');
-		// header('Accept: application/json');
+
 		global $_ebsco_document;
 
 
 		$params = $_REQUEST;
-		
-	
 
-		if (\Drupal::currentUser()->isAuthenticated()) {
+
+
+
 			if (empty($_ebsco_document)) {
 				$_ebsco_document = new \EBSCODocument();
 			}
 
-	
+
 			$_ebsco_document->autocomplete();
-			
+
 			$autoCompleteRequest = $_ebsco_document->autocomplete();
 
 			$result = str_replace('&amp;','&',$autoCompleteRequest);
-		
-			
+
+
 			$url = $autoCompleteRequest;
 
 			$buildAutocomplete = [];
-	
+
 			$buildAutocomplete['#attached']['library'][] = 'ebsco/autocomplete';
 			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationToken'] = $url['authenticationToken'];
 			$buildAutocomplete['#attached']['drupalSettings']['autocomplete']['authenticationTimeout'] = $url['authenticationTimeout'];
@@ -335,20 +416,13 @@ class EbscoController extends ControllerBase  {
 			$autocompleteCustId = $url['autocompleteCustId'];
 
 			return $buildAutocomplete;
-			
-			header('Location: '.$url);
-			//header('Location: '.$newurl);
-			die();
-		}
-		else 
-		{
-			$_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
-			//return new RedirectResponse(\Drupal::url('user.page'));
-			return new RedirectResponse( Url::fromRoute('user.page')->toString() );
-		}
 
-	
+			header('Location: '.$url);
+			die();
+
+
+
 	}
-	
-	
+
+
 }
