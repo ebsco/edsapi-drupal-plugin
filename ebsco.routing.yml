@@ -27,7 +27,6 @@ ebsco.results:
   defaults:
     _title: 'EDS results list'
     _controller: '\Drupal\ebsco\Controller\EbscoController::results'
-    #_controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
 
@@ -80,7 +79,7 @@ ebsco.exportformat:
 ebsco.exportformat_detail:
   path: '/ebsco/exportformat_detail'
   defaults:
-    _title: 'Detailed RIS 2'
+    _title: 'Export Format Detail'
     _controller: '\Drupal\ebsco\Controller\EbscoController::exportformat_detail'
   requirements:
     _permission: 'access content'
@@ -96,7 +95,7 @@ ebsco.citation_styles_detail:
 ebsco.citation_styles:
   path: '/ebsco/citation_styles'
   defaults:
-    _title: 'Detailed RIS 2'
+    _title: 'Citations Styles'
     _controller: '\Drupal\ebsco\Controller\EbscoController::citation_styles'
   requirements:
     _permission: 'access content'
@@ -104,7 +103,7 @@ ebsco.citation_styles:
 ebsco.autocomplete:
   path: '/ebsco/autocomplete'
   defaults:
-    _title: 'Autocomplete Detail 2'
+    _title: 'Autocomplete'
     _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'

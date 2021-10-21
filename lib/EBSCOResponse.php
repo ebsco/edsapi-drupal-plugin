@@ -72,7 +72,6 @@ class EBSCOResponse
             return (string) $this->response->AutocompleteToken;
         } elseif (!empty($this->response->SearchResult)) {
             return $this->buildSearch();
-
         } elseif (!empty($this->response->Record)) {
             return $this->buildRetrieve();
         } elseif (!empty($this->response->AvailableSearchCriteria)) {
@@ -231,7 +230,7 @@ class EBSCOResponse
                         $url = (string) $link->Url;
                         // If we have an empty url when type is pdflink then just return something so
                         // that the UI check for empty string will pass.
-                        $url = empty($url) && $type == 'pdflink' ? 'http://content.ebscohost.com' : $url;
+                        $url = empty($url) && $type == 'pdflink' ? 'https://content.ebscohost.com' : $url;
                         $links[$type] = $url;
                     }
                 }
@@ -344,17 +343,14 @@ class EBSCOResponse
                     'IsPartOfRelationships' => array(),
                 );
 
-                if (isset($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships)) {
-                    foreach ($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships->HasContributor as $contributor) {
-                        $nameFull = $contributor->PersonEntity->Name->NameFull ?
-                        (string) $contributor->PersonEntity->Name->NameFull : '';
-                        
-                        $result['RecordInfo']['BibRelationships']['HasContributorRelationships'][] = array(
-                            'NameFull' => $nameFull,
-                        );
-                
-                    }
-                }
+                // if ($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships) {
+                //     foreach ($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships->HasContributor as $contributor) {
+                //         $nameFull = $contributor->PersonEntity->Name->NameFull ? (string) $contributor->PersonEntity->Name->NameFull : '';
+                //         $result['RecordInfo']['BibRelationships']['HasContributorRelationships'][] = [
+                //             'NameFull' => $nameFull,
+                //         ];
+                //     }
+                // }
 
                 if ($record->RecordInfo->BibRecord->BibRelationships) {
                     foreach ($record->RecordInfo->BibRecord->BibRelationships->IsPartOfRelationships->IsPartOf as $relationship) {
@@ -475,7 +471,7 @@ class EBSCOResponse
                 }
             }
         }
-        
+
 
         return $results;
     }
@@ -501,7 +497,7 @@ class EBSCOResponse
                     'Action' => (string) $element->AddAction,
                 );
             }
-        
+
 
         // Search fields.
         $tags = array();
@@ -512,8 +508,8 @@ class EBSCOResponse
                 'Code' => (string) $element->FieldCode,
             );
           }
-        
-        
+
+
         $expanders = array();
         // Expanders.
         $elements = $this->response->AvailableSearchCriteria->AvailableExpanders->AvailableExpander;
@@ -526,65 +522,55 @@ class EBSCOResponse
                 'selected' => false,
             );
           }
-        
-       
-        
+
+
+
 
         // RelatedContent.
         // add !empty to check bug
-        $relatedContent = array();
-        $elements = $this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent;
-        $elementsRelatedContent = $this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent;
-       
-            foreach ($elementsRelatedContent as $element) {
-                $relatedContent[] = array(
-                    'Type' => (string) $element->Type,
-                    'Label' => (string) $element->Label,
-                    'Action' => (string) $element->AddAction,
-                    'DefaultOn' => (string) $element->DefaultOn,
-                );
-            }
-    $relatedContent = array();
-    $elements = $this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent;
-        
-            foreach ($elements as $element) {
-                $relatedContent[] = array(
-                    'Type' => (string) $element->Type,
-                    'Label' => (string) $element->Label,
-                    'Action' => (string) $element->AddAction,
-                    'DefaultOn' => (string) $element->DefaultOn,
-                );
-            }
-        
-            
-        
-        
+        // $relatedContent = array();
+        // $elements = $this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent;
+        // $elementsRelatedContent = $this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent;
+
+        //     foreach ($elementsRelatedContent as $element) {
+        //         $relatedContent[] = array(
+        //             'Type' => (string) $element->Type,
+        //             'Label' => (string) $element->Label,
+        //             'Action' => (string) $element->AddAction,
+        //             'DefaultOn' => (string) $element->DefaultOn,
+        //         );
+        //     }
+
+
+
+
 
         // Did you mean.
-        $didYouMean = array();
-        $elements = $this->response->AvailableSearchCriteria->AvailableDidYouMeanOptions->AvailableDidYouMeanOption;
-            foreach ($elements as $element) {
-                $didYouMean[] = array(
-                    'Id' => (string) $element->Id,
-                    'Label' => (string) $element->Label,
-                    'DefaultOn' => (string) $element->DefaultOn,
-                );
-            }
-        
-        
+        // $didYouMean = array();
+        // $elements = $this->response->AvailableSearchCriteria->AvailableDidYouMeanOptions->AvailableDidYouMeanOption;
+        //     foreach ($elements as $element) {
+        //         $didYouMean[] = array(
+        //             'Id' => (string) $element->Id,
+        //             'Label' => (string) $element->Label,
+        //             'DefaultOn' => (string) $element->DefaultOn,
+        //         );
+        //     }
+
+
 
         //ImageQuickView
         $includeImageQuickView = array();
-        $elements = $this->response->AvailableIncludeImageQuickView->IncludeImageQuickViewOptions->IncludeImageQuickViewOption;
-            foreach ($this->response->ViewResultSettings->IncludeImageQuickView as $element) {
-                $includeImageQuickView[] = array(
-                    'Label' => (string) $element->Label,
-                    'Id' => (string) $element->Id,
-                    'DefaultOn' => (string) $element->DefaultOn,
-                );
-            }
-        
-        
+
+        $imagemQuickViewElements = $this->response->ViewResultSettings->IncludeImageQuickView;
+        foreach ($imagemQuickViewElements as $imagemQuickViewElement) {
+            $includeImageQuickView[] = array(
+                'Label' => (string) $imagemQuickViewElement->Label,
+                'Id' => (string) $imagemQuickViewElement->Id,
+                'DefaultOn' => (string) $imagemQuickViewElement->DefaultOn,
+            );
+        }
+
+
 
         // Limiters.
         $limiters = array();
@@ -611,16 +597,16 @@ class EBSCOResponse
                     'selected' => false,
                 );
             }
-        
-        
+
+
 
         $result = array(
             'sort' => $sort,
             'tags' => $tags,
             'expanders' => $expanders,
             'limiters' => $limiters,
-            'relatedContent' => $relatedContent,
-            'didYouMean' => $didYouMean,
+            //'relatedContent' => $relatedContent,
+            //'didYouMean' => $didYouMean,
             'includeImageQuickView' => $includeImageQuickView,
         );
 
@@ -883,6 +869,9 @@ class EBSCOResponse
                 );
             }
         }
+
+        // var_dump($record);
+        // die();
 
         return $result;
 

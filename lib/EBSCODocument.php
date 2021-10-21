@@ -39,7 +39,7 @@ use Drupal\Core\Pager\PagerManagerInterface;
  *
  */
 class EBSCODocument  {
-    
+
     /**
      * The EBSCOAPI object that performs the API calls.
      *
@@ -78,7 +78,7 @@ class EBSCODocument  {
      * The EBSCORecord model returned by a Retrieve API call
      * #global object EBSCORecord.
      */
-    private $record = NULL;
+    private $record = null;
 
     /**
      * The array of EBSCORecord models returned by a Search API call
@@ -236,13 +236,13 @@ class EBSCODocument  {
         ));
 
         $this->params = $params ? $params : $_REQUEST;
-        
-        
+
+
         $this->limit = \Drupal::config('ebsco.settings')->get('ebsco_default_limit') ? \Drupal::config('ebsco.settings')->get('ebsco_default_limit') : $this->limit;
 
         $this->amount = \Drupal::config('ebsco.settings')->get('ebsco_default_amount') ? \Drupal::config('ebsco.settings')->get('ebsco_default_amount') : $this->amount;
     }
-    
+
     /**
      * Perform the API Info call.
      *
@@ -250,10 +250,10 @@ class EBSCODocument  {
      */
     public function info() {
         $this->info = $this->eds->apiInfo();
-        
+
         return $this->info;
 
-        
+
     }
 
     /**
@@ -266,7 +266,7 @@ class EBSCODocument  {
         $this->result = $this->eds->apiRetrieve($an, $db);
 
         return $this->result;
-        
+
     }
 
      /**
@@ -276,11 +276,11 @@ class EBSCODocument  {
      */
     public function export() {
         list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
-        
+
         $this->result = $this->eds->apiExport($an, $db, 'format=ris');
 
         return $this->result;
-        
+
     }
 
     /**
@@ -290,11 +290,11 @@ class EBSCODocument  {
      */
     public function citation() {
         list($an, $db, $styles) = isset($this->params['id']) ? explode('|', $this->params['id'], 3) : array(NULL, NULL, NULL);
-        
+
         $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
 
         return $this->result;
-        
+
     }
 
     public function autocomplete() {
@@ -316,12 +316,10 @@ class EBSCODocument  {
                 'lookfor' => $this->params['lookfor'],
                 'index'   => $this->params['type'],
             );
-            
-        }
-        
-        elseif (isset($this->params['group'])) {
+
+        } elseif (isset($this->params['group'])) {
             $search = $this->params;
-            
+
         }else {
             return array();
             }
@@ -337,12 +335,13 @@ class EBSCODocument  {
 
         // Check if research starters , EMP are active.
         $info = $this->info();
-    
+
         if ($info instanceof EBSCOException) {
             return array();
         }
-        $rs = FALSE;
-        $emp = FALSE;
+
+        $rs = false;
+        $emp = false;
 
         if (isset($info["relatedContent"])) {
             foreach ($info["relatedContent"] as $related) {
@@ -363,7 +362,7 @@ class EBSCODocument  {
 
         $iqv = FALSE;
         if (isset($info["includeImageQuickView"])) {
-            
+
             if ($info["includeImageQuickView"][0]["DefaultOn"] == "y") {
                 $iqv = TRUE;
             }
@@ -371,7 +370,7 @@ class EBSCODocument  {
 
         $stylesItem = '';
         if (isset($info["styles"])) {
-            
+
             if ($info["styles"] == "all") {
                 $stylesItem = TRUE;
             }
@@ -397,7 +396,7 @@ class EBSCODocument  {
         return $this->record;
     }
 
-    
+
 
     /**
      * Get the EBSCORecord models array from results array.
@@ -406,7 +405,7 @@ class EBSCODocument  {
      */
     public function records() {
         if ($this->record instanceof EBSCOException) {
-            
+
             return NULL;
         }
         if ($this->results instanceof EBSCOException) {
@@ -445,8 +444,8 @@ class EBSCODocument  {
 
 
 
-    
-    
+
+
     public function imageQuickViewTerms() {
         $this->imageQuickViewTerms = isset($this->results['imageQuickViewTerms']) ? $this->results['imageQuickViewTerms'] : NULL;
         return $this->imageQuickViewTerms;
@@ -457,8 +456,8 @@ class EBSCODocument  {
         return $this->citationStylesTerms;
     }
 
-  
-    
+
+
     /**
      * Get the pagination HTML string.
      *
@@ -466,12 +465,12 @@ class EBSCODocument  {
      */
     public function pager() {
         $pager = NULL;
-      
+
         try {
             if (!empty($this->has_records())) {
-           
+
                 \Drupal::service('pager.manager')->createPager($this->record_count() / $this->limit, 1)->getCurrentPage();
-          
+
                 $pageId = 1;
                 if (isset($_REQUEST["page"]))
                 {
@@ -485,7 +484,7 @@ class EBSCODocument  {
                     }
                 }
 
-           
+
 
                 $pagerVars = [
                     '#type' => 'pager',
@@ -494,22 +493,22 @@ class EBSCODocument  {
                     '#parameters' => array(),
                     '#quantity' => self::$page_links
                 ];
-    
-                $arrayExample =  [  
+
+                $arrayExample =  [
                     '#type' => 'pager',
                     '#element' => 0,
                     '#parameters' => [],
                     '#quantity' => 5,
                     '#tags' => [],
                     '#route_name' => 'ebsco.results',
-                    
+
                 ];
-                
+
                 $renderer = \Drupal::service('renderer');
                 $renderer->render($pagerVars);
-                
-                $pager = $pagerVars; 
-                
+
+                $pager = $pagerVars;
+
 
                 // remove last page navigation. Does not make sense in discovery navigation
                 $pi=@stripos((string)$pager,'<li class="pager__item pager__item--last">');
@@ -519,7 +518,7 @@ class EBSCODocument  {
                     $s=substr($pager,1,$pi-1).substr($pager,$pf+6,strlen($pager)-($pf+6));
                     $pager=$s;
                 }
-                
+
             }
 
         }
@@ -528,9 +527,9 @@ class EBSCODocument  {
         return $pager;
     }
 
-    
 
-    
+
+
     /********************************************************
      *
      * Getters (class methods)
@@ -719,7 +718,8 @@ class EBSCODocument  {
      * @return array
      */
     public function limiters() {
-        $actions = array(); $ids = array();
+        $actions = array();
+        $ids = array();
         if ($this->info instanceof EBSCOException) {
             return array();
         }
@@ -997,7 +997,7 @@ class EBSCODocument  {
         $_SESSION['EBSCO']['last-search']['current'] = $id;
         return $lastSearch;
     }
-    
+
     /**
      * A recursive array_filter.
      *

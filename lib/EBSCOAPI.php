@@ -13,7 +13,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -129,21 +129,17 @@ class EBSCOAPI {
    *
    * @access public
    */
-  
+
 
   public function authenticationToken(){
 
     $autocompleteTokenTimeOut = time();
-		$authenticationTimeout = 0;
-    //$authenticationTimeout;
-    // $autocompleteUrl = '';
-    // $token = '';
-    // $timeout = '';
-    // $autoToken = '';
-    // //$autocompleteTokenTimeOut = '';
-    // //$autocompleteTokenTimeOut;
-    // $autocompleteTokenTimeOut = 0;
-    // $autocompleteCustId ='';
+    $authenticationTimeout = 0;
+    $autocompleteCustId = '';
+    $token = '';
+    $timeout = '';
+    $autocompleteUrl = '';
+    $autoToken = '';
 
 		if (isset($_SESSION["authenticationToken"])){
             $token = $_SESSION["authenticationToken"];
@@ -159,7 +155,7 @@ class EBSCOAPI {
       $_SESSION["authenticationTimeout"]= $result['authenticationTimeout'];
       $_SESSION['autocompleteUrl'] = $result['autocompleteUrl'];
       $_SESSION['autocompleteToken'] = $result['autocompleteToken'];
-      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];  
+      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];
       $_SESSION['autocompleteCustId'] = $result['autocompleteCustId'];
 		}
 
@@ -169,11 +165,11 @@ class EBSCOAPI {
       $_SESSION["authenticationTimeout"]= $result['authenticationTimeout'];
       $_SESSION['autocompleteUrl'] = $result['autocompleteUrl'];
       $_SESSION['autocompleteToken'] = $result['autocompleteToken'];
-      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];  
+      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];
       $_SESSION['autocompleteCustId'] = $result['autocompleteCustId'];
 
 
-    
+
 
     $result = array(
       'authenticationToken'   => $token,
@@ -409,7 +405,7 @@ class EBSCOAPI {
     }
 
     // We don't have to return anything, both tokens can be accessed using the getters.
-    return TRUE;
+    return true;
   }
 
   /**
@@ -443,13 +439,13 @@ class EBSCOAPI {
   $sortBy = 'relevance',
   $amount = 'detailed',
   $mode = 'all',
-  $rs = FALSE,
-  $emp = FALSE,
-  $autosuggest = FALSE,
-  $includeimagequickview = FALSE,
+  $rs = false,
+  $emp = false,
+  $autosuggest = false,
+  $includeimagequickview = false,
   $styles = '',
-  $IllustrationInfo = FALSE,
-  $autoComplete = FALSE
+  $IllustrationInfo = false,
+  $autoComplete = false
   ) {
     $query = array();
 
@@ -592,7 +588,7 @@ class EBSCOAPI {
         // Specifies whether or not to include highlighting in the search results.
       'highlight'      => 'y',
 
-      
+
       'includeimagequickview' => $includeimagequickview,
 
 
@@ -600,7 +596,7 @@ class EBSCOAPI {
 
       'styles'    => $styles,
 
-    
+
     );
 
     if ($autosuggest == TRUE) {
@@ -655,8 +651,10 @@ class EBSCOAPI {
    * @access public
    */
   public function apiRetrieve($an, $db) {
-    // Add the HTTP query params.
-    //$includeimagequickviewDetail = FALSE;
+
+    $IllustrationInfo = '';
+    $styles = '';
+
     $params = array(
       'an'        => $an,
       'dbid'      => $db,
@@ -667,14 +665,14 @@ class EBSCOAPI {
       'format' => 'ris',
       'styles'    => $styles,
     );
-    
-    $result = $this->request('Retrieve', $params);    
-        
+
+    $result = $this->request('Retrieve', $params);
+
     return $result;
-    
+
   }
 
-  
+
 
   public function apiExport($an, $db) {
 
@@ -683,11 +681,11 @@ class EBSCOAPI {
       'dbid'      => $db,
       'format' => 'ris'
     );
-    
+
     $result = $this->request('Export', $params);
-    
+
     return $result;
-    
+
   }
 
   public function apiCitationStyles($an, $db, $styles) {
@@ -697,14 +695,14 @@ class EBSCOAPI {
       'dbid'      => $db,
       'styles'    => $styles
     );
-    
+
     $result = $this->request('CitationStyles', $params);
-    
+
     return $result;
-    
+
   }
 
-  
+
   /**
    * Wrapper for info API call.
    *
@@ -728,15 +726,13 @@ class EBSCOAPI {
 
   public function apiAutoComplete(){
       if(self::$autocomplete == 'y'){
-        // var_dump($autocomplete);
-        // die();
         return true;
       }
       else{
         return false;
       }
   }
-  
+
 
   /**
    * Handle a PEAR_Error. Return :

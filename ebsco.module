@@ -69,14 +69,14 @@ function hooks_ebsco_help($path, $arg) {
     switch ($path) {
         case "admin/help#ebsco":
             $output .= '<h2>'.  t("Full-text articles and eBooks from EBSCOhost Discovery Services") .'</h2>';
-            $output .= '<p>'. t("EBSCO Discovery Service provides users with an easy, yet powerful means of accessing all of 
+            $output .= '<p>'. t("EBSCO Discovery Service provides users with an easy, yet powerful means of accessing all of
                 an institution's information resources through a single search.") .'</p>';
-            $output .= '<p>'. t("This is achieved by harvesting metadata from both internal (library) and external (database vendors) sources, 
+            $output .= '<p>'. t("This is achieved by harvesting metadata from both internal (library) and external (database vendors) sources,
                 and creating a pre-indexed service of unprecedented size and speed.") .'</p>';
-            $output .= '<p>'. t("Although the resulting collection can be massive in size and scope, the fact that it is indexed locally 
+            $output .= '<p>'. t("Although the resulting collection can be massive in size and scope, the fact that it is indexed locally
                 (on the EBSCOhost&reg; servers) allows for exceptionally fast search response times.") .'</p>';
-            $output .= '<p>'. t("As no two institutions are the same, EBSCO Discovery Service offers a vast array of customization options with 
-                regard to both the underlying collection of metadata as well as the front-end delivery of search results. 
+            $output .= '<p>'. t("As no two institutions are the same, EBSCO Discovery Service offers a vast array of customization options with
+                regard to both the underlying collection of metadata as well as the front-end delivery of search results.
                 All of this functionality is based upon the powerful EBSCOhost search experience familiar to researchers worldwide.") .'</p>';
             break;
     }
@@ -148,7 +148,7 @@ function ebsco_basic_search_form() {
         $default_value =  $params['lookfor'] ;
     }
 
-    
+
 
     $form['basic']['lookfor'] = array(
         '#id'            => 'lookfor',
@@ -166,7 +166,7 @@ function ebsco_basic_search_form() {
         ),
     );
 
-  
+
 
     $default_value = isset($params['type']) ? $params['type'] : '';
     $form['basic']['type'] = array(
@@ -188,12 +188,12 @@ function ebsco_basic_search_form() {
         '#type'  => 'ul',
         '#attributes'    => array(
             'data-js'    => 'autocomplete'
-            
+
         ),
     );
     $formautocomplete = '<div id="autocomplete" class="autocomplete" data-js="autocomplete"><ul></ul></div>';
 
-   
+
 
     if (isset($params['filter'])) {
         foreach($params['filter'] as $key => $value) {
@@ -214,8 +214,8 @@ function ebsco_basic_search_form() {
         );
     }
     echo $formautocomplete;
-    
-    
+
+
     return $form;
 }
 
@@ -227,10 +227,10 @@ function ebsco_basic_search_form() {
 function template_preprocess_ebsco_basic_search(&$variables) {
     global $Document;
     $params = $_REQUEST;
-    
+
     $variables['#attached']['library'][] = 'ebsco/global-styling';
 
-    
+
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -253,10 +253,11 @@ function template_preprocess_ebsco_basic_search(&$variables) {
             }
         }
     }
-    $form=ebsco_basic_search_form();
+    $form = ebsco_basic_search_form();
     $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
     $variables['advanced_search_url'] =  \Drupal\Core\Url::fromRoute('ebsco.advanced',  array())->toString();
-    $variables['search_form'] = \Drupal::service('renderer')->render($form);
+    //$variables['search_form'] = \Drupal::service('renderer')->render($form);
+    $variables['search_form'] = array_merge($form);
 
 }
 
@@ -711,7 +712,7 @@ function ebsco_advanced_search_form() {
         '#type'  => 'reset',
         '#name'  => 'reset',
         '#value' => t('Clear')
-        
+
     );
 
     return $form;
@@ -747,7 +748,7 @@ function template_preprocess_ebsco_results(&$variables) {
     global $Document;
     $params = $_REQUEST;
 
-    
+
     $variables['#attached']['library'][] = 'ebsco/global-styling';
     $variables['#attached']['library'][] = 'ebsco/global-scripts';
 
@@ -764,8 +765,8 @@ function template_preprocess_ebsco_results(&$variables) {
     }
 
     $Document->search();
-   
- 
+
+
 
     $variables['records'] = $Document->records();
     $_SESSION['records'] = $Document->records();
@@ -801,15 +802,15 @@ function template_preprocess_ebsco_results(&$variables) {
 
     // process records
     if ($Document->has_records()){
-        
+
         if (!\Drupal::currentUser()->isAuthenticated()) {
-            
+
             $link = '<a href="' . \Drupal\Core\Url::fromRoute('user.page')->toString() . '">' . t('Login') . '</a>';
             $variables["guestbanner"] ='<p class="top-login-message">'
                 . sprintf(t('Hello, Guest. %s for full access.'), $link)
                 .'</p>';
 
-                
+
         }
 
         $tabs = "";
@@ -867,7 +868,7 @@ function template_preprocess_ebsco_results(&$variables) {
                             case "Ab":
                                 $rsAbstract = $it["Data"];
                                 break;
-                            
+
                             case "Dbl":
                                 $rsDbLabel = $it["Data"];
                                 break;
@@ -877,7 +878,7 @@ function template_preprocess_ebsco_results(&$variables) {
                             case "Dbl":
                                 $rsCitationStyles = $it["Data"];
                                 break;
-                                
+
                         }
                     }
 
@@ -902,7 +903,7 @@ function template_preprocess_ebsco_results(&$variables) {
                     if ($rsAbstract <> ""){
                         $tabsContent .= '<p><cite>' . $rsAbstract . '</cite></p>';
                     }
-                    
+
                     if ($rsDbLabel <> ""){
                         $tabsContent .= '<p><h1>' . $rsDbLabel . '</h1></p>';
                     }
@@ -915,14 +916,14 @@ function template_preprocess_ebsco_results(&$variables) {
                         $tabsContent .= '<p><h1>' . $rsCitationStyles . '</h1></p>';
                     }
 
-                    
+
 
                     $tabsContent .= '</div></div>';
                 }
 
                 // Replated publications.
                 if  (isset($item["RelatedPublication"])) {
-                    
+
                     $tabs .= '<li data-target="#ematchplacard" data-slide-to="' . $counter . '" ' . ($counter == 0 ? ' class="active" ' : ' ') . '></li>';
                     $counter++;
 
@@ -980,8 +981,8 @@ function template_preprocess_ebsco_results(&$variables) {
                     break;
                 }
             }
-        } 
-        
+        }
+
         if ($tabsContent <> "") {
             $variables["relatedContent"].= '<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 
@@ -1017,7 +1018,7 @@ function template_preprocess_ebsco_results(&$variables) {
             $recordUrl= \Drupal\Core\Url::fromRoute('ebsco.detailedrecord', array('id' => $id))->toString();
             $fulltextUrl= \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
             $pdfUrl= \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-                        
+
 
             $recordHtml="<li>"
                 .'<div class="record-number floatleft">'.$record->result_id.'</div>'
@@ -1087,11 +1088,11 @@ function template_preprocess_ebsco_results(&$variables) {
             if (!empty($record->db_label)){
                 $recordHtml.='<br><strong>' . t('Database') . '</strong>:<span class="quotestart">' . str_replace('<br />', ', ', $record->db_label) . '</span>';
             }
-            
+
             $recordHtml.='</div>';
 
 
-            $recordHtml.='<div class="result-line5">';       
+            $recordHtml.='<div class="result-line5">';
             if (!empty($record->image_quick_view)){
                 $recordHtml.='<div><strong>' . t('Images') . ':</strong></div>';
                 $recordHtml.='<div class="iqv-custom">';
@@ -1103,8 +1104,8 @@ function template_preprocess_ebsco_results(&$variables) {
                     <img class="iqv-item"  src="' . $iqv['Url'] . '" alt="' . $iqv['Type'] . '" title="' . $iqv['Type'] . '">
                 </a>';
                 }
-                $recordHtml.='</div>';    
-            }    
+                $recordHtml.='</div>';
+            }
             $recordHtml.='</div>';
 
             // custom link processing
@@ -1135,7 +1136,7 @@ function template_preprocess_ebsco_results(&$variables) {
             $recordHtml.='<div class="result-line5">';
             if ($record->full_text_availability){
                 $recordHtml.= '<a href="' . $fulltextUrl . '#html" class="icon html fulltext _record_link">'.t('HTML full text')."</a>&nbsp; &nbsp;";
-                
+
             }
 
             if ($record->pdf_availability){
@@ -1190,7 +1191,7 @@ function template_preprocess_ebsco_results(&$variables) {
                 }
             }
         }
-        
+
         $variables['results_url'] =  \Drupal\Core\Url::fromRoute('ebsco.results',  array())->toString();
         $variables['advanced_search_url'] =  \Drupal\Core\Url::fromRoute('ebsco.advanced',  array())->toString();
         $variables['search_form'] = \Drupal::service('renderer')->render($form);
@@ -1229,7 +1230,7 @@ function template_preprocess_ebsco_advanced_search(&$variables) {
 }
 
 function tmeplate_preprocess_ebsco__page(array &$variables) : void {
-	//Module name: 'mymodule', library name: 'mymodule'. 
+	//Module name: 'mymodule', library name: 'mymodule'.
 	$variables['#attached']['library'][] = 'ebsco/ebsco';
 }
 
@@ -1245,6 +1246,9 @@ function template_preprocess_ebsco_result(&$variables) {
     $params = $_REQUEST;
 
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
+
+    //$iqv = ['An', 'DbId'];
+    $iqv = array('An', 'DbId');
 
     $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
     if (empty($Document)) {
@@ -1262,44 +1266,45 @@ function template_preprocess_ebsco_result(&$variables) {
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
    // $clipboardLibrary="";
     $detailRecordHTML="";
-    
+
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
         $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();
         $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
-        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+        //$iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv = 'An' . "|" . $iqv = 'DbId'))->toString();
 
         $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
 
         $citationStylesDetailRecord = \Drupal\Core\Url::fromRoute('ebsco.citation_styles_detail', array('id' => $id))->toString();
 
-        
+
         $detailRecordHTML.='<div class="ebsco-record detailrecord-2columns">'
             .'<div>'
             .'<div class="detailrecord-links">	'
 
             .'<ul class="external-links">';
-        
+
 
         if($record->record_id){
-            
+
             $detailRecordHTML.= "
-            
+
             <li>
             <i class='quote-style'></i>
-            <a class='use-ajax' data-dialog-options='{&quot;width&quot;:800}' 
+            <a class='use-ajax' data-dialog-options='{&quot;width&quot;:800}'
             data-dialog-type='modal'  href='" . $citationStylesDetailRecord . "|all'>" . t('Citations Styles') . "</a>
             </li>";
 
         }
-    
+
         if($record->record_id){
 
             $detailRecordHTML.= "<li> <a href='" . $exportFormatDetail . "&format=ris'>" . t('RIS Export') . "</a></li>";
         }
 
-    
+
 
 
         if($record->p_link){
@@ -1364,7 +1369,7 @@ function template_preprocess_ebsco_result(&$variables) {
 
         $detailRecordHTML.='</div class="span-13">';
         if($record->p_link){
-            
+
             $detailRecordHTML.= '
             <input class="text-permalink" data-js="my-input" type="text" value="' . $record->p_link . '">
             <div class="tooltip">
@@ -1373,14 +1378,14 @@ function template_preprocess_ebsco_result(&$variables) {
                     <i class="fa fa-paperclip" aria-hidden="true"></i>
                 </button>
                 <script type="text/javascript">
-                    
+
                     var $clipboard = document.querySelector(\'[data-js="button-clipboard"]\');
                     var $clipboardout = document.getElementById("button-clipboard-out");
                     var $clipboardout = document.querySelector(\'[data-js="button-clipboard-out"]\');
                     console.log($clipboard);
                     console.log($clipboardout);
 
-                    
+
                     $clipboard.addEventListener(\'click\', handleClip, false);
 
                     function handleClip() {
@@ -1389,7 +1394,7 @@ function template_preprocess_ebsco_result(&$variables) {
                         copyText.setSelectionRange(0, 99999);
                         document.execCommand("copy");
                         var tooltip = document.querySelector(\'[data-js="button-clipboard-out"]\');
-                        tooltip.innerHTML = "Copied: " + copyText.value;  
+                        tooltip.innerHTML = "Copied: " + copyText.value;
                     }
 
 
@@ -1410,7 +1415,7 @@ function template_preprocess_ebsco_result(&$variables) {
 
         $detailRecordHTML.='<div class="span-13">'
             .' <table cellpadding="2" cellspacing="0" border="0" class="citation" summary="'.t('Bibliographic Details').'">';
-    
+
 
         foreach ($record->items as $item){
             if (!empty($item['Data'])){
@@ -1425,7 +1430,7 @@ function template_preprocess_ebsco_result(&$variables) {
             $detailRecordHTML.='<tr valign="top">'
                 .'<th width="150">' . t('Database') . ':</th><td>' . \Drupal\Component\Utility\Html::escape($record->db_label) . '</td>'
                 .'</tr>';
-        }        
+        }
 
         if ($record->full_text){
             $detailRecordHTML.='<tr id="html" valign="top">'
@@ -1447,9 +1452,9 @@ function template_preprocess_ebsco_result(&$variables) {
             .'</div>'
         ;
 
-        
+
         if ($record->medium_thumb_link){
-        
+
             $detailRecordHTML.='<img src="' . UrlHelper::filterBadProtocol($record->medium_thumb_link) . '" class="book-jacket" alt="' . t('Book jacket') . '"/>';
         }
 
@@ -1459,14 +1464,14 @@ function template_preprocess_ebsco_result(&$variables) {
         $detailRecordHTML.='</div>'
 
             .'</div>'
-        
+
         ;
 
         $detailRecordHTML.='<div class="clear"></div>';
 
         $detailRecordHTML.='</div>';
 
-            
+
     }
 
 
@@ -1484,8 +1489,8 @@ to IQV records
 function template_preprocess_ebsco_image_quick_view(&$variables) {
     $params = $_REQUEST;
 
-  
-    
+
+
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
 
@@ -1496,7 +1501,7 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     $Document->retrieve();
     $record = $Document->record();
 
-   
+
     $variables['record'] = $record;
     $lastSearch['count'] = $Document->record_count();
     $variables['count'] = $Document->record_count();
@@ -1508,13 +1513,13 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
-        $iqv = [];
-        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
-
-        
+        $iqv = array();
+        $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view',  array('id' => $iqv = 'An' . "|" . $iqv = 'DbId'))->toString();
 
 
-        $detailImageQuickViewHTML.='<div class="result-line5">';       
+
+
+        $detailImageQuickViewHTML.='<div class="result-line5">';
             if (!empty($record->title) &&
                 !empty($record->source) &&
                 !empty($record->type) &&
@@ -1528,7 +1533,7 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
                     $detailImageQuickViewHTML.='<div><strong>' . t('Images Informations') . ':</strong></div>';
                     $detailImageQuickViewHTML.='<a href="' . $record->illustrationinfo['Target'] . '" target="_blank"><img class="iqv-item" src="' . $record->illustrationinfo['Target'] . '"></a>';
 
-                    
+
                     $detailImageQuickViewHTML.='<div><table>
                         <tr>
                             <th>Descriptions</th>
@@ -1555,11 +1560,11 @@ function template_preprocess_ebsco_image_quick_view(&$variables) {
                             <td>' . $record->permission['Data'] . '</td>
                         </tr>
                 </table></div>';
-                    
-            }    
+
+            }
         $detailImageQuickViewHTML.='</div>';
 
-            
+
     }
 
     $variables['imagequickviewrecord'] = $detailImageQuickViewHTML;
@@ -1589,8 +1594,8 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
         $Document = new EBSCODocument();
     }
 
-    
-    
+
+
     $Document->retrieve();
     $record = $Document->record();
     $Document->export();
@@ -1602,28 +1607,31 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
     $variables['last_search'] = $_SESSION['EBSCO']['lastsearch'];
     $risDetailViewHTML="";
-    
-    
+
+
     if (isset($record) ){
 
         $id = \Drupal\Component\Utility\Html::escape($record->record_id());
         $fulltextUrl = \Drupal\Core\Url::fromRoute('ebsco.fulltext', array('id' => $id))->toString();;
         $pdfUrl = \Drupal\Core\Url::fromRoute('ebsco.pdf', array('id' => $id))->toString();
+
+
         $iqvUrl= \Drupal\Core\Url::fromRoute('ebsco.image_quick_view', array('id' => $iqv['An'] . "|" . $iqv['DbId']))->toString();
+
 
         $exportFormatDetail = \Drupal\Core\Url::fromRoute('ebsco.exportformat_detail', array('id' => $id))->toString();
 
-        
-            
+
+
             $exportFormat = $Document->export();
             $filename = $_REQUEST['an'].'delivery'.$_REQUEST['db'].'.ris';
             header('Content-Type: application/x-research-info-systems');
             header('Content-Disposition: inline; filename="'.$filename.'"');
             echo (string)$exportFormat;
             exit;
-            
+
         }
-            
+
 
 
     $variables['exportformatrecord'] = $risDetailViewHTML;
@@ -1639,9 +1647,9 @@ function template_preprocess_ebsco_exportformat_detail(&$variables) {
 function template_preprocess_ebsco_citation_styles_detail(&$variables) {
 
     $params = $_REQUEST;
-    
-    
-    
+
+
+
     $params['op'] = isset($params['op']) ? $params['op'] : 'Next';
 
    $_SESSION['EBSCO']['redirect'] = \Drupal::destination()->getAsArray();
@@ -1649,11 +1657,11 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
         $Document = new EBSCODocument();
     }
 
-   
-    
+
+
     $Document->retrieve();
     $record = $Document->record();
-    $recordCitation = $Document->citation();    
+    $recordCitation = $Document->citation();
 
     $variables['record'] = $recordCitation;
     $lastSearch['count'] = $Document->record_count();
@@ -1661,23 +1669,23 @@ function template_preprocess_ebsco_citation_styles_detail(&$variables) {
 
     $lastSearch = isset($params['id']) ? $Document->search_read($params['id'], $params['op']) : 'fail';
     $citationsStylesViewHTML="";
-    
+
 
     if (isset($recordCitation) ){
 
-        
+
        $id = \Drupal\Component\Utility\Html::escape($record->record_id());
 
 
         if(!empty($recordCitation)) {
             foreach($variables['record']['Citation'] as $citationIndex) {
-                
+
                 $citationsStylesViewHTML.= '<div><strong><h2>' . $citationIndex['Label'] . '</h2></strong></div>';
                 $citationsStylesViewHTML.= '<div>' . $citationIndex['SectionLabel'] . '</div>';
                 $citationsStylesViewHTML.= '<div>' . $citationIndex['Data'] . '</div>';
-                $citationsStylesViewHTML.= '<div>' . $citationIndex['Caption'] . '</div>';        
+                $citationsStylesViewHTML.= '<div>' . $citationIndex['Caption'] . '</div>';
             }
-        
+
 
         }
 
@@ -1872,8 +1880,7 @@ function remove_filter_link($filter)
             }
         }
     }
-    return url('ebsco/results', array('query' => $params));
-    //return \Drupal\Core\Url::fromRoute('ebsco.results',  $params)->toString();
+    return \Drupal\Core\Url::fromRoute('ebsco.results',  $params)->toString();
 }
 
 
@@ -1896,5 +1903,5 @@ function auto_link($string) {
 }
 
 /**
- * 
+ *
  */
