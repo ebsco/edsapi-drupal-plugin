@@ -7,7 +7,9 @@
 ![Packagist](https://img.shields.io/packagist/v/ebsco/edsapi-drupal8-plugin.svg)
 
 ## Installation
-`$ composer require ebsco/edsapi-drupal8-plugin`
+`$ composer require ebsco/edsapi-drupal-plugin`
+## Installation to a specific branch
+git clone --branch edsapi-drupal9-plugin git@github.com:ebsco/edsapi-drupal-plugin.git
 
 ## Usage
 
@@ -15,15 +17,15 @@
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ebsco/edsapi-drupal8-plugin.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ebsco/edsapi-drupal-plugin.
 
 
 # Setup 
 
-EBSCO module for Drupal 8
+EBSCO module for Drupal 9
 1. Description
 
-The EBSCO module adds the search capabilities of EBSCO Discover service to an existing Drupal 7 installation.
+The EBSCO module adds the search capabilities of EBSCO Discover service to an existing Drupal 9 installation.
 
 2. Features
 
